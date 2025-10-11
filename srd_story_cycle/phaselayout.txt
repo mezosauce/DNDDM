@@ -1,0 +1,251 @@
+1. SETUP & INTRODUCTION
+Establishing the world and characters
+Files:
+
+01_world_building/
+
+races.md - Character ancestry and culture
+backgrounds.md - Character history and motivations
+setting_basics.md - Planes of existence, cosmology
+languages.md - Communication options
+
+
+02_character_creation/
+
+classes.md - Hero archetypes and roles
+ability_scores.md - Core character attributes
+alignment.md - Moral compass
+equipment_starting.md - Initial gear
+
+
+
+Story Purpose: Who are the heroes? What world do they inhabit?
+
+2. THE CALL TO ADVENTURE
+Inciting incidents and motivation
+Files:
+
+03_hooks_and_motivation/
+
+adventure_hooks.md - Quest starters
+backgrounds_expanded.md - Personal stakes
+factions.md - Organizations that might call on PCs
+gods_and_pantheons.md - Divine callings
+
+
+
+Story Purpose: Why do the heroes embark on this journey?
+
+3. PREPARATION & PLANNING
+Getting ready for the adventure
+Files:
+
+04_equipping/
+
+equipment_full.md - All available gear
+weapons.md - Combat tools
+armor.md - Protection
+adventuring_gear.md - Utility items
+tools.md - Profession equipment
+
+
+05_learning_abilities/
+
+spells_by_level.md - Magic progression
+class_features.md - Special abilities
+feats.md - Character improvements
+
+
+
+Story Purpose: How do heroes prepare for challenges ahead?
+
+4. JOURNEY & EXPLORATION
+The adventure unfolds
+Files:
+
+06_travel/
+
+movement.md - Travel speeds and methods
+mounts_and_vehicles.md - Transportation
+environment_rules.md - Terrain, weather, survival
+time_tracking.md - Rests, long journeys
+
+
+07_discovery/
+
+ability_checks.md - Skill usage
+investigation.md - Finding clues
+perception.md - Noticing details
+social_interaction.md - NPC encounters
+
+
+
+Story Purpose: What do the heroes experience on their journey?
+
+5. OBSTACLES & CHALLENGES
+Complications arise
+Files:
+
+08_environmental_hazards/
+
+traps.md - Mechanical dangers
+hazards.md - Natural threats
+diseases_and_poisons.md - Afflictions
+exhaustion.md - Resource depletion
+
+
+09_social_conflict/
+
+persuasion_deception.md - Social mechanics
+npc_attitudes.md - Relationship rules
+intimidation.md - Coercion
+
+
+
+Story Purpose: What stands in the heroes' way?
+
+6. CONFRONTATION & COMBAT
+Major conflicts and battles
+Files:
+
+10_combat_basics/
+
+initiative.md - Turn order
+actions_in_combat.md - What you can do
+movement_combat.md - Positioning
+attack_rolls.md - Hitting targets
+damage_and_healing.md - HP management
+
+
+11_tactical_combat/
+
+conditions.md - Status effects
+cover_and_concealment.md - Tactical positioning
+special_attacks.md - Grappling, shoving, etc.
+mounted_combat.md - Fighting on horseback
+
+
+12_monsters/
+
+monsters_by_cr.md - Organized by difficulty
+monster_abilities.md - Special traits
+legendary_creatures.md - Boss fights
+
+
+
+Story Purpose: How do heroes overcome direct opposition?
+
+7. CRISIS & SETBACK
+Things get worse before they get better
+Files:
+
+13_consequences/
+
+death_and_dying.md - Character mortality
+exhaustion_stress.md - Pushing limits
+curses_and_afflictions.md - Lasting problems
+equipment_damage.md - Resource loss
+
+
+
+Story Purpose: What is the cost of the adventure?
+
+8. MAGIC & EXTRAORDINARY SOLUTIONS
+Special powers and supernatural elements
+Files:
+
+14_spellcasting/
+
+magic_basics.md - How magic works
+spell_slots.md - Resource management
+concentration.md - Maintaining spells
+spell_lists/
+
+combat_spells.md
+utility_spells.md
+healing_spells.md
+divination_spells.md
+
+
+
+
+15_magic_items/
+
+magic_items_by_rarity.md
+artifacts.md - Legendary items
+cursed_items.md - Dangerous treasures
+
+
+
+Story Purpose: What extraordinary means do heroes use?
+
+9. CLIMAX & RESOLUTION
+The final challenge
+Files:
+
+16_boss_encounters/
+
+legendary_actions.md - Epic combat rules
+lair_actions.md - Environmental boss mechanics
+high_level_threats.md - CR 15+ creatures
+
+
+17_resolution_mechanics/
+
+quest_completion.md
+rewards.md - Treasure and XP
+
+
+
+Story Purpose: How does the story conclude?
+
+10. AFTERMATH & GROWTH
+Consequences and character development
+Files:
+
+18_downtime/
+
+downtime_activities.md - Between adventures
+crafting.md - Creating items
+training.md - Learning new skills
+business.md - Running establishments
+
+
+19_advancement/
+
+leveling_up.md - Character progression
+experience_points.md - XP rules
+milestone_advancement.md - Alternative progression
+
+
+
+Story Purpose: How have the heroes changed?
+
+11. NEW HORIZONS
+Setup for the next adventure
+Files:
+
+20_world_changes/
+
+fame_and_renown.md - Reputation
+political_consequences.md - World impact
+new_opportunities.md - Future hooks
+
+
+21_campaign_continuation/
+
+story_threads.md - Unresolved plots
+escalating_threats.md - Bigger challenges
+
+
+
+Story Purpose: What comes next?
+
+REFERENCE MATERIALS
+Quick lookup during any story phase
+Files:
+
+ref_conditions_quick.md - Fast condition lookup
+ref_actions_quick.md - Action economy cheatsheet
+ref_common_dcs.md - Difficulty class guide
+ref_random_tables.md - Quick generation tools

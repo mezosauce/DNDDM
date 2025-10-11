@@ -84,7 +84,7 @@ class OllamaDM:
         self,
         srd_path: str,
         ollama_url: str = "http://localhost:11434",
-        default_model: str = "llama2:13b"
+        default_model: str = "llama3.2:3b"
     ):
         self.srd_path = srd_path
         self.router = QueryRouter(srd_path)
@@ -192,10 +192,10 @@ DM:"""
             game_state.current_phase
         )
         
-        # Load relevant SRD content (increased for llama2:13b - better context handling)
+        # Load relevant SRD content (optimized for llama3.2:3b)
         srd_content = self.loader.load_files(
             routing['files_to_load'],
-            max_chars=20000  # Llama2:13b can handle more context than smaller models
+            max_chars=15000  # Balanced context for 3B models
         )
         
         # Create the prompt
@@ -216,10 +216,10 @@ DM:"""
                     "stream": stream,
                     "options": {
                         "temperature": temperature,
-                        "num_predict": 600,  # Increased for llama2:13b - better quality responses
+                        "num_predict": 500,  # Optimized for llama3.2:3b
                         "top_p": 0.9,
                         "top_k": 40,
-                        "repeat_penalty": 1.1  # Helps reduce repetition
+                        "repeat_penalty": 1.1
                     }
                 },
                 timeout=120
@@ -271,7 +271,7 @@ DM:"""
         
         # Route and prepare
         routing = self.router.get_context_files_for_ai(query, game_state.current_phase)
-        srd_content = self.loader.load_files(routing['files_to_load'], max_chars=20000)  # More context for llama2:13b
+        srd_content = self.loader.load_files(routing['files_to_load'], max_chars=15000)  # Optimized for 3B models
         prompt = self.create_prompt(query, game_state, routing['ai_instructions']['context'], srd_content)
         
         try:
@@ -281,7 +281,7 @@ DM:"""
                     "model": model,
                     "prompt": prompt,
                     "stream": True,
-                    "options": {"temperature": temperature, "num_predict": 600, "repeat_penalty": 1.1}
+                    "options": {"temperature": temperature, "num_predict": 500, "repeat_penalty": 1.1}
                 },
                 stream=True,
                 timeout=120
@@ -320,14 +320,14 @@ STEP 3: Download a Model (one-time, ~4-8GB)
 -------------------------------------------
 Recommended models for D&D:
 
-🧠 BEST CHOICE: Llama 2 13B (best quality, you chose this!)
-    ollama pull llama2:13b
+🌟 BEST FOR PI 5 (8GB): Llama 3.2 3B (optimal balance)
+    ollama pull llama3.2:3b
 
-🌟 ALTERNATIVE: Mistral 7B (balanced speed + quality)
+⚡ FAST ALTERNATIVE: Phi 3 3.8B (quick responses)
+    ollama pull phi3:3.8b
+
+🧠 QUALITY OPTION: Mistral 7B (best quality, uses more RAM)
     ollama pull mistral:7b
-
-⚡ FAST: Llama 2 7B (faster, good quality)  
-    ollama pull llama2:7b
 
 🎯 D&D OPTIMIZED: Neural Chat
     ollama pull neural-chat:7b
@@ -340,7 +340,7 @@ That's it! 100% FREE, no API keys, no subscriptions! 🎲
 """)
 
 
-def interactive_session(srd_path: str, model: str = "llama2:13b"):
+def interactive_session(srd_path: str, model: str = "llama3.2:3b"):
     """Run an interactive AI DM session"""
     
     print("╔══════════════════════════════════════════════════════════════╗")
@@ -483,8 +483,8 @@ def main():
     
     parser.add_argument(
         "--model",
-        default="llama2:13b",
-        help="Ollama model to use (default: llama2:13b)"
+        default="llama3.2:3b",
+        help="Ollama model to use (default: llama3.2:3b - optimized for Pi 5 8GB)"
     )
     
     parser.add_argument(
