@@ -10,6 +10,7 @@ import secrets
 import os
 from pathlib import Path
 from datetime import datetime
+from prompt_templates import PromptTemplates, create_full_prompt
 
 # Import campaign manager
 from campaign_manager import CampaignManager, Character, get_campaign_manager
@@ -28,6 +29,7 @@ app.config['SECRET_KEY'] = secrets.token_hex(16)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Initialize systems
+prompt_templates = PromptTemplates()
 campaign_mgr = get_campaign_manager()
 SRD_PATH = "./srd_story_cycle"
 dm = None
@@ -162,28 +164,114 @@ def ai_assist(campaign_name):
         return jsonify({'error': 'AI not available'}), 503
     
     try:
-        # Get campaign context
-        context = campaign_mgr.get_campaign_context(campaign_name)
-        campaign = context['campaign']
+        # Load campaign
+        campaign = campaign_mgr.load_campaign(campaign_name)
+        characters = campaign_mgr.get_characters(campaign_name)
         
-        # Create game state based on phase
-        game_state = GameState(
-            current_phase=context['available_story_phases'][0],  # Use first available story phase
-            party_level=1,
-            location=campaign['name'],
-            active_combat=False,
-            recent_events=[]
+        # Determine phase (prep or active)
+        if campaign.current_phase == "call_to_adventure":
+            phase = 'prep'
+        else:
+            phase = 'active'
+        
+        # Build campaign context
+        campaign_context = {
+            'name': campaign.name,
+            'description': campaign.description,
+            'party_size': campaign.party_size,
+            'characters': [
+                {
+                    'name': char.name,
+                    'race': char.race,
+                    'char_class': char.char_class,
+                    'level': char.level,
+                    'hp': char.hp,
+                    'max_hp': char.max_hp,
+                    'ac': char.ac,
+                    'stats': char.stats
+                }
+                for char in characters
+            ],
+            'session_number': campaign.session_number,
+            'current_location': getattr(campaign, 'current_location', 'Unknown'),
+            'active_combat': getattr(campaign, 'active_combat', False),
+            'recent_events': getattr(campaign, 'recent_events', [])
+        }
+        
+        # Load relevant SRD content
+        srd_content = ""
+        try:
+            from ai_dm_query_router import QueryRouter
+            from ai_dm_free import SRDContentLoader
+            
+            router = QueryRouter(SRD_PATH)
+            # Use first available story phase as current phase
+            story_phase = campaign_mgr.get_available_story_phases(campaign.current_phase)[0] if hasattr(campaign_mgr, 'get_available_story_phases') else ''
+            routing = router.route_query(query, current_phase=story_phase)
+            
+            # Load more files for active phase, fewer for prep
+            max_files = 5 if phase == 'active' else 3
+            max_chars = 15000 if phase == 'active' else 10000
+            
+            if routing['files_to_load']:
+                loader = SRDContentLoader(SRD_PATH)
+                srd_content = loader.load_files(
+                    routing['files_to_load'][:max_files], 
+                    max_chars=max_chars
+                )
+        except Exception as e:
+            print(f"SRD loading warning: {e}")
+        
+        # Create full prompt using template system
+        full_prompt = create_full_prompt(
+            phase=phase,
+            campaign_context=campaign_context,
+            query=query,
+            srd_content=srd_content
         )
         
-        # Get AI response with campaign context
-        result = dm.get_response(query, game_state)
+        # Get AI response using Ollama
+        import requests
         
-        if 'error' in result:
-            return jsonify(result), 500
+        ollama_url = "http://localhost:11434/api/generate"
+        payload = {
+            "model": dm.default_model,
+            "prompt": full_prompt,
+            "stream": False,
+            "options": {
+                "temperature": 0.7,
+                "num_predict": 500 if phase == 'active' else 400,
+                "repeat_penalty": 1.1
+            }
+        }
         
-        return jsonify(result)
+        response = requests.post(ollama_url, json=payload, timeout=60)
+        response.raise_for_status()
+        
+        ai_response = response.json().get('response', '').strip()
+        
+        # Update recent events if in active phase
+        if phase == 'active':
+            if not hasattr(campaign, 'recent_events'):
+                campaign.recent_events = []
+            campaign.recent_events.append(f"Player: {query[:100]}")
+            campaign.recent_events.append(f"DM: {ai_response[:100]}")
+            # Keep only last 10 events
+            campaign.recent_events = campaign.recent_events[-10:]
+            campaign_mgr.save_campaign(campaign)
+        
+        return jsonify({
+            'response': ai_response,
+            'query': query,
+            'phase': phase
+        })
+        
     except Exception as e:
+        print(f"Error in ai_assist: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
+    
 
 @app.route('/campaign/<campaign_name>/complete-phase', methods=['POST'])
 def complete_phase(campaign_name):
@@ -367,7 +455,10 @@ def create_templates():
         <button class="new-campaign-btn" onclick="location.href='/campaign/new'">
             ⚔️ New Campaign
         </button>
-        
+        <button class="new-campaign-btn" onclick="location.href='/settings/prompts'" 
+        style="background: linear-gradient(135deg, #4dabf7 0%, #3b9ae1 100%); margin-bottom: 10px;">
+    ⚙️ AI Prompt Settings
+        </button>
         {% if campaigns %}
         <div class="campaigns-grid">
             {% for campaign in campaigns %}
@@ -1342,6 +1433,7 @@ def create_templates():
         async function markComplete() {
             if (conversationHistory.length > 0) {
                 const shouldSave = confirm('You have unsaved preparation notes. Do you want to save them before advancing?\\n\\n(Click "Cancel" to go back and save, or "OK" to proceed without saving)');
+
                 
                 if (!shouldSave) {
                     return;
@@ -1968,6 +2060,294 @@ def create_templates():
         f.write(active_campaign_html)
     
     print("✓ Campaign templates created")
+
+
+@app.route('/settings/prompts')
+def prompt_settings():
+    """Prompt template editor"""
+    prep_prompt = prompt_templates.get_prompt('prep')
+    active_prompt = prompt_templates.get_prompt('active')
+    
+    html = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Prompt Settings</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d1b3d 100%);
+            color: #e0e0e0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            color: #b0b0b0;
+            margin-bottom: 30px;
+        }
+        .info-box {
+            background: rgba(33, 150, 243, 0.15);
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .prompt-section {
+            background: rgba(30, 30, 46, 0.8);
+            border: 2px solid #4a4a6a;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+        .phase-desc {
+            color: #b0b0b0;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+        }
+        textarea {
+            width: 100%;
+            min-height: 400px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid #4a4a6a;
+            border-radius: 6px;
+            color: #e0e0e0;
+            padding: 15px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .save-btn {
+            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            color: white;
+            flex: 1;
+        }
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(81, 207, 102, 0.4);
+        }
+        .reset-btn {
+            background: #f44336;
+            color: white;
+            flex: 1;
+        }
+        .reset-btn:hover {
+            background: #da190b;
+            transform: translateY(-2px);
+        }
+        .back-btn {
+            background: #666;
+            color: white;
+            padding: 12px 24px;
+            display: inline-block;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        .back-btn:hover {
+            background: #555;
+            transform: translateY(-2px);
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .success-msg {
+            background: rgba(81, 207, 102, 0.2);
+            border: 2px solid #51cf66;
+            color: #51cf66;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎲 AI Prompt Templates</h1>
+        <p class="subtitle">Customize how your AI Dungeon Master behaves</p>
+        
+        <div class="info-box">
+            <strong>💡 What are prompt templates?</strong><br>
+            These prompts tell the AI how to act as your Dungeon Master. Edit them to change the AI's 
+            personality, style, and behavior. Changes take effect immediately!
+        </div>
+        
+        <div class="prompt-section">
+            <h2>📜 Preparation Phase Prompt</h2>
+            <p class="phase-desc">
+                Used during quest planning and adventure setup (Phase 2: Call to Adventure)
+            </p>
+            <textarea id="prep-prompt">""" + prep_prompt.replace('</textarea>', '&lt;/textarea&gt;') + """</textarea>
+            <div id="prep-success" class="success-msg">✓ Prep prompt saved!</div>
+            <div class="button-group">
+                <button class="save-btn" onclick="savePrompt('prep')">💾 Save Prep Prompt</button>
+                <button class="reset-btn" onclick="resetPrompt('prep')">🔄 Reset to Default</button>
+            </div>
+        </div>
+        
+        <div class="prompt-section">
+            <h2>⚔️ Active Campaign Prompt</h2>
+            <p class="phase-desc">
+                Used during actual gameplay sessions (Phase 3: Active Campaign)
+            </p>
+            <textarea id="active-prompt">""" + active_prompt.replace('</textarea>', '&lt;/textarea&gt;') + """</textarea>
+            <div id="active-success" class="success-msg">✓ Active prompt saved!</div>
+            <div class="button-group">
+                <button class="save-btn" onclick="savePrompt('active')">💾 Save Active Prompt</button>
+                <button class="reset-btn" onclick="resetPrompt('active')">🔄 Reset to Default</button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <a href="/" class="back-btn">← Back to Campaigns</a>
+        </div>
+    </div>
+    
+    <script>
+        function showSuccess(phase) {
+            const msg = document.getElementById(phase + '-success');
+            msg.style.display = 'block';
+            setTimeout(() => {
+                msg.style.display = 'none';
+            }, 3000);
+        }
+        
+        async function savePrompt(phase) {
+            const content = document.getElementById(phase + '-prompt').value;
+            
+            try {
+                const response = await fetch('/settings/prompts/save', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ phase: phase, content: content })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess(phase);
+                } else {
+                    alert('✗ Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('✗ Error saving prompt: ' + error);
+            }
+        }
+        
+        async function resetPrompt(phase) {
+            if (!confirm('Reset this prompt to default? This cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/settings/prompts/reset', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ phase: phase })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('✗ Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('✗ Error resetting prompt: ' + error);
+            }
+        }
+    </script>
+</body>
+</html>"""
+    return html
+
+
+@app.route('/settings/prompts/save', methods=['POST'])
+def save_prompt():
+    """Save edited prompt template"""
+    try:
+        data = request.json
+        phase = data.get('phase')
+        content = data.get('content')
+        
+        if not phase or not content:
+            return jsonify({'success': False, 'error': 'Missing phase or content'})
+        
+        prompt_templates.update_prompt(phase, content)
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+
+@app.route('/settings/prompts/reset', methods=['POST'])
+def reset_prompt():
+    """Reset prompt to default"""
+    try:
+        data = request.json
+        phase = data.get('phase')
+        
+        if not phase:
+            return jsonify({'success': False, 'error': 'Missing phase'})
+        
+        # Delete the file to force recreation of default
+        import os
+        if phase == 'prep':
+            filepath = 'prompts/prep_phase_prompt.txt'
+        elif phase == 'active':
+            filepath = 'prompts/active_phase_prompt.txt'
+        else:
+            return jsonify({'success': False, 'error': 'Invalid phase'})
+        
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        
+        # Recreate defaults
+        prompt_templates._create_default_templates()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+    
 
 
 if __name__ == '__main__':

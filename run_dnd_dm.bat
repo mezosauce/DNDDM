@@ -34,6 +34,24 @@ if exist "templates" (
 )
 
 REM Force delete any remaining template files
+if exist "prompts" (
+    echo    - Force removing stubborn files...
+    del /f /s /q prompts\* >nul 2>&1
+    rmdir /s /q prompts >nul 2>&1
+)
+
+echo    - Templates will be regenerated on startup
+
+echo [2.5/5] Deleting old prompts for fresh regeneration...
+if exist "prompts" (
+    rmdir /s /q prompts
+    timeout /t 1 /nobreak >nul
+    echo    - Prompts folder deleted
+) else (
+    echo    - No Prompts folder found
+)
+
+REM Force delete any remaining template files
 if exist "templates" (
     echo    - Force removing stubborn files...
     del /f /s /q templates\* >nul 2>&1

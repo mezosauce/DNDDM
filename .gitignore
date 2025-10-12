@@ -18,6 +18,9 @@ backup/
 # Templates (auto-generated)
 templates/
 
+# Prompts (auto-generated)
+prompts/
+
 # Python
 __pycache__/
 *.py[cod]
@@ -63,3 +66,5 @@ _trash/
 # Keep README files
 !README.md
 !**/README.md
+
+/nullfile.md
