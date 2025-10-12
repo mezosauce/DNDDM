@@ -1,18 +1,65 @@
-.idea/
-site/
-5thsrd_offline/
-docs/spellcasting/spell_lists/*
-docs/spellcasting/spell_indexes/*
-docs/gamemaster_rules/magic_item_indexes/*
-docs/gamemaster_rules/monster_indexes/*
+# Campaign Data - Keep Local Stories Private
+campaigns/
+*.db
+*.sqlite
+*.sqlite3
 
-!docs/spellcasting/spell_lists/index.md
-!docs/spellcasting/spell_indexes/index.md
-!docs/gamemaster_rules/magic_item_indexes/index.md
-!docs/gamemaster_rules/monster_indexes/index.md
+# Session Notes and Character Files
+sessions/
+characters/
+notes/
 
-purecss_theme/inline_styles.html
+# Backup Files
+Backup/
+backup/
+*_backup/
+*.bak
 
-__pycache__
-*.pyc
+# Templates (auto-generated)
+templates/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+venv/
+env/
 .venv
+
+# Virtual Environments
+5thsrd-py3.8/
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+
+# Archive
+archive/
+_trash/
+
+# Keep README files
+!README.md
+!**/README.md
