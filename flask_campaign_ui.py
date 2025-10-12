@@ -9,6 +9,7 @@ from flask_socketio import SocketIO, emit
 import secrets
 import os
 from pathlib import Path
+from datetime import datetime
 
 # Import campaign manager
 from campaign_manager import CampaignManager, Character, get_campaign_manager
@@ -192,6 +193,46 @@ def complete_phase(campaign_name):
     
     try:
         campaign = campaign_mgr.mark_phase_complete(campaign_name, phase)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/campaign/<campaign_name>/save-prep', methods=['POST'])
+def save_prep_conversation(campaign_name):
+    """Save preparation phase conversation"""
+    data = request.json
+    conversation = data.get('conversation', [])
+    
+    try:
+        # Get campaign folder
+        campaign = campaign_mgr.load_campaign(campaign_name)
+        folder = campaign_mgr._get_campaign_folder(campaign_name)
+        
+        # Save conversation to prep notes file
+        prep_file = folder / "PREPARATION_NOTES.md"
+        
+        content = f"""# Preparation Phase - {campaign.name}
+
+**Date:** {datetime.now().strftime('%B %d, %Y at %I:%M %p')}
+
+## Quest Planning Conversation
+
+"""
+        
+        for msg in conversation:
+            if msg['type'] == 'user':
+                content += f"**You:** {msg['text']}\n\n"
+            else:
+                content += f"**DM:** {msg['text']}\n\n"
+        
+        content += f"""
+---
+*This preparation conversation was saved before beginning the active campaign.*
+"""
+        
+        with open(prep_file, 'w', encoding='utf-8') as f:
+            f.write(content)
+        
         return jsonify({'success': True})
     except Exception as e:
         return jsonify({'error': str(e)}), 400
@@ -926,6 +967,1005 @@ def create_templates():
     
     with open(templates_dir / 'setup_phase.html', 'w', encoding='utf-8') as f:
         f.write(setup_phase_html)
+    
+    # Adventure Phase Template
+    adventure_phase_html = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call to Adventure - {{ context.campaign.name }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d1b3d 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+        .phase-header {
+            background: rgba(30, 30, 46, 0.8);
+            border: 2px solid #4a4a6a;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .phase-badge {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #51cf66;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        .panel {
+            background: rgba(30, 30, 46, 0.8);
+            border: 2px solid #4a4a6a;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        h2 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+        }
+        .chat-container {
+            height: 400px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .message-dm {
+            background: rgba(255, 107, 107, 0.2);
+            border-left: 3px solid #ff6b6b;
+        }
+        .message-user {
+            background: rgba(81, 207, 102, 0.2);
+            border-left: 3px solid #51cf66;
+        }
+        .message-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid #4a4a6a;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 16px;
+        }
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 107, 107, 0.4);
+        }
+        .advance-btn {
+            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+        }
+        .prompt-suggestions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .prompt-btn {
+            padding: 12px;
+            background: rgba(74, 74, 106, 0.5);
+            border: 2px solid #4a4a6a;
+            border-radius: 6px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .prompt-btn:hover {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.2);
+        }
+        .party-summary {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .character-mini {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            margin: 5px 0;
+            background: rgba(81, 207, 102, 0.1);
+            border-radius: 4px;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #ff6b6b;
+        }
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 107, 107, 0.3);
+            border-radius: 50%;
+            border-top-color: #ff6b6b;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .checklist li:hover {
+            background: rgba(81, 207, 102, 0.2);
+        }
+        .checklist li.completed {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+        .checklist li::before {
+            content: "☐ ";
+            color: #ff6b6b;
+            font-size: 1.2em;
+            margin-right: 10px;
+        }
+        .checklist li.completed::before {
+            content: "☑ ";
+            color: #51cf66;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="phase-header">
+            <h1>📜 {{ context.campaign.name }}</h1>
+            <p>📍 Phase 2: Call to Adventure & Preparation</p>
+            <span class="phase-badge">Quest Setup</span>
+        </div>
+        
+        <div class="content">
+            <!-- Main AI Chat -->
+            <div>
+                <div class="panel">
+                    <h2>🎭 AI Dungeon Master</h2>
+                    
+                    <div class="prompt-suggestions">
+                        <button class="prompt-btn" onclick="usePrompt('Create a quest hook for my party')">
+                            💡 Create a quest hook for my party
+                        </button>
+                        <button class="prompt-btn" onclick="usePrompt('What equipment should the party bring?')">
+                            🎒 What equipment should the party bring?
+                        </button>
+                        <button class="prompt-btn" onclick="usePrompt('Describe the starting location')">
+                            🗺️ Describe the starting location
+                        </button>
+                        <button class="prompt-btn" onclick="usePrompt('What dangers await the party?')">
+                            ⚠️ What dangers await the party?
+                        </button>
+                    </div>
+                    
+                    <div class="chat-container" id="chat-container"></div>
+                    
+                    <textarea id="query-input" placeholder="Ask the DM anything about the adventure..."></textarea>
+                    <button onclick="askDM()">Ask DM</button>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div>
+                <div class="panel">
+                    <h2>👥 Party</h2>
+                    <div class="party-summary">
+                        {% for char in context.characters %}
+                        <div class="character-mini">
+                            <span>{{ char.name }}</span>
+                            <span style="color: #888;">{{ char.char_class }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <h2>✅ Preparation Checklist</h2>
+                    <ul class="checklist" id="checklist">
+                        <li onclick="toggleCheck(this)">Establish the quest hook</li>
+                        <li onclick="toggleCheck(this)">Define the main objective</li>
+                        <li onclick="toggleCheck(this)">Set the starting location</li>
+                        <li onclick="toggleCheck(this)">Identify key NPCs</li>
+                        <li onclick="toggleCheck(this)">Plan equipment needed</li>
+                        <li onclick="toggleCheck(this)">Discuss party roles</li>
+                    </ul>
+                </div>
+                
+                <div class="panel">
+                    <button onclick="saveConversation()" style="margin-bottom: 10px;">
+                        💾 Save Preparation Notes
+                    </button>
+                    <button class="advance-btn" onclick="markComplete()">
+                        ✨ Ready to Begin Adventure
+                    </button>
+                    <p style="text-align: center; color: #888; margin-top: 10px; font-size: 0.9em;">
+                        Save your prep conversation before advancing!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let isLoading = false;
+        let conversationHistory = [];
+        
+        function usePrompt(text) {
+            document.getElementById('query-input').value = text;
+            askDM();
+        }
+        
+        async function askDM() {
+            if (isLoading) return;
+            
+            const input = document.getElementById('query-input');
+            const query = input.value.trim();
+            if (!query) return;
+            
+            // Add user message
+            addMessage(query, 'user');
+            conversationHistory.push({type: 'user', text: query});
+            input.value = '';
+            isLoading = true;
+            
+            // Show loading
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'loading';
+            loadingDiv.innerHTML = '<div class="spinner"></div> DM is thinking...';
+            document.getElementById('chat-container').appendChild(loadingDiv);
+            
+            try {
+                const response = await fetch('/campaign/{{ context.campaign.name }}/ai-assist', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({query})
+                });
+                
+                const data = await response.json();
+                loadingDiv.remove();
+                
+                if (data.error) {
+                    addMessage(`Error: ${data.error}`, 'dm');
+                    conversationHistory.push({type: 'dm', text: `Error: ${data.error}`});
+                } else {
+                    addMessage(data.response, 'dm');
+                    conversationHistory.push({type: 'dm', text: data.response});
+                }
+            } catch (error) {
+                loadingDiv.remove();
+                addMessage(`Error: ${error.message}`, 'dm');
+                conversationHistory.push({type: 'dm', text: `Error: ${error.message}`});
+            }
+            
+            isLoading = false;
+        }
+        
+        function addMessage(text, type) {
+            const container = document.getElementById('chat-container');
+            const div = document.createElement('div');
+            div.className = `message message-${type}`;
+            div.innerHTML = `
+                <div class="message-label">${type === 'user' ? '👤 You' : '🎭 DM'}</div>
+                <div>${text}</div>
+            `;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function toggleCheck(element) {
+            element.classList.toggle('completed');
+        }
+        
+        async function saveConversation() {
+            if (conversationHistory.length === 0) {
+                alert('No conversation to save yet!');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/campaign/{{ context.campaign.name }}/save-prep', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({conversation: conversationHistory})
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('✓ Preparation notes saved successfully!');
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        async function markComplete() {
+            if (conversationHistory.length > 0) {
+                const shouldSave = confirm('You have unsaved preparation notes. Do you want to save them before advancing?\\n\\n(Click "Cancel" to go back and save, or "OK" to proceed without saving)');
+                
+                if (!shouldSave) {
+                    return;
+                }
+                
+                // Save conversation before advancing
+                await saveConversation();
+            }
+            
+            if (!confirm('Ready to begin the adventure? This will create Session 1.')) return;
+            
+            try {
+                // Mark phase complete
+                await fetch('/campaign/{{ context.campaign.name }}/complete-phase', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({phase: 'call_to_adventure'})
+                });
+                
+                // Advance to next phase
+                const response = await fetch('/campaign/{{ context.campaign.name }}/advance', {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    location.href = '/campaign/{{ context.campaign.name }}';
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        // Add welcome message
+        window.onload = () => {
+            addMessage('Welcome to the Call to Adventure phase! Use the suggestions above or ask me anything about setting up your quest.', 'dm');
+        };
+        
+        // Warn on page leave if conversation not saved
+        window.addEventListener('beforeunload', (e) => {
+            if (conversationHistory.length > 0) {
+                e.preventDefault();
+                e.returnValue = 'You have unsaved preparation notes. Are you sure you want to leave?';
+                return e.returnValue;
+            }
+        });
+    </script>
+</body>
+</html>"""
+    
+    with open(templates_dir / 'adventure_phase.html', 'w', encoding='utf-8') as f:
+        f.write(adventure_phase_html)
+    
+    # Active Campaign Template
+    active_campaign_html = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session {{ context.campaign.session_number }} - {{ context.campaign.name }}</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d1b3d 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+        .phase-header {
+            background: rgba(30, 30, 46, 0.8);
+            border: 2px solid #4a4a6a;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .session-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .phase-badge {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #4dabf7;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 20px;
+        }
+        .panel {
+            background: rgba(30, 30, 46, 0.8);
+            border: 2px solid #4a4a6a;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        h2 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        h3 {
+            color: #51cf66;
+            margin: 15px 0 10px;
+            font-size: 1.1em;
+        }
+        
+        /* Chat Area */
+        .chat-container {
+            height: 500px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .message-dm {
+            background: rgba(255, 107, 107, 0.2);
+            border-left: 3px solid #ff6b6b;
+        }
+        .message-player {
+            background: rgba(81, 207, 102, 0.2);
+            border-left: 3px solid #51cf66;
+        }
+        .message-system {
+            background: rgba(77, 171, 247, 0.2);
+            border-left: 3px solid #4dabf7;
+            text-align: center;
+        }
+        .message-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        /* Character Panels */
+        .character-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid #51cf66;
+        }
+        .char-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #51cf66;
+            margin-bottom: 5px;
+        }
+        .char-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
+            font-size: 0.9em;
+            color: #b0b0b0;
+        }
+        .hp-bar {
+            margin-top: 8px;
+        }
+        .hp-fill {
+            height: 8px;
+            background: #51cf66;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        /* Dice Roller */
+        .dice-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .dice-btn {
+            padding: 12px;
+            background: rgba(74, 74, 106, 0.5);
+            border: 2px solid #4a4a6a;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .dice-btn:hover {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.2);
+        }
+        .dice-result {
+            text-align: center;
+            padding: 15px;
+            background: rgba(81, 207, 102, 0.2);
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .natural-20 {
+            background: rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+        }
+        .natural-1 {
+            background: rgba(255, 0, 0, 0.3);
+            color: #ff6b6b;
+        }
+        
+        /* Initiative Tracker */
+        .initiative-list {
+            list-style: none;
+        }
+        .initiative-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            border-left: 3px solid #4a4a6a;
+        }
+        .initiative-item.active {
+            border-left-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.2);
+        }
+        
+        /* Inputs */
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid #4a4a6a;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+        textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+        
+        /* Buttons */
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 107, 107, 0.4);
+        }
+        .btn-secondary {
+            background: #666;
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 15px;
+            color: #ff6b6b;
+        }
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255, 107, 107, 0.3);
+            border-radius: 50%;
+            border-top-color: #ff6b6b;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .quick-btn {
+            padding: 10px;
+            background: rgba(74, 74, 106, 0.5);
+            border: 2px solid #4a4a6a;
+            border-radius: 6px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .quick-btn:hover {
+            border-color: #51cf66;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="phase-header">
+            <h1>⚔️ {{ context.campaign.name }}</h1>
+            <div class="session-info">
+                <div>
+                    <span class="phase-badge">Session {{ context.campaign.session_number }}</span>
+                </div>
+                <button onclick="endSession()" style="width: auto; padding: 8px 20px; background: #666;">
+                    End Session
+                </button>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- Left Sidebar: Party -->
+            <div>
+                <div class="panel">
+                    <h2>👥 Party</h2>
+                    {% for char in context.characters %}
+                    <div class="character-card">
+                        <div class="char-name">{{ char.name }}</div>
+                        <div class="char-stats">
+                            <div>{{ char.race }} {{ char.char_class }}</div>
+                            <div>Level {{ char.level }}</div>
+                            <div>HP: {{ char.hp }}/{{ char.max_hp }}</div>
+                            <div>AC: {{ char.ac }}</div>
+                        </div>
+                        <div class="hp-bar">
+                            <div class="hp-fill" style="width: {{ (char.hp / char.max_hp * 100)|int }}%"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="panel">
+                    <h2>🎲 Dice Roller</h2>
+                    <div class="dice-grid">
+                        <button class="dice-btn" onclick="roll('d4')">d4</button>
+                        <button class="dice-btn" onclick="roll('d6')">d6</button>
+                        <button class="dice-btn" onclick="roll('d8')">d8</button>
+                        <button class="dice-btn" onclick="roll('d10')">d10</button>
+                        <button class="dice-btn" onclick="roll('d12')">d12</button>
+                        <button class="dice-btn" onclick="roll('d20')">d20</button>
+                    </div>
+                    <input type="text" id="custom-dice" placeholder="2d6+3">
+                    <button onclick="rollCustom()">Roll Custom</button>
+                    <div id="dice-result"></div>
+                </div>
+                
+                <div class="panel">
+                    <h2>⚡ Quick Actions</h2>
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="quickAction('I attack')">⚔️ Attack</button>
+                        <button class="quick-btn" onclick="quickAction('I cast a spell')">✨ Cast Spell</button>
+                        <button class="quick-btn" onclick="quickAction('I search the room')">🔍 Search</button>
+                        <button class="quick-btn" onclick="quickAction('I investigate')">📖 Investigate</button>
+                        <button class="quick-btn" onclick="quickAction('I try to persuade')">💬 Persuade</button>
+                        <button class="quick-btn" onclick="quickAction('I take a rest')">🛌 Rest</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Center: Main Chat -->
+            <div>
+                <div class="panel">
+                    <h2>🎭 Adventure Log</h2>
+                    <div class="chat-container" id="chat-container"></div>
+                    <textarea id="action-input" placeholder="What do you do?"></textarea>
+                    <button onclick="takeAction()">Take Action</button>
+                </div>
+            </div>
+            
+            <!-- Right Sidebar: Combat & Tools -->
+            <div>
+                <div class="panel">
+                    <h2>⚔️ Initiative Tracker</h2>
+                    <ul class="initiative-list" id="initiative-list">
+                        <li style="text-align: center; color: #888; padding: 20px;">
+                            No combat active
+                        </li>
+                    </ul>
+                    <input type="text" id="init-name" placeholder="Name">
+                    <input type="number" id="init-value" placeholder="Initiative" min="1">
+                    <button onclick="addInitiative()">Add to Initiative</button>
+                    <button class="btn-secondary" onclick="clearInitiative()">Clear All</button>
+                </div>
+                
+                <div class="panel">
+                    <h2>📝 Session Notes</h2>
+                    <textarea id="session-notes" placeholder="Take notes about this session..." style="min-height: 150px;"></textarea>
+                    <button onclick="saveNotes()">Save Notes</button>
+                </div>
+                
+                <div class="panel">
+                    <h2>📍 Current Context</h2>
+                    <div style="font-size: 0.9em; color: #b0b0b0;">
+                        <p><strong>Phase:</strong> {{ context.phase_info.name }}</p>
+                        <p><strong>Location:</strong> <span id="current-location">Unknown</span></p>
+                        <p><strong>Combat:</strong> <span id="combat-status">No</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const socket = io();
+        let isLoading = false;
+        let currentTurn = 0;
+        
+        // Add welcome message
+        window.onload = () => {
+            addMessage('Session {{ context.campaign.session_number }} begins! What do you do?', 'system');
+        };
+        
+        async function takeAction() {
+            if (isLoading) return;
+            
+            const input = document.getElementById('action-input');
+            const action = input.value.trim();
+            if (!action) return;
+            
+            addMessage(action, 'player');
+            input.value = '';
+            isLoading = true;
+            
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'loading';
+            loadingDiv.innerHTML = '<div class="spinner"></div> DM is responding...';
+            document.getElementById('chat-container').appendChild(loadingDiv);
+            
+            try {
+                const response = await fetch('/campaign/{{ context.campaign.name }}/ai-assist', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({query: action})
+                });
+                
+                const data = await response.json();
+                loadingDiv.remove();
+                
+                if (data.error) {
+                    addMessage(`Error: ${data.error}`, 'dm');
+                } else {
+                    addMessage(data.response, 'dm');
+                }
+            } catch (error) {
+                loadingDiv.remove();
+                addMessage(`Error: ${error.message}`, 'dm');
+            }
+            
+            isLoading = false;
+        }
+        
+        function addMessage(text, type) {
+            const container = document.getElementById('chat-container');
+            const div = document.createElement('div');
+            div.className = `message message-${type}`;
+            
+            let label = '';
+            if (type === 'player') label = '🎲 Player';
+            else if (type === 'dm') label = '🎭 DM';
+            else if (type === 'system') label = '📢 System';
+            
+            div.innerHTML = `
+                ${label ? `<div class="message-label">${label}</div>` : ''}
+                <div>${text}</div>
+            `;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        async function roll(dice) {
+            const response = await fetch('/api/dice/roll', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({dice})
+            });
+            const data = await response.json();
+            displayDiceResult(data);
+            addMessage(`Rolled ${data.dice}: ${data.total}`, 'system');
+        }
+        
+        async function rollCustom() {
+            const dice = document.getElementById('custom-dice').value;
+            const response = await fetch('/api/dice/roll', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({dice})
+            });
+            const data = await response.json();
+            displayDiceResult(data);
+            addMessage(`Rolled ${data.dice}: ${data.total}`, 'system');
+        }
+        
+        function displayDiceResult(data) {
+            const resultDiv = document.getElementById('dice-result');
+            let className = 'dice-result';
+            if (data.natural_20) className += ' natural-20';
+            if (data.natural_1) className += ' natural-1';
+            
+            resultDiv.className = className;
+            resultDiv.innerHTML = `
+                ${data.dice}: ${data.total}
+                ${data.natural_20 ? '<br>🌟 CRITICAL!' : ''}
+                ${data.natural_1 ? '<br>💀 FUMBLE!' : ''}
+            `;
+        }
+        
+        function quickAction(action) {
+            document.getElementById('action-input').value = action;
+            takeAction();
+        }
+        
+        async function addInitiative() {
+            const name = document.getElementById('init-name').value;
+            const value = document.getElementById('init-value').value;
+            
+            if (!name || !value) return;
+            
+            await fetch('/api/initiative', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    name: name,
+                    initiative: parseInt(value)
+                })
+            });
+            
+            document.getElementById('init-name').value = '';
+            document.getElementById('init-value').value = '';
+            
+            loadInitiative();
+            document.getElementById('combat-status').textContent = 'Yes';
+        }
+        
+        async function loadInitiative() {
+            const response = await fetch('/api/initiative');
+            const data = await response.json();
+            
+            const list = document.getElementById('initiative-list');
+            if (data.initiative.length === 0) {
+                list.innerHTML = '<li style="text-align: center; color: #888; padding: 20px;">No combat active</li>';
+            } else {
+                list.innerHTML = data.initiative.map((item, index) => `
+                    <li class="initiative-item ${index === currentTurn ? 'active' : ''}">
+                        <span>${item.name}</span>
+                        <span>${item.initiative}</span>
+                    </li>
+                `).join('');
+            }
+        }
+        
+        async function clearInitiative() {
+            if (!confirm('Clear initiative tracker?')) return;
+            
+            await fetch('/api/initiative', {method: 'DELETE'});
+            loadInitiative();
+            document.getElementById('combat-status').textContent = 'No';
+            addMessage('Combat ended', 'system');
+        }
+        
+        function saveNotes() {
+            const notes = document.getElementById('session-notes').value;
+            localStorage.setItem('session_{{ context.campaign.session_number }}_notes', notes);
+            alert('Notes saved!');
+        }
+        
+        async function endSession() {
+            if (!confirm('End this session?')) return;
+            
+            const notes = document.getElementById('session-notes').value;
+            // Save notes logic here
+            
+            alert('Session ended! Notes saved.');
+            location.href = '/campaign/{{ context.campaign.name }}';
+        }
+        
+        // Keyboard shortcuts
+        document.getElementById('action-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                takeAction();
+            }
+        });
+        
+        // Load saved notes
+        const savedNotes = localStorage.getItem('session_{{ context.campaign.session_number }}_notes');
+        if (savedNotes) {
+            document.getElementById('session-notes').value = savedNotes;
+        }
+    </script>
+</body>
+</html>"""
+    
+    with open(templates_dir / 'active_campaign.html', 'w', encoding='utf-8') as f:
+        f.write(active_campaign_html)
     
     print("✓ Campaign templates created")
 
