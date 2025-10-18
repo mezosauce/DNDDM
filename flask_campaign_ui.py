@@ -427,59 +427,7 @@ def parse_options(response):
     return options
 
 
-@app.route('/campaign/<campaign_name>/complete-phase', methods=['POST'])
-def complete_phase(campaign_name):
-    """Mark current phase as complete"""
-    data = request.json
-    phase = data.get('phase')
-    
-    try:
-        campaign = campaign_mgr.mark_phase_complete(campaign_name, phase)
-        return jsonify({'success': True})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 400
-
-@app.route('/campaign/<campaign_name>/save-prep', methods=['POST'])
-def save_prep_conversation(campaign_name):
-    """Save preparation phase conversation"""
-    data = request.json
-    conversation = data.get('conversation', [])
-    
-    try:
-        # Get campaign folder
-        campaign = campaign_mgr.load_campaign(campaign_name)
-        folder = campaign_mgr._get_campaign_folder(campaign_name)
-        
-        # Save conversation to prep notes file
-        prep_file = folder / "PREPARATION_NOTES.md"
-        
-        content = f"""# Preparation Phase - {campaign.name}
-
-**Date:** {datetime.now().strftime('%B %d, %Y at %I:%M %p')}
-
-## Quest Planning Conversation
-
-"""
-        
-        for msg in conversation:
-            if msg['type'] == 'user':
-                content += f"**You:** {msg['text']}\n\n"
-            else:
-                content += f"**DM:** {msg['text']}\n\n"
-        
-        content += f"""
----
-*This preparation conversation was saved before beginning the active campaign.*
-"""
-        
-        with open(prep_file, 'w', encoding='utf-8') as f:
-            f.write(content)
-        
-        return jsonify({'success': True})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 400
-
-
+           
 # ============================================================================
 # Phase 3: Active Campaign
 # ============================================================================
@@ -501,6 +449,141 @@ def new_session(campaign_name):
         return jsonify({'success': True, 'session_number': session_num})
     except Exception as e:
         return jsonify({'error': str(e)}), 400
+
+def parse_options(response):
+    """Parse AI response into individual options"""
+    options = []
+    lines = response.split('\n')
+    current_option = None
+    
+    for line in lines:
+        line = line.strip()
+        if line.startswith('## Option'):
+            if current_option:
+                options.append(current_option)
+            # Extract title from "## Option X: Title"
+            title = line.split(':', 1)[1].strip() if ':' in line else line
+            current_option = {'title': title, 'content': ''}
+        elif current_option and line:
+            current_option['content'] += line + '\n'
+    
+    if current_option:
+        options.append(current_option)
+    
+    return options
+
+
+# ADD THIS COMPLETE FUNCTION HERE:
+@app.route('/campaign/<campaign_name>/save-quest-setup', methods=['POST'])
+def save_quest_setup(campaign_name):
+    """Save quest setup selections to markdown file"""
+    data = request.json
+    selections = data.get('selections', {})
+    
+    try:
+        # Get campaign folder
+        campaign = campaign_mgr.load_campaign(campaign_name)
+        folder = campaign_mgr._get_campaign_folder(campaign_name)
+        
+        # Get character info for the file
+        characters = campaign_mgr.get_characters(campaign_name)
+        
+        # Create quest setup file
+        quest_file = folder / "preparations.md"
+        
+        content = f"""# Quest Preparation - {campaign.name}
+
+**Campaign:** {campaign.name}  
+**Date Prepared:** {datetime.now().strftime('%B %d, %Y at %I:%M %p')}  
+**Prepared By:** Campaign Manager  
+
+---
+
+## 👥 Party Composition
+
+"""
+        
+        for char in characters:
+            content += f"### {char.name}\n"
+            content += f"- **Race:** {char.race}\n"
+            content += f"- **Class:** {char.char_class}\n"
+            content += f"- **Level:** {char.level}\n"
+            content += f"- **Background:** {char.background}\n"
+            content += f"- **HP:** {char.hp}/{char.max_hp} | **AC:** {char.ac}\n"
+            content += f"- **Stats:** STR {char.stats.get('strength', 10)}, "
+            content += f"DEX {char.stats.get('dexterity', 10)}, "
+            content += f"CON {char.stats.get('constitution', 10)}, "
+            content += f"INT {char.stats.get('intelligence', 10)}, "
+            content += f"WIS {char.stats.get('wisdom', 10)}, "
+            content += f"CHA {char.stats.get('charisma', 10)}\n\n"
+        
+        content += f"""---
+
+## 🎯 Quest Setup
+
+### Quest Hook
+{selections.get('quest_hook', '*Not selected*')}
+
+### Main Objective
+{selections.get('objective', '*Not selected*')}
+
+### Starting Location
+{selections.get('location', '*Not selected*')}
+
+### Key NPCs
+{selections.get('npcs', '*Not selected*')}
+
+### Equipment Needed
+{selections.get('equipment', '*Not selected*')}
+
+### Party Roles & Strategy
+{selections.get('roles', '*Not selected*')}
+
+---
+
+## 📝 Notes for the DM
+
+*This quest setup was completed during the Call to Adventure phase.*  
+*The adventure is ready to begin with Session 1.*
+
+**Next Steps:**
+- Review the quest hook and prepare opening narration
+- Prepare NPC dialogue and motivations
+- Set up initial encounter or scene
+- Consider potential player choices and consequences
+
+---
+
+*Generated by AI Dungeon Master Campaign System*
+"""
+        
+        with open(quest_file, 'w', encoding='utf-8') as f:
+            f.write(content)
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"Error saving quest setup: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 400
+
+
+@app.route('/campaign/<campaign_name>/complete-phase', methods=['POST'])
+def complete_phase(campaign_name):
+    """Mark current phase as complete"""
+    data = request.json
+    phase = data.get('phase')
+    
+    try:
+        campaign = campaign_mgr.mark_phase_complete(campaign_name, phase)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+           
+# ============================================================================
+# Phase 3: Active Campaign
+# ============================================================================
 
 
 # ============================================================================
@@ -1717,15 +1800,22 @@ def create_templates():
         }
         
         async function beginAdventure() {
-            if (!confirm('Ready to begin the adventure? This will start Session 1.')) return;
-            
-            try {
-                // Mark phase complete
-                await fetch('/campaign/{{ context.campaign.name }}/complete-phase', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({phase: 'call_to_adventure'})
-                });
+    if (!confirm('Ready to begin the adventure? This will start Session 1.')) return;
+    
+    try {
+        // Save quest setup to markdown file
+        await fetch('/campaign/{{ context.campaign.name }}/save-quest-setup', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({selections: selections})
+        });
+        
+        // Mark phase complete
+        await fetch('/campaign/{{ context.campaign.name }}/complete-phase', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({phase: 'call_to_adventure'})
+        });
                 
                 // Advance to next phase
                 const response = await fetch('/campaign/{{ context.campaign.name }}/advance', {
@@ -1733,16 +1823,17 @@ def create_templates():
                 });
                 
                 const result = await response.json();
-                
-                if (result.success) {
-                    location.href = '/campaign/{{ context.campaign.name }}';
-                } else {
-                    alert('Error: ' + result.error);
-                }
-            } catch (error) {
-                alert('Error: ' + error.message);
-            }
+        
+        if (result.success) {
+            alert('✓ Quest preparation saved to preparations.md!');
+            location.href = '/campaign/{{ context.campaign.name }}';
+        } else {
+            alert('Error: ' + result.error);
         }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
         
         // Initialize on page load
         window.onload = init;
