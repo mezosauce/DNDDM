@@ -16,7 +16,7 @@ REM Check if virtual environment exists
 if exist "venv\Scripts\activate.bat" (
     echo [1/5] Activating virtual environment...
     call venv\Scripts\activate.bat
-) else if exist "5thsrd-py3.8\Scripts\activate.bat" (
+) else if exist "DNDDM\Scripts\activate.bat" (
     echo [1/5] Activating virtual environment...
     call 5thsrd-py3.8\Scripts\activate.bat
 ) else (

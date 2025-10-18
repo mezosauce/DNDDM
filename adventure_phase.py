@@ -184,6 +184,166 @@ def ai_assist(campaign_name):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# ============================================================================
+# ADD THIS NEW ROUTE TO flask_campaign_ui.py
+# (Add after the @app.route('/campaign/<campaign_name>/ai-assist') route)
+# ============================================================================
+
+@app.route('/campaign/<campaign_name>/generate-options', methods=['POST'])
+def generate_options(campaign_name):
+    """Generate AI options for a specific quest setup step"""
+    data = request.json
+    step = data.get('step', '')
+    
+    if not dm or not dm.ollama_available:
+        return jsonify({'error': 'AI not available'}), 503
+    
+    try:
+        # Get campaign context
+        context = campaign_mgr.get_campaign_context(campaign_name)
+        campaign = context['campaign']
+        
+        # Create prompts for each step
+        prompts = {
+            'quest_hook': f"""Generate 5 unique quest hooks for this D&D party.
+
+Campaign: {campaign['name']}
+Party: {', '.join([c['name'] + ' (' + c['char_class'] + ')' for c in context['characters']])}
+
+For each quest hook, provide:
+- A catchy title
+- A 2-sentence description
+- Why this party would care
+
+Format each option as:
+## Option X: [Title]
+[Description]
+*Why your party cares:* [Reason]
+
+Generate 5 diverse options.""",
+            
+            'objective': """Based on the chosen quest hook, generate 4 possible main objectives.
+
+Each objective should be:
+- Clear and achievable
+- Appropriate for the party level
+- Connected to the quest hook
+
+Format as:
+## Option X: [Objective Title]
+[What success looks like]""",
+            
+            'location': """Generate 4 starting locations for this adventure.
+
+Each location should:
+- Match the quest theme
+- Provide opportunities for exploration
+- Include sensory details
+
+Format as:
+## Option X: [Location Name]
+[Description with sights, sounds, atmosphere]""",
+            
+            'npcs': """Generate 4 key NPCs for this quest.
+
+For each NPC include:
+- Name and role
+- Personality trait
+- How they connect to the quest
+
+Format as:
+## Option X: [NPC Name - Role]
+[Description and quest connection]""",
+            
+            'equipment': """Suggest 4 equipment loadouts for this adventure.
+
+Each loadout should include:
+- Essential gear for the quest type
+- Tactical items
+- Estimated cost
+
+Format as:
+## Option X: [Loadout Name]
+[Items and reasoning]""",
+            
+            'roles': """Suggest 4 party role assignments based on the characters.
+
+For each suggestion include:
+- Who does what
+- Tactical synergies
+- Backup plans
+
+Format as:
+## Option X: [Strategy Name]
+[Role assignments and reasoning]"""
+        }
+        
+        prompt = prompts.get(step, '')
+        if not prompt:
+            return jsonify({'error': 'Invalid step'}), 400
+        
+        # Add previous selections if they exist
+        selections = data.get('selections', {})
+        if selections:
+            prompt = f"Previous selections:\n"
+            for key, value in selections.items():
+                prompt += f"{key}: {value}\n"
+            prompt += f"\n{prompts[step]}"
+        
+        # Create game state
+        game_state = GameState(
+            current_phase='02_call_to_adventure',
+            party_level=1,
+            location=campaign['name'],
+            active_combat=False,
+            recent_events=[]
+        )
+        
+        # Get AI response
+        result = dm.get_response(prompt, game_state)
+        
+        if 'error' in result:
+            return jsonify(result), 500
+        
+        # Parse options from response
+        options = parse_options(result['response'])
+        
+        return jsonify({
+            'options': options,
+            'raw_response': result['response']
+        })
+        
+    except Exception as e:
+        print(f"Error generating options: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+def parse_options(response):
+    """Parse AI response into individual options"""
+    options = []
+    lines = response.split('\n')
+    current_option = None
+    
+    for line in lines:
+        line = line.strip()
+        if line.startswith('## Option'):
+            if current_option:
+                options.append(current_option)
+            # Extract title from "## Option X: Title"
+            title = line.split(':', 1)[1].strip() if ':' in line else line
+            current_option = {'title': title, 'content': ''}
+        elif current_option and line:
+            current_option['content'] += line + '\n'
+    
+    if current_option:
+        options.append(current_option)
+    
+    return options
+
+
+
 @app.route('/campaign/<campaign_name>/complete-phase', methods=['POST'])
 def complete_phase(campaign_name):
     """Mark current phase as complete"""
@@ -928,12 +1088,19 @@ def create_templates():
         f.write(setup_phase_html)
     
     # Adventure Phase Template
+    
+    
+    with open(templates_dir / 'adventure_phase.html', 'w', encoding='utf-8') as f:
+        f.write(adventure_phase_html)
+    
+    print("✓ Campaign templates created")
+
     adventure_phase_html = """<!DOCTYPE html>
-<html lang="en">
-<head>
+    <html lang="en">
+    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Call to Adventure - {{ context.campaign.name }}</title>
+    <title>Quest Builder - {{ context.campaign.name }}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -981,51 +1148,66 @@ def create_templates():
             color: #ff6b6b;
             margin-bottom: 15px;
         }
-        .chat-container {
-            height: 400px;
-            overflow-y: auto;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
+        
+        /* Step Display */
+        .step-container {
+            margin-bottom: 20px;
         }
-        .message {
-            margin-bottom: 15px;
-            padding: 12px;
-            border-radius: 8px;
-            animation: fadeIn 0.3s;
+        .step-title {
+            font-size: 1.3em;
+            color: #51cf66;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .message-dm {
-            background: rgba(255, 107, 107, 0.2);
-            border-left: 3px solid #ff6b6b;
-        }
-        .message-user {
-            background: rgba(81, 207, 102, 0.2);
-            border-left: 3px solid #51cf66;
-        }
-        .message-label {
+        .step-number {
+            background: #51cf66;
+            color: #1e1e2e;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 0.9em;
         }
-        input, textarea {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
+        
+        /* Options Display */
+        .options-container {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .option-card {
             background: rgba(0, 0, 0, 0.3);
             border: 2px solid #4a4a6a;
-            border-radius: 6px;
-            color: #e0e0e0;
-            font-size: 16px;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        textarea {
-            min-height: 80px;
-            resize: vertical;
+        .option-card:hover {
+            border-color: #51cf66;
+            transform: translateX(5px);
+            background: rgba(81, 207, 102, 0.1);
         }
+        .option-card.selected {
+            border-color: #51cf66;
+            background: rgba(81, 207, 102, 0.2);
+        }
+        .option-title {
+            font-weight: bold;
+            color: #51cf66;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        .option-content {
+            color: #b0b0b0;
+            line-height: 1.6;
+        }
+        
+        /* Buttons */
         button {
             width: 100%;
             padding: 12px;
@@ -1042,28 +1224,78 @@ def create_templates():
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(255, 107, 107, 0.4);
         }
-        .advance-btn {
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .generate-btn {
+            background: linear-gradient(135deg, #4dabf7 0%, #3b9ae1 100%);
+        }
+        .next-btn {
             background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
         }
-        .prompt-suggestions {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
+        .advance-btn {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #1e1e2e;
         }
-        .prompt-btn {
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #4dabf7;
+        }
+        .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 4px solid rgba(77, 171, 247, 0.3);
+            border-radius: 50%;
+            border-top-color: #4dabf7;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
             padding: 12px;
-            background: rgba(74, 74, 106, 0.5);
-            border: 2px solid #4a4a6a;
+            margin: 8px 0;
+            background: rgba(0, 0, 0, 0.2);
             border-radius: 6px;
-            text-align: left;
-            cursor: pointer;
+            border-left: 3px solid #4a4a6a;
             transition: all 0.3s;
         }
-        .prompt-btn:hover {
-            border-color: #ff6b6b;
-            background: rgba(255, 107, 107, 0.2);
+        .checklist li.completed {
+            border-left-color: #51cf66;
+            background: rgba(81, 207, 102, 0.1);
         }
+        .checklist li.active {
+            border-left-color: #4dabf7;
+            background: rgba(77, 171, 247, 0.1);
+        }
+        .checklist li::before {
+            content: "○ ";
+            color: #4a4a6a;
+            font-size: 1.2em;
+            margin-right: 10px;
+        }
+        .checklist li.completed::before {
+            content: "✓ ";
+            color: #51cf66;
+        }
+        .checklist li.active::before {
+            content: "→ ";
+            color: #4dabf7;
+        }
+        
+        /* Party Summary */
         .party-summary {
             background: rgba(0, 0, 0, 0.3);
             padding: 15px;
@@ -1078,51 +1310,30 @@ def create_templates():
             background: rgba(81, 207, 102, 0.1);
             border-radius: 4px;
         }
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #ff6b6b;
+        
+        /* Selections Summary */
+        .selections-summary {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
         }
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 107, 107, 0.3);
-            border-radius: 50%;
-            border-top-color: #ff6b6b;
-            animation: spin 1s ease-in-out infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .checklist {
-            list-style: none;
-            padding: 0;
-        }
-        .checklist li {
+        .selection-item {
+            margin: 10px 0;
             padding: 10px;
-            margin: 5px 0;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
+            background: rgba(81, 207, 102, 0.1);
+            border-left: 3px solid #51cf66;
+            border-radius: 4px;
         }
-        .checklist li:hover {
-            background: rgba(81, 207, 102, 0.2);
-        }
-        .checklist li.completed {
-            text-decoration: line-through;
-            opacity: 0.6;
-        }
-        .checklist li::before {
-            content: "☐ ";
-            color: #ff6b6b;
-            font-size: 1.2em;
-            margin-right: 10px;
-        }
-        .checklist li.completed::before {
-            content: "☑ ";
+        .selection-label {
+            font-weight: bold;
             color: #51cf66;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        .selection-value {
+            color: #e0e0e0;
+            font-size: 0.95em;
         }
     </style>
 </head>
@@ -1130,35 +1341,17 @@ def create_templates():
     <div class="container">
         <div class="phase-header">
             <h1>📜 {{ context.campaign.name }}</h1>
-            <p>📍 Phase 2: Call to Adventure & Preparation</p>
-            <span class="phase-badge">Quest Setup</span>
+            <p>📍 Phase 2: Guided Quest Builder</p>
+            <span class="phase-badge">Step-by-Step Setup</span>
         </div>
         
         <div class="content">
-            <!-- Main AI Chat -->
+            <!-- Main Quest Builder -->
             <div>
                 <div class="panel">
-                    <h2>🎭 AI Dungeon Master</h2>
-                    
-                    <div class="prompt-suggestions">
-                        <button class="prompt-btn" onclick="usePrompt('Create a quest hook for my party')">
-                            💡 Create a quest hook for my party
-                        </button>
-                        <button class="prompt-btn" onclick="usePrompt('What equipment should the party bring?')">
-                            🎒 What equipment should the party bring?
-                        </button>
-                        <button class="prompt-btn" onclick="usePrompt('Describe the starting location')">
-                            🗺️ Describe the starting location
-                        </button>
-                        <button class="prompt-btn" onclick="usePrompt('What dangers await the party?')">
-                            ⚠️ What dangers await the party?
-                        </button>
-                    </div>
-                    
-                    <div class="chat-container" id="chat-container"></div>
-                    
-                    <textarea id="query-input" placeholder="Ask the DM anything about the adventure..."></textarea>
-                    <button onclick="askDM()">Ask DM</button>
+                    <div id="step-display"></div>
+                    <div id="options-container"></div>
+                    <div id="button-container"></div>
                 </div>
             </div>
             
@@ -1177,96 +1370,235 @@ def create_templates():
                 </div>
                 
                 <div class="panel">
-                    <h2>✅ Preparation Checklist</h2>
-                    <ul class="checklist" id="checklist">
-                        <li onclick="toggleCheck(this)">Establish the quest hook</li>
-                        <li onclick="toggleCheck(this)">Define the main objective</li>
-                        <li onclick="toggleCheck(this)">Set the starting location</li>
-                        <li onclick="toggleCheck(this)">Identify key NPCs</li>
-                        <li onclick="toggleCheck(this)">Plan equipment needed</li>
-                        <li onclick="toggleCheck(this)">Discuss party roles</li>
+                    <h2>✅ Progress</h2>
+                    <ul class="checklist" id="progress-checklist">
+                        <li data-step="quest_hook">Quest Hook</li>
+                        <li data-step="objective">Main Objective</li>
+                        <li data-step="location">Starting Location</li>
+                        <li data-step="npcs">Key NPCs</li>
+                        <li data-step="equipment">Equipment Needed</li>
+                        <li data-step="roles">Party Roles</li>
                     </ul>
                 </div>
                 
                 <div class="panel">
-                    <button class="advance-btn" onclick="markComplete()">
-                        ✨ Ready to Begin Adventure
-                    </button>
-                    <p style="text-align: center; color: #888; margin-top: 10px; font-size: 0.9em;">
-                        This will start your first session
-                    </p>
+                    <h2>📋 Your Selections</h2>
+                    <div class="selections-summary" id="selections-display">
+                        <p style="text-align: center; color: #888;">No selections yet</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     
     <script>
-        let isLoading = false;
+        const steps = [
+            { key: 'quest_hook', name: 'Quest Hook', description: 'Choose the adventure that will draw your party in' },
+            { key: 'objective', name: 'Main Objective', description: 'What does success look like?' },
+            { key: 'location', name: 'Starting Location', description: 'Where does the adventure begin?' },
+            { key: 'npcs', name: 'Key NPCs', description: 'Who will the party interact with?' },
+            { key: 'equipment', name: 'Equipment', description: 'What should the party bring?' },
+            { key: 'roles', name: 'Party Roles', description: 'How will the party work together?' }
+        ];
         
-        function usePrompt(text) {
-            document.getElementById('query-input').value = text;
-            askDM();
+        let currentStep = 0;
+        let selections = {};
+        let currentOptions = [];
+        let selectedOptionIndex = null;
+        
+        function init() {
+            updateProgress();
+            showStep();
         }
         
-        async function askDM() {
-            if (isLoading) return;
+        function updateProgress() {
+            const items = document.querySelectorAll('#progress-checklist li');
+            items.forEach((item, index) => {
+                item.classList.remove('completed', 'active');
+                if (index < currentStep) {
+                    item.classList.add('completed');
+                } else if (index === currentStep) {
+                    item.classList.add('active');
+                }
+            });
+        }
+        
+        function showStep() {
+            const step = steps[currentStep];
+            const stepDisplay = document.getElementById('step-display');
+            const optionsContainer = document.getElementById('options-container');
+            const buttonContainer = document.getElementById('button-container');
             
-            const input = document.getElementById('query-input');
-            const query = input.value.trim();
-            if (!query) return;
+            stepDisplay.innerHTML = `
+                <div class="step-container">
+                    <div class="step-title">
+                        <div class="step-number">${currentStep + 1}</div>
+                        <span>${step.name}</span>
+                    </div>
+                    <p style="color: #b0b0b0; margin-bottom: 20px;">${step.description}</p>
+                </div>
+            `;
             
-            // Add user message
-            addMessage(query, 'user');
-            input.value = '';
-            isLoading = true;
+            optionsContainer.innerHTML = '';
+            buttonContainer.innerHTML = `
+                <button class="generate-btn" onclick="generateOptions()">
+                    ✨ Generate ${step.name} Options
+                </button>
+            `;
             
-            // Show loading
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'loading';
-            loadingDiv.innerHTML = '<div class="spinner"></div> DM is thinking...';
-            document.getElementById('chat-container').appendChild(loadingDiv);
+            updateSelectionsDisplay();
+        }
+        
+        async function generateOptions() {
+            const step = steps[currentStep];
+            const optionsContainer = document.getElementById('options-container');
+            const buttonContainer = document.getElementById('button-container');
+            
+            optionsContainer.innerHTML = '<div class="loading"><div class="spinner"></div><p>Generating options...</p></div>';
+            buttonContainer.innerHTML = '';
             
             try {
-                const response = await fetch('/campaign/{{ context.campaign.name }}/ai-assist', {
+                const response = await fetch('/campaign/{{ context.campaign.name }}/generate-options', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({query})
+                    body: JSON.stringify({
+                        step: step.key,
+                        selections: selections
+                    })
                 });
                 
                 const data = await response.json();
-                loadingDiv.remove();
                 
                 if (data.error) {
-                    addMessage(`Error: ${data.error}`, 'dm');
-                } else {
-                    addMessage(data.response, 'dm');
+                    optionsContainer.innerHTML = `<p style="color: #ff6b6b;">Error: ${data.error}</p>`;
+                    return;
                 }
+                
+                currentOptions = data.options;
+                displayOptions();
+                
             } catch (error) {
-                loadingDiv.remove();
-                addMessage(`Error: ${error.message}`, 'dm');
+                optionsContainer.innerHTML = `<p style="color: #ff6b6b;">Error: ${error.message}</p>`;
+            }
+        }
+        
+        function displayOptions() {
+            const optionsContainer = document.getElementById('options-container');
+            const buttonContainer = document.getElementById('button-container');
+            
+            optionsContainer.innerHTML = `
+                <div class="options-container">
+                    ${currentOptions.map((option, index) => `
+                        <div class="option-card" onclick="selectOption(${index})">
+                            <div class="option-title">${option.title}</div>
+                            <div class="option-content">${option.content}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            buttonContainer.innerHTML = `
+                <button onclick="regenerateOptions()" style="background: #666;">
+                    🔄 Regenerate Options
+                </button>
+                <button class="next-btn" onclick="confirmSelection()" disabled id="next-btn">
+                    → Continue to Next Step
+                </button>
+            `;
+        }
+        
+        function selectOption(index) {
+            selectedOptionIndex = index;
+            
+            // Update visual selection
+            document.querySelectorAll('.option-card').forEach((card, i) => {
+                card.classList.toggle('selected', i === index);
+            });
+            
+            // Enable next button
+            document.getElementById('next-btn').disabled = false;
+        }
+        
+        function regenerateOptions() {
+            generateOptions();
+        }
+        
+        function confirmSelection() {
+            if (selectedOptionIndex === null) return;
+            
+            const step = steps[currentStep];
+            const selected = currentOptions[selectedOptionIndex];
+            
+            selections[step.key] = selected.title;
+            
+            currentStep++;
+            selectedOptionIndex = null;
+            
+            if (currentStep < steps.length) {
+                updateProgress();
+                showStep();
+            } else {
+                showCompletion();
+            }
+        }
+        
+        function updateSelectionsDisplay() {
+            const display = document.getElementById('selections-display');
+            
+            if (Object.keys(selections).length === 0) {
+                display.innerHTML = '<p style="text-align: center; color: #888;">No selections yet</p>';
+                return;
             }
             
-            isLoading = false;
+            display.innerHTML = Object.entries(selections).map(([key, value]) => {
+                const step = steps.find(s => s.key === key);
+                return `
+                    <div class="selection-item">
+                        <div class="selection-label">${step ? step.name : key}</div>
+                        <div class="selection-value">${value}</div>
+                    </div>
+                `;
+            }).join('');
         }
         
-        function addMessage(text, type) {
-            const container = document.getElementById('chat-container');
-            const div = document.createElement('div');
-            div.className = `message message-${type}`;
-            div.innerHTML = `
-                <div class="message-label">${type === 'user' ? '👤 You' : '🎭 DM'}</div>
-                <div>${text}</div>
+        function showCompletion() {
+            const stepDisplay = document.getElementById('step-display');
+            const optionsContainer = document.getElementById('options-container');
+            const buttonContainer = document.getElementById('button-container');
+            
+            stepDisplay.innerHTML = `
+                <div class="step-container">
+                    <div class="step-title">
+                        <div class="step-number">✓</div>
+                        <span>Quest Setup Complete!</span>
+                    </div>
+                    <p style="color: #51cf66; margin-bottom: 20px;">
+                        All preparation steps are complete. You're ready to begin your adventure!
+                    </p>
+                </div>
             `;
-            container.appendChild(div);
-            container.scrollTop = container.scrollHeight;
+            
+            optionsContainer.innerHTML = `
+                <div style="background: rgba(81, 207, 102, 0.1); padding: 20px; border-radius: 8px; border: 2px solid #51cf66;">
+                    <h3 style="color: #51cf66; margin-bottom: 15px;">📋 Quest Summary</h3>
+                    ${Object.entries(selections).map(([key, value]) => {
+                        const step = steps.find(s => s.key === key);
+                        return `<p style="margin: 10px 0;"><strong>${step ? step.name : key}:</strong> ${value}</p>`;
+                    }).join('')}
+                </div>
+            `;
+            
+            buttonContainer.innerHTML = `
+                <button class="advance-btn" onclick="beginAdventure()">
+                    ⚔️ Begin Adventure (Start Session 1)
+                </button>
+            `;
+            
+            updateProgress();
         }
         
-        function toggleCheck(element) {
-            element.classList.toggle('completed');
-        }
-        
-        async function markComplete() {
-            if (!confirm('Ready to begin the adventure? This will create Session 1.')) return;
+        async function beginAdventure() {
+            if (!confirm('Ready to begin the adventure? This will start Session 1.')) return;
             
             try {
                 // Mark phase complete
@@ -1293,19 +1625,11 @@ def create_templates():
             }
         }
         
-        // Add welcome message
-        window.onload = () => {
-            addMessage('Welcome to the Call to Adventure phase! Use the suggestions above or ask me anything about setting up your quest.', 'dm');
-        };
+        // Initialize on page load
+        window.onload = init;
     </script>
 </body>
 </html>"""
-    
-    with open(templates_dir / 'adventure_phase.html', 'w', encoding='utf-8') as f:
-        f.write(adventure_phase_html)
-    
-    print("✓ Campaign templates created")
-
 
 if __name__ == '__main__':
     # Create templates if they don't exist
