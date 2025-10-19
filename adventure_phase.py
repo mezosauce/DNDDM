@@ -11,7 +11,7 @@ import os
 from pathlib import Path
 
 # Import campaign manager
-from campaign_manager import CampaignManager, Character, get_campaign_manager
+from Main.campaign_manager import CampaignManager, Character, get_campaign_manager
 
 # Import AI DM components
 try:

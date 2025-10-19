@@ -1921,7 +1921,7 @@ def create_templates():
             margin-bottom: 15px;
         }
         .message {
-            margin-bottom: 15px;
+            margin-bottom: 15px;    
             padding: 12px;
             border-radius: 8px;
             animation: fadeIn 0.3s;

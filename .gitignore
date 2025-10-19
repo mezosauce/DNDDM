@@ -16,10 +16,8 @@ backup/
 *.bak
 
 # Templates (auto-generated)
-templates/
 
 # Prompts (auto-generated)
-prompts/
 
 # Python
 __pycache__/

@@ -15,7 +15,7 @@ from typing import Dict, List
 
 # Import your AI DM components
 try:
-    from ai_dm_query_router import QueryRouter
+    from Main.ai_dm_query_router import QueryRouter
     from ai_dm_free import OllamaDM, GameState, SRDContentLoader
 except ImportError as e:
     print(f"Warning: AI DM modules not found. Error: {e}")
