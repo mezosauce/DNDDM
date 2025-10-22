@@ -4,276 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Session {{ context.campaign.session_number }} - {{ context.campaign.name }}</title>
+    <link rel="stylesheet" href="/static/css/base.css">
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e1e2e 0%, #2d1b3d 100%);
-            color: #e0e0e0;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-        h1 {
-            color: #ff6b6b;
-            margin-bottom: 10px;
-        }
-        .phase-header {
-            background: rgba(30, 30, 46, 0.8);
-            border: 2px solid #4a4a6a;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .session-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-        }
-        .phase-badge {
-            display: inline-block;
-            padding: 8px 15px;
-            background: #4dabf7;
+        /* Additional styles specific to active campaign */
+        .routing-info {
+            background: rgba(77, 171, 247, 0.1);
+            border: 1px solid #4dabf7;
             border-radius: 6px;
-            font-weight: bold;
-        }
-        .content {
-            display: grid;
-            grid-template-columns: 1fr 2fr 1fr;
-            gap: 20px;
-        }
-        .panel {
-            background: rgba(30, 30, 46, 0.8);
-            border: 2px solid #4a4a6a;
-            border-radius: 10px;
-            padding: 20px;
-        }
-        h2 {
-            color: #ff6b6b;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
-        h3 {
-            color: #51cf66;
-            margin: 15px 0 10px;
-            font-size: 1.1em;
+            padding: 8px 12px;
+            margin-top: 8px;
+            font-size: 0.85em;
+            color: #4dabf7;
         }
         
-        /* Chat Area */
-        .chat-container {
-            height: 500px;
-            overflow-y: auto;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-        .message {
-            margin-bottom: 15px;
-            padding: 12px;
-            border-radius: 8px;
-            animation: fadeIn 0.3s;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .message-dm {
-            background: rgba(255, 107, 107, 0.2);
-            border-left: 3px solid #ff6b6b;
-        }
-        .message-player {
-            background: rgba(81, 207, 102, 0.2);
-            border-left: 3px solid #51cf66;
-        }
-        .message-system {
+        .routing-badge {
+            display: inline-block;
             background: rgba(77, 171, 247, 0.2);
-            border-left: 3px solid #4dabf7;
-            text-align: center;
-        }
-        .message-label {
-            font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-        }
-        
-        /* Character Panels */
-        .character-card {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border-left: 3px solid #51cf66;
-        }
-        .char-name {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #51cf66;
-            margin-bottom: 5px;
-        }
-        .char-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 5px;
-            font-size: 0.9em;
-            color: #b0b0b0;
-        }
-        .hp-bar {
-            margin-top: 8px;
-        }
-        .hp-fill {
-            height: 8px;
-            background: #51cf66;
+            padding: 2px 8px;
             border-radius: 4px;
-            transition: width 0.3s;
+            margin: 2px;
+            font-size: 0.8em;
         }
         
-        /* Dice Roller */
-        .dice-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin: 10px 0;
+        .message-content {
+            white-space: pre-wrap;
+            line-height: 1.6;
         }
-        .dice-btn {
-            padding: 12px;
-            background: rgba(74, 74, 106, 0.5);
-            border: 2px solid #4a4a6a;
+        
+        .debug-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            background: rgba(77, 171, 247, 0.2);
+            border: 2px solid #4dabf7;
             border-radius: 6px;
-            color: #e0e0e0;
-            font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
+            font-size: 0.9em;
+            z-index: 1000;
         }
-        .dice-btn:hover {
-            border-color: #ff6b6b;
-            background: rgba(255, 107, 107, 0.2);
+        
+        .debug-toggle:hover {
+            background: rgba(77, 171, 247, 0.3);
         }
-        .dice-result {
-            text-align: center;
+        
+        .ai-thinking {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             padding: 15px;
-            background: rgba(81, 207, 102, 0.2);
+            background: rgba(77, 171, 247, 0.1);
             border-radius: 8px;
             margin: 10px 0;
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-        .natural-20 {
-            background: rgba(255, 215, 0, 0.3);
-            color: #ffd700;
-        }
-        .natural-1 {
-            background: rgba(255, 0, 0, 0.3);
-            color: #ff6b6b;
         }
         
-        /* Initiative Tracker */
-        .initiative-list {
-            list-style: none;
-        }
-        .initiative-item {
+        .thinking-dots {
             display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            margin: 5px 0;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 6px;
-            border-left: 3px solid #4a4a6a;
-        }
-        .initiative-item.active {
-            border-left-color: #ff6b6b;
-            background: rgba(255, 107, 107, 0.2);
+            gap: 4px;
         }
         
-        /* Inputs */
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            background: rgba(0, 0, 0, 0.3);
-            border: 2px solid #4a4a6a;
-            border-radius: 6px;
-            color: #e0e0e0;
-            font-size: 14px;
-        }
-        textarea {
-            min-height: 60px;
-            resize: vertical;
-        }
-        
-        /* Buttons */
-        button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 8px;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-            border: none;
-            border-radius: 6px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(255, 107, 107, 0.4);
-        }
-        .btn-secondary {
-            background: #666;
-        }
-        
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 15px;
-            color: #ff6b6b;
-        }
-        .spinner {
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            border: 3px solid rgba(255, 107, 107, 0.3);
+        .thinking-dot {
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            border-top-color: #ff6b6b;
-            animation: spin 1s ease-in-out infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+            background: #4dabf7;
+            animation: bounce 1.4s infinite ease-in-out both;
         }
         
-        /* Quick Actions */
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin: 10px 0;
+        .thinking-dot:nth-child(1) { animation-delay: -0.32s; }
+        .thinking-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
         }
-        .quick-btn {
-            padding: 10px;
-            background: rgba(74, 74, 106, 0.5);
-            border: 2px solid #4a4a6a;
+        
+        .error-details {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid #ff6b6b;
             border-radius: 6px;
-            font-size: 0.9em;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .quick-btn:hover {
-            border-color: #51cf66;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 0.85em;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container container-full">
         <div class="phase-header">
             <h1>⚔️ {{ context.campaign.name }}</h1>
             <div class="session-info">
                 <div>
-                    <span class="phase-badge">Session {{ context.campaign.session_number }}</span>
+                    <span class="phase-badge phase-active">Session {{ context.campaign.session_number }}</span>
                 </div>
                 <button onclick="endSession()" style="width: auto; padding: 8px 20px; background: #666;">
                     End Session
@@ -287,6 +111,9 @@
                 <div class="panel">
                     <h2>👥 Party</h2>
                     {% for char in context.characters %}
+                    {# compute hp percent safely and use in style attribute #}
+                    {% set max_hp_safe = char.max_hp if char.max_hp and char.max_hp > 0 else 1 %}
+                    {% set hp_pct = ((char.hp / max_hp_safe) * 100)|int %}
                     <div class="character-card">
                         <div class="char-name">{{ char.name }}</div>
                         <div class="char-stats">
@@ -296,7 +123,8 @@
                             <div>AC: {{ char.ac }}</div>
                         </div>
                         <div class="hp-bar">
-                            <div class="hp-fill" style="width: {{ (char.hp / char.max_hp * 100)|int }}%"></div>
+                            {# Avoid putting template expression directly inside style (some editors flag CSS) #}
+                            <div class="hp-fill" data-hp-pct="{{ hp_pct }}"></div>
                         </div>
                     </div>
                     {% endfor %}
@@ -335,8 +163,8 @@
                 <div class="panel">
                     <h2>🎭 Adventure Log</h2>
                     <div class="chat-container" id="chat-container"></div>
-                    <textarea id="action-input" placeholder="What do you do?"></textarea>
-                    <button onclick="takeAction()">Take Action</button>
+                    <textarea id="action-input" placeholder="What do you do?" rows="3"></textarea>
+                    <button onclick="takeAction()" id="action-btn">Take Action</button>
                 </div>
             </div>
             
@@ -373,15 +201,42 @@
         </div>
     </div>
     
+    <!-- Debug Toggle -->
+    <div class="debug-toggle" onclick="toggleDebug()" id="debug-toggle">
+        🔧 Debug: <span id="debug-status">OFF</span>
+    </div>
+    
     <script>
         const socket = io();
         let isLoading = false;
         let currentTurn = 0;
+        let debugMode = false;
         
         // Add welcome message
         window.onload = () => {
             addMessage('Session {{ context.campaign.session_number }} begins! What do you do?', 'system');
+
+            // Load saved notes
+            const savedNotes = localStorage.getItem('session_{{ context.campaign.session_number }}_notes');
+            if (savedNotes) {
+                document.getElementById('session-notes').value = savedNotes;
+            }
+
+            // Apply HP bar widths from data attributes to avoid inline template expressions in style
+            document.querySelectorAll('.hp-fill[data-hp-pct]').forEach(el => {
+                const pct = el.getAttribute('data-hp-pct');
+                if (pct !== null) {
+                    el.style.width = pct + '%';
+                }
+            });
         };
+        
+        function toggleDebug() {
+            debugMode = !debugMode;
+            document.getElementById('debug-status').textContent = debugMode ? 'ON' : 'OFF';
+            document.getElementById('debug-toggle').style.background = 
+                debugMode ? 'rgba(81, 207, 102, 0.2)' : 'rgba(77, 171, 247, 0.2)';
+        }
         
         async function takeAction() {
             if (isLoading) return;
@@ -394,10 +249,24 @@
             input.value = '';
             isLoading = true;
             
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'loading';
-            loadingDiv.innerHTML = '<div class="spinner"></div> DM is responding...';
-            document.getElementById('chat-container').appendChild(loadingDiv);
+            // Disable button during loading
+            const actionBtn = document.getElementById('action-btn');
+            actionBtn.disabled = true;
+            actionBtn.textContent = 'Processing...';
+            
+            // Add AI thinking indicator
+            const thinkingDiv = document.createElement('div');
+            thinkingDiv.className = 'ai-thinking';
+            thinkingDiv.id = 'ai-thinking';
+            thinkingDiv.innerHTML = `
+                <div class="thinking-dots">
+                    <div class="thinking-dot"></div>
+                    <div class="thinking-dot"></div>
+                    <div class="thinking-dot"></div>
+                </div>
+                <span>DM is preparing a response...</span>
+            `;
+            document.getElementById('chat-container').appendChild(thinkingDiv);
             
             try {
                 const response = await fetch('/campaign/{{ context.campaign.name }}/ai-assist', {
@@ -406,19 +275,49 @@
                     body: JSON.stringify({query: action})
                 });
                 
+                // Remove thinking indicator
+                const thinking = document.getElementById('ai-thinking');
+                if (thinking) thinking.remove();
+                
                 const data = await response.json();
-                loadingDiv.remove();
                 
                 if (data.error) {
-                    addMessage(`Error: ${data.error}`, 'dm');
+                    addMessage(`❌ Error: ${data.error}`, 'dm');
+                    
+                    // Show error details in debug mode
+                    if (debugMode) {
+                        addDebugInfo({
+                            error: data.error,
+                            query: action
+                        });
+                    }
                 } else {
                     addMessage(data.response, 'dm');
+                    
+                    // Show routing info in debug mode
+                    if (debugMode && data.routing_info) {
+                        addRoutingInfo(data.routing_info);
+                    }
                 }
             } catch (error) {
-                loadingDiv.remove();
-                addMessage(`Error: ${error.message}`, 'dm');
+                // Remove thinking indicator
+                const thinking = document.getElementById('ai-thinking');
+                if (thinking) thinking.remove();
+                
+                addMessage(`❌ Connection Error: ${error.message}`, 'dm');
+                
+                if (debugMode) {
+                    addDebugInfo({
+                        error: error.message,
+                        query: action,
+                        stack: error.stack
+                    });
+                }
             }
             
+            // Re-enable button
+            actionBtn.disabled = false;
+            actionBtn.textContent = 'Take Action';
             isLoading = false;
         }
         
@@ -434,33 +333,99 @@
             
             div.innerHTML = `
                 ${label ? `<div class="message-label">${label}</div>` : ''}
-                <div>${text}</div>
+                <div class="message-content">${escapeHtml(text)}</div>
             `;
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
         }
         
+        function addRoutingInfo(routingInfo) {
+            const container = document.getElementById('chat-container');
+            const div = document.createElement('div');
+            div.className = 'routing-info';
+            
+            let badges = '';
+            if (routingInfo.categories && routingInfo.categories.length > 0) {
+                badges = routingInfo.categories.map(cat => 
+                    `<span class="routing-badge">${cat}</span>`
+                ).join('');
+            }
+            
+            div.innerHTML = `
+                <strong>🔍 SRD Context Used:</strong><br>
+                ${badges || 'None'}
+                <br>
+                <small>Files loaded: ${routingInfo.files_loaded || 0}</small>
+            `;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function addDebugInfo(debugData) {
+            const container = document.getElementById('chat-container');
+            const div = document.createElement('div');
+            div.className = 'error-details';
+            div.innerHTML = `
+                <strong>Debug Info:</strong><br>
+                ${JSON.stringify(debugData, null, 2)}
+            `;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
         async function roll(dice) {
-            const response = await fetch('/api/dice/roll', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({dice})
+            // Simple client-side dice roller
+            const sides = parseInt(dice.replace('d', ''));
+            const result = Math.floor(Math.random() * sides) + 1;
+            
+            displayDiceResult({
+                dice: dice,
+                total: result,
+                natural_20: sides === 20 && result === 20,
+                natural_1: sides === 20 && result === 1
             });
-            const data = await response.json();
-            displayDiceResult(data);
-            addMessage(`Rolled ${data.dice}: ${data.total}`, 'system');
+            
+            addMessage(`Rolled ${dice}: ${result}`, 'system');
         }
         
         async function rollCustom() {
             const dice = document.getElementById('custom-dice').value;
-            const response = await fetch('/api/dice/roll', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({dice})
+            // Parse dice notation (e.g., "2d6+3")
+            const match = dice.match(/(\d+)?d(\d+)([\+\-]\d+)?/i);
+            
+            if (!match) {
+                alert('Invalid dice format. Use format like: 2d6+3');
+                return;
+            }
+            
+            const count = parseInt(match[1] || '1');
+            const sides = parseInt(match[2]);
+            const modifier = parseInt(match[3] || '0');
+            
+            let total = modifier;
+            let rolls = [];
+            
+            for (let i = 0; i < count; i++) {
+                const roll = Math.floor(Math.random() * sides) + 1;
+                rolls.push(roll);
+                total += roll;
+            }
+            
+            displayDiceResult({
+                dice: dice,
+                total: total,
+                rolls: rolls,
+                natural_20: sides === 20 && rolls.includes(20),
+                natural_1: sides === 20 && rolls.includes(1)
             });
-            const data = await response.json();
-            displayDiceResult(data);
-            addMessage(`Rolled ${data.dice}: ${data.total}`, 'system');
+            
+            addMessage(`Rolled ${dice}: ${total} (${rolls.join(', ')})`, 'system');
         }
         
         function displayDiceResult(data) {
@@ -488,31 +453,28 @@
             
             if (!name || !value) return;
             
-            await fetch('/api/initiative', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    name: name,
-                    initiative: parseInt(value)
-                })
-            });
+            // Store in local storage for now
+            let initiative = JSON.parse(localStorage.getItem('initiative') || '[]');
+            initiative.push({name: name, initiative: parseInt(value)});
+            initiative.sort((a, b) => b.initiative - a.initiative);
+            localStorage.setItem('initiative', JSON.stringify(initiative));
             
             document.getElementById('init-name').value = '';
             document.getElementById('init-value').value = '';
             
             loadInitiative();
             document.getElementById('combat-status').textContent = 'Yes';
+            addMessage(`${name} joins combat with initiative ${value}!`, 'system');
         }
         
-        async function loadInitiative() {
-            const response = await fetch('/api/initiative');
-            const data = await response.json();
-            
+        function loadInitiative() {
+            const initiative = JSON.parse(localStorage.getItem('initiative') || '[]');
             const list = document.getElementById('initiative-list');
-            if (data.initiative.length === 0) {
+            
+            if (initiative.length === 0) {
                 list.innerHTML = '<li style="text-align: center; color: #888; padding: 20px;">No combat active</li>';
             } else {
-                list.innerHTML = data.initiative.map((item, index) => `
+                list.innerHTML = initiative.map((item, index) => `
                     <li class="initiative-item ${index === currentTurn ? 'active' : ''}">
                         <span>${item.name}</span>
                         <span>${item.initiative}</span>
@@ -521,10 +483,11 @@
             }
         }
         
-        async function clearInitiative() {
+        function clearInitiative() {
             if (!confirm('Clear initiative tracker?')) return;
             
-            await fetch('/api/initiative', {method: 'DELETE'});
+            localStorage.removeItem('initiative');
+            currentTurn = 0;
             loadInitiative();
             document.getElementById('combat-status').textContent = 'No';
             addMessage('Combat ended', 'system');
@@ -533,32 +496,39 @@
         function saveNotes() {
             const notes = document.getElementById('session-notes').value;
             localStorage.setItem('session_{{ context.campaign.session_number }}_notes', notes);
-            alert('Notes saved!');
+            
+            // Visual feedback
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Saved!';
+            btn.style.background = '#51cf66';
+            
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '';
+            }, 1500);
         }
         
         async function endSession() {
-            if (!confirm('End this session?')) return;
+            if (!confirm('End this session? Your notes will be saved.')) return;
             
             const notes = document.getElementById('session-notes').value;
-            // Save notes logic here
+            localStorage.setItem('session_{{ context.campaign.session_number }}_notes', notes);
             
-            alert('Session ended! Notes saved.');
+            alert('Session ended! Notes saved to browser storage.');
             location.href = '/campaign/{{ context.campaign.name }}';
         }
         
         // Keyboard shortcuts
         document.getElementById('action-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
+            if (e.key === 'Enter' && e.ctrlKey) {
                 e.preventDefault();
                 takeAction();
             }
         });
         
-        // Load saved notes
-        const savedNotes = localStorage.getItem('session_{{ context.campaign.session_number }}_notes');
-        if (savedNotes) {
-            document.getElementById('session-notes').value = savedNotes;
-        }
+        // Load initiative on start
+        loadInitiative();
     </script>
 </body>
 </html>

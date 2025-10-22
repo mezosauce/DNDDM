@@ -13,7 +13,7 @@ from dataclasses import dataclass
 
 # Import the query router (assumes it's in the same directory)
 try:
-    from Main.ai_dm_query_router import QueryRouter, QueryType
+    from ai_dm_query_router import QueryRouter, QueryType
 except ImportError:
     print("Warning: Query router not found. Install ai_dm_query_router.py in the same directory.")
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 AI Dungeon Master - Complete Application
-Integrates all phases into a single working app
+Integrates all phases into a single working app with enhanced Phase 3
 """
 
 from flask import Flask, render_template, request, jsonify, redirect, url_for
@@ -20,6 +20,9 @@ OllamaDM = None
 GameState = None
 QueryRouter = None
 SRDContentLoader = None
+Phase3QueryRouter = None
+create_phase3_prompt = None
+Phase3SRDLoader = None
 
 try:
     from ai_dm_free import OllamaDM, GameState
@@ -29,15 +32,26 @@ except ImportError as e:
 
 try:
     from ai_dm_query_router import QueryRouter
-    print("✓ Query router loaded")
+    print("✓ Query router loaded (Phase 2)")
 except ImportError:
-    print("⚠ Query router not found - AI will work without SRD content")
+    print("⚠ Query router not found - Phase 2 will work without SRD content")
 
 try:
     from ai_dm_free import SRDContentLoader
     print("✓ SRD content loader available")
 except (ImportError, AttributeError):
     print("⚠ SRD content loader not available")
+
+# Import Phase 3 enhanced router
+try:
+    from phase3_DM import (
+        Phase3QueryRouter, 
+        create_phase3_prompt,
+        SRDContentLoader as Phase3SRDLoader
+    )
+    print("✓ Phase 3 enhanced router loaded")
+except ImportError as e:
+    print(f"⚠ Phase 3 router not found: {e}")
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -486,7 +500,7 @@ def complete_phase(campaign_name):
 
 
 # ============================================================================
-# PHASE 3: ACTIVE CAMPAIGN
+# PHASE 3: ACTIVE CAMPAIGN (ENHANCED)
 # ============================================================================
 
 @app.route('/campaign/<campaign_name>/play')
@@ -511,7 +525,7 @@ def new_session(campaign_name):
 
 @app.route('/campaign/<campaign_name>/ai-assist', methods=['POST'])
 def ai_assist(campaign_name):
-    """Get AI assistance in current phase"""
+    """Get AI assistance in current phase - ENHANCED for Phase 3"""
     data = request.json
     query = data.get('query', '').strip()
     
@@ -560,40 +574,73 @@ def ai_assist(campaign_name):
             'recent_events': getattr(campaign, 'recent_events', [])
         }
         
-        # Load relevant SRD content (if available)
+        # ENHANCED: Use Phase 3 router for active campaign
         srd_content = ""
-        if QueryRouter and SRDContentLoader:
+        routing_info = None
+        
+        if phase == 'active' and Phase3QueryRouter and Phase3SRDLoader:
+            try:
+                # Use enhanced Phase 3 router
+                router = Phase3QueryRouter(SRD_PATH)
+                
+                # Route the query with context
+                routing_info = router.route_query(
+                    query, 
+                    context={
+                        'active_combat': campaign_context['active_combat'],
+                        'session_number': campaign_context['session_number']
+                    }
+                )
+                
+                # Load SRD content
+                loader = Phase3SRDLoader(SRD_PATH)
+                srd_content = loader.load_files(
+                    routing_info['files_to_load'],
+                    max_chars=15000
+                )
+                
+                # Log what we're using
+                print(f"[Phase 3 Router] Categories: {routing_info['matched_categories']}")
+                print(f"[Phase 3 Router] Files: {len(routing_info['files_to_load'])}")
+                
+            except Exception as e:
+                print(f"Phase 3 routing warning: {e}")
+                # Fall back to basic routing if needed
+                
+        elif phase == 'prep' and QueryRouter and SRDContentLoader:
+            # Use Phase 2 router for prep
             try:
                 router = QueryRouter(SRD_PATH)
-                # Use first available story phase as current phase
-                story_phase = ''
-                if hasattr(campaign_mgr, 'get_available_story_phases'):
-                    phases = campaign_mgr.get_available_story_phases(campaign.current_phase)
-                    if phases:
-                        story_phase = phases[0]
-                
+                story_phase = '03_call_to_adventure'
                 routing = router.route_query(query, current_phase=story_phase)
-                
-                # Load more files for active phase, fewer for prep
-                max_files = 5 if phase == 'active' else 3
-                max_chars = 15000 if phase == 'active' else 10000
                 
                 if routing['files_to_load']:
                     loader = SRDContentLoader(SRD_PATH)
                     srd_content = loader.load_files(
-                        routing['files_to_load'][:max_files], 
-                        max_chars=max_chars
+                        routing['files_to_load'][:3], 
+                        max_chars=10000
                     )
             except Exception as e:
-                print(f"SRD loading warning: {e}")
+                print(f"Phase 2 routing warning: {e}")
         
-        # Create full prompt using template system
-        full_prompt = create_full_prompt(
-            phase=phase,
-            campaign_context=campaign_context,
-            query=query,
-            srd_content=srd_content
-        )
+        # Create full prompt using appropriate system
+        if phase == 'active' and create_phase3_prompt:
+            # Use enhanced Phase 3 prompt
+            base_prompt = prompt_templates.get_prompt('active')
+            full_prompt = create_phase3_prompt(
+                campaign_context=campaign_context,
+                query=query,
+                srd_content=srd_content,
+                base_prompt=base_prompt
+            )
+        else:
+            # Use standard prompt template
+            full_prompt = create_full_prompt(
+                phase=phase,
+                campaign_context=campaign_context,
+                query=query,
+                srd_content=srd_content
+            )
         
         # Get AI response using Ollama
         import requests
@@ -623,13 +670,22 @@ def ai_assist(campaign_name):
             campaign.recent_events.append(f"DM: {ai_response[:100]}")
             # Keep only last 10 events
             campaign.recent_events = campaign.recent_events[-10:]
-            campaign_mgr.save_campaign(campaign)
+            campaign_mgr._save_campaign(campaign)
         
-        return jsonify({
+        # Include routing info in response for debugging
+        response_data = {
             'response': ai_response,
             'query': query,
             'phase': phase
-        })
+        }
+        
+        if routing_info:
+            response_data['routing_info'] = {
+                'categories': routing_info['matched_categories'],
+                'files_loaded': len(routing_info['files_to_load'])
+            }
+        
+        return jsonify(response_data)
         
     except Exception as e:
         print(f"Error in ai_assist: {e}")
@@ -701,8 +757,13 @@ if __name__ == '__main__':
         print("⚠ Ollama not detected - AI features disabled")
         print("  To enable AI: Install Ollama and run 'ollama serve'")
     
+    if Phase3QueryRouter:
+        print("✓ Phase 3 Enhanced Router active")
+    else:
+        print("⚠ Phase 3 router not available")
+    
     if not QueryRouter:
-        print("⚠ Query router not available - AI will work without SRD context")
+        print("⚠ Phase 2 router not available")
     
     print(f"\n📡 Server starting...")
     print(f"   Campaign Manager: http://localhost:5000")
