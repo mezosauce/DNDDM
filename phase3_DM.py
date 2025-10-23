@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Enhanced AI DM Integration for Phase 3 (Active Campaign)
-Properly routes queries to relevant SRD content for active gameplay
+UPDATED: Now includes preparations.md context for opening session
 """
 
 from pathlib import Path
@@ -12,7 +12,7 @@ import re
 class Phase3QueryRouter:
     """
     Smart query router for Phase 3 (Active Campaign)
-    Maps player queries to relevant SRD files from packages 5-13
+    Maps player queries to relevant SRD content for active gameplay
     """
     
     # Story phases 5-13 (Active Campaign)
@@ -365,20 +365,58 @@ class SRDContentLoader:
             return None
 
 
+def extract_quest_details(preparations_content: str) -> Dict[str, str]:
+    """
+    Extract quest setup details from preparations.md
+    Returns a dict with quest_hook, objective, location, npcs, equipment, roles
+    """
+    details = {
+        'quest_hook': '',
+        'objective': '',
+        'location': '',
+        'npcs': '',
+        'equipment': '',
+        'roles': ''
+    }
+    
+    if not preparations_content:
+        return details
+    
+    # Pattern to extract each section
+    sections = {
+        'quest_hook': r'### Quest Hook\s*\n(.*?)(?=###|$)',
+        'objective': r'### Main Objective\s*\n(.*?)(?=###|$)',
+        'location': r'### Starting Location\s*\n(.*?)(?=###|$)',
+        'npcs': r'### Key NPCs\s*\n(.*?)(?=###|$)',
+        'equipment': r'### Equipment Needed\s*\n(.*?)(?=###|$)',
+        'roles': r'### Party Roles & Strategy\s*\n(.*?)(?=###|$)'
+    }
+    
+    for key, pattern in sections.items():
+        match = re.search(pattern, preparations_content, re.DOTALL | re.MULTILINE)
+        if match:
+            details[key] = match.group(1).strip()
+    
+    return details
+
+
 def create_phase3_prompt(
     campaign_context: Dict,
     query: str,
     srd_content: str,
-    base_prompt: str
+    base_prompt: str,
+    is_first_message: bool = False
 ) -> str:
     """
     Create a complete prompt for Phase 3 (Active Campaign)
+    UPDATED: Includes quest preparation context and opening scene generation
     
     Args:
         campaign_context: Dict with campaign/party info
         query: Player's action/query
         srd_content: Relevant SRD rules
         base_prompt: Base DM prompt from template
+        is_first_message: True if this is the first message of Session 1
         
     Returns:
         Complete formatted prompt
@@ -390,8 +428,26 @@ def create_phase3_prompt(
     prompt += f"Campaign: {campaign_context.get('name', 'Unknown')}\n"
     prompt += f"Session: {campaign_context.get('session_number', 1)}\n"
     
+    # Quest preparation details (from Phase 2)
+    if campaign_context.get('preparations_content'):
+        quest_details = extract_quest_details(campaign_context['preparations_content'])
+        
+        prompt += "\n=== QUEST SETUP (From Preparation Phase) ===\n"
+        if quest_details['quest_hook']:
+            prompt += f"**Quest Hook:** {quest_details['quest_hook']}\n\n"
+        if quest_details['objective']:
+            prompt += f"**Main Objective:** {quest_details['objective']}\n\n"
+        if quest_details['location']:
+            prompt += f"**Starting Location:** {quest_details['location']}\n\n"
+        if quest_details['npcs']:
+            prompt += f"**Key NPCs:** {quest_details['npcs']}\n\n"
+        if quest_details['equipment']:
+            prompt += f"**Equipment:** {quest_details['equipment']}\n\n"
+        if quest_details['roles']:
+            prompt += f"**Party Strategy:** {quest_details['roles']}\n\n"
+    
     if campaign_context.get('current_location'):
-        prompt += f"Location: {campaign_context['current_location']}\n"
+        prompt += f"Current Location: {campaign_context['current_location']}\n"
     
     if campaign_context.get('active_combat'):
         prompt += "⚔️ COMBAT IS ACTIVE\n"
@@ -414,13 +470,33 @@ def create_phase3_prompt(
     if srd_content and len(srd_content) > 100:
         prompt += f"\n=== D&D 5E RULES REFERENCE ===\n{srd_content}\n"
     
-    # Player query
-    prompt += f"\n=== PLAYER ACTION ===\n{query}\n"
+    # Special handling for first message of session 1
+    if is_first_message and campaign_context.get('session_number', 0) == 1:
+        prompt += "\n=== OPENING SCENE INSTRUCTIONS ===\n"
+        prompt += "This is the FIRST moment of Session 1. You must:\n"
+        prompt += "1. Set the scene at the Starting Location with vivid sensory details\n"
+        prompt += "2. Introduce the Quest Hook naturally through narration or NPC interaction\n"
+        prompt += "3. Present an immediate choice or situation that engages the players\n"
+        prompt += "4. Do NOT wait for player input - start the adventure NOW\n"
+        prompt += "5. Make it exciting, dramatic, and clear what's at stake\n\n"
+        
+        prompt += "Examples of strong openings:\n"
+        prompt += "- 'You arrive at the tavern as a wounded messenger bursts through the door...'\n"
+        prompt += "- 'The village elder grabs your arm urgently as smoke rises from the forest...'\n"
+        prompt += "- 'As you enter the ruins, you hear a scream echoing from below...'\n\n"
+    
+    # Player query (unless it's the auto-start)
+    if query and query.lower() not in ['start', 'begin', 'start adventure', 'begin session']:
+        prompt += f"\n=== PLAYER ACTION ===\n{query}\n"
     
     # Response instruction
     prompt += "\n=== YOUR RESPONSE ===\n"
-    prompt += "As Dungeon Master, respond to the player's action with vivid narration "
-    prompt += "and clear mechanics. Call for rolls when needed, describe outcomes dramatically.\n\n"
+    if is_first_message:
+        prompt += "Begin Session 1 with a dramatic opening scene that immediately engages the party.\n\n"
+    else:
+        prompt += "As Dungeon Master, respond to the player's action with vivid narration "
+        prompt += "and clear mechanics. Call for rolls when needed, describe outcomes dramatically.\n\n"
+    
     prompt += "DM: "
     
     return prompt

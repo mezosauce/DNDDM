@@ -89,6 +89,22 @@
             font-family: monospace;
             font-size: 0.85em;
         }
+        
+        .session-start-banner {
+            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            animation: fadeIn 1s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -211,25 +227,118 @@
         let isLoading = false;
         let currentTurn = 0;
         let debugMode = false;
+        const sessionNumber = {{ context.campaign.session_number }};
+        const isFirstSession = sessionNumber === 1;
+        let sessionStarted = false;
         
-        // Add welcome message
+        // Auto-start Session 1 with opening scene
         window.onload = () => {
-            addMessage('Session {{ context.campaign.session_number }} begins! What do you do?', 'system');
-
             // Load saved notes
             const savedNotes = localStorage.getItem('session_{{ context.campaign.session_number }}_notes');
             if (savedNotes) {
                 document.getElementById('session-notes').value = savedNotes;
             }
 
-            // Apply HP bar widths from data attributes to avoid inline template expressions in style
+            // Apply HP bar widths from data attributes
             document.querySelectorAll('.hp-fill[data-hp-pct]').forEach(el => {
                 const pct = el.getAttribute('data-hp-pct');
                 if (pct !== null) {
                     el.style.width = pct + '%';
                 }
             });
+            
+            // Load initiative
+            loadInitiative();
+            
+            // Check if this is Session 1 and hasn't been started yet
+            const sessionStartedKey = 'session_1_started_{{ context.campaign.name }}';
+            sessionStarted = localStorage.getItem(sessionStartedKey) === 'true';
+            
+            if (isFirstSession && !sessionStarted) {
+                // Show banner and auto-start
+                const banner = document.createElement('div');
+                banner.className = 'session-start-banner';
+                banner.innerHTML = '⚔️ Session 1 Beginning! The adventure starts now... ⚔️';
+                document.querySelector('.phase-header').after(banner);
+                
+                // Auto-start after short delay
+                setTimeout(() => {
+                    banner.remove();
+                    startSessionOne();
+                }, 2000);
+                
+                // Mark as started
+                localStorage.setItem(sessionStartedKey, 'true');
+            } else {
+                // Regular welcome message for ongoing sessions
+                addMessage(`Session ${sessionNumber} continues! What do you do?`, 'system');
+            }
         };
+        
+        async function startSessionOne() {
+            addMessage('🎬 The Dungeon Master begins your tale...', 'system');
+            
+            // Disable input during opening scene
+            const input = document.getElementById('action-input');
+            const actionBtn = document.getElementById('action-btn');
+            input.disabled = true;
+            actionBtn.disabled = true;
+            
+            // Add AI thinking indicator
+            const thinkingDiv = document.createElement('div');
+            thinkingDiv.className = 'ai-thinking';
+            thinkingDiv.id = 'ai-thinking';
+            thinkingDiv.innerHTML = `
+                <div class="thinking-dots">
+                    <div class="thinking-dot"></div>
+                    <div class="thinking-dot"></div>
+                    <div class="thinking-dot"></div>
+                </div>
+                <span>Crafting your opening scene...</span>
+            `;
+            document.getElementById('chat-container').appendChild(thinkingDiv);
+            
+            try {
+                const response = await fetch('/campaign/{{ context.campaign.name }}/ai-assist', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        query: 'START_SESSION_1',
+                        is_first_message: true
+                    })
+                });
+                
+                // Remove thinking indicator
+                const thinking = document.getElementById('ai-thinking');
+                if (thinking) thinking.remove();
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    addMessage(`❌ Error: ${data.error}`, 'dm');
+                    if (debugMode) {
+                        addDebugInfo({ error: data.error });
+                    }
+                } else {
+                    addMessage(data.response, 'dm');
+                    if (debugMode && data.routing_info) {
+                        addRoutingInfo(data.routing_info);
+                    }
+                }
+            } catch (error) {
+                const thinking = document.getElementById('ai-thinking');
+                if (thinking) thinking.remove();
+                addMessage(`❌ Connection Error: ${error.message}`, 'dm');
+                if (debugMode) {
+                    addDebugInfo({ error: error.message, stack: error.stack });
+                }
+            }
+            
+            // Re-enable input
+            input.disabled = false;
+            actionBtn.disabled = false;
+            input.focus();
+        }
         
         function toggleDebug() {
             debugMode = !debugMode;
@@ -526,9 +635,6 @@
                 takeAction();
             }
         });
-        
-        // Load initiative on start
-        loadInitiative();
     </script>
 </body>
 </html>

@@ -2,6 +2,7 @@
 """
 Campaign Manager - Phased Session System
 Manages campaigns with structured phases and persistent storage
+UPDATED: Now includes preparations.md support for Phase 3
 """
 
 import os
@@ -380,7 +381,7 @@ Add your campaign notes, world-building, and story hooks here.
             f.write(content)
     
     def get_campaign_context(self, campaign_name: str) -> Dict:
-        """Get full campaign context for AI DM"""
+        """Get full campaign context for AI DM - UPDATED with preparations support"""
         campaign = self.load_campaign(campaign_name)
         characters = self.get_characters(campaign_name)
         
@@ -392,6 +393,13 @@ Add your campaign notes, world-building, and story hooks here.
         if setup_file.exists():
             with open(setup_file, 'r', encoding='utf-8') as f:
                 setup_content = f.read()
+        
+        # Read quest preparations (Phase 2 output) - NEW!
+        preparations_content = ""
+        preparations_file = folder / "preparations.md"
+        if preparations_file.exists():
+            with open(preparations_file, 'r', encoding='utf-8') as f:
+                preparations_content = f.read()
         
         # Get latest session notes if in active campaign
         latest_session = ""
@@ -405,6 +413,7 @@ Add your campaign notes, world-building, and story hooks here.
             "campaign": asdict(campaign),
             "characters": [asdict(char) for char in characters],
             "setup_content": setup_content,
+            "preparations_content": preparations_content,  # NEW!
             "latest_session": latest_session,
             "phase_info": self.PHASES[campaign.current_phase],
             "available_story_phases": self.PHASES[campaign.current_phase]["story_phases"]
