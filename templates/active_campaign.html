@@ -105,6 +105,63 @@
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
+        /* Quest Details Styles */
+        .quest-detail {
+            margin: 12px 0;
+        }
+        
+        .quest-detail summary {
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 8px;
+            user-select: none;
+            padding: 6px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        
+        .quest-detail summary:hover {
+            background: rgba(77, 171, 247, 0.1);
+        }
+        
+        .quest-detail-content {
+            margin: 8px 0;
+            padding-left: 10px;
+            border-left: 3px solid #4dabf7;
+            color: #d0d0d0;
+            line-height: 1.5;
+        }
+        
+        .quest-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            overflow: auto;
+        }
+        
+        .quest-modal-content {
+            background: #1a1a1a;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 800px;
+            border: 2px solid #4dabf7;
+        }
+        
+        .quest-modal-close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #888;
+            line-height: 20px;
+        }
     </style>
 </head>
 <body>
@@ -123,11 +180,106 @@
         
         <div class="content">
             <!-- Left Sidebar: Party -->
+             <div>
+
+                
+                {% if context.preparations_content %}
+                <div class="panel">
+                    <h2>🎯 Quest Setup</h2>
+                    <div style="font-size: 0.85em; color: #b0b0b0; line-height: 1.6;">
+                        <div class="quest-detail">
+                            <details open>
+                                <summary>📖 Quest Hook</summary>
+                                <div class="quest-detail-content" id="quest-hook">
+                                    <!-- Will be populated by JavaScript -->
+                                </div>
+                            </details>
+                        </div>
+                        
+                        <div class="quest-detail">
+                            <details open>
+                                <summary>🎯 Objective</summary>
+                                <div class="quest-detail-content" id="quest-objective">
+                                    <!-- Will be populated by JavaScript -->
+                                </div>
+                            </details>
+                        </div>
+                        
+                        <div class="quest-detail">
+                            <details>
+                                <summary>📍 Location</summary>
+                                <div class="quest-detail-content" id="quest-location">
+                                    <!-- Will be populated by JavaScript -->
+                                </div>
+                            </details>
+                        </div>
+                        
+                        <div class="quest-detail">
+                            <details>
+                                <summary>👤 Key NPCs</summary>
+                                <div class="quest-detail-content" id="quest-npcs">
+                                    <!-- Will be populated by JavaScript -->
+                                </div>
+                            </details>
+                        </div>
+                        
+                        <button onclick="toggleFullQuestDetails()" style="margin-top: 12px; padding: 6px 12px; font-size: 0.8em; width: 100%;">
+                            View Full Quest Details
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="panel">
+                    <h2>⚔️ Initiative Tracker</h2>
+                    <ul class="initiative-list" id="initiative-list">
+                        <li style="text-align: center; color: #888; padding: 20px;">
+                            No combat active
+                        </li>
+                    </ul>
+                    <input type="text" id="init-name" placeholder="Name">
+                    <input type="number" id="init-value" placeholder="Initiative" min="1">
+                    <button onclick="addInitiative()">Add to Initiative</button>
+                    <button class="btn-secondary" onclick="clearInitiative()">Clear All</button>
+                </div>
+                
+                <div class="panel">
+                    <h2>📝 Session Notes</h2>
+                    <textarea id="session-notes" placeholder="Take notes about this session..." style="min-height: 150px;"></textarea>
+                    <button onclick="saveNotes()">Save Notes</button>
+                </div>
+                
+                
+                <div class="panel">
+                    <h2>📍 Current Context</h2>
+                    <div style="font-size: 0.9em; color: #b0b0b0;">
+                        <p><strong>Phase:</strong> {{ context.phase_info.name }}</p>
+                        <p><strong>Location:</strong> <span id="current-location">Unknown</span></p>
+                        <p><strong>Combat:</strong> <span id="combat-status">No</span></p>
+                    </div>
+                </div>
+                
+            </div>
+           
+           
+            
+            <!-- Center: Main Chat -->
+            <div>
+                <div class="panel">
+                    <h2>🎭 Adventure Log</h2>
+                    <div class="chat-container" id="chat-container"></div>
+                    <textarea id="action-input" placeholder="What do you do?" rows="3"></textarea>
+                    <button onclick="takeAction()" id="action-btn">Take Action</button>
+                </div>
+            </div>
+            
+            <!-- Right Sidebar: Combat & Tools -->
+
+            
             <div>
                 <div class="panel">
                     <h2>👥 Party</h2>
                     {% for char in context.characters %}
-                    {# compute hp percent safely and use in style attribute #}
                     {% set max_hp_safe = char.max_hp if char.max_hp and char.max_hp > 0 else 1 %}
                     {% set hp_pct = ((char.hp / max_hp_safe) * 100)|int %}
                     <div class="character-card">
@@ -139,7 +291,6 @@
                             <div>AC: {{ char.ac }}</div>
                         </div>
                         <div class="hp-bar">
-                            {# Avoid putting template expression directly inside style (some editors flag CSS) #}
                             <div class="hp-fill" data-hp-pct="{{ hp_pct }}"></div>
                         </div>
                     </div>
@@ -173,46 +324,17 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Center: Main Chat -->
-            <div>
-                <div class="panel">
-                    <h2>🎭 Adventure Log</h2>
-                    <div class="chat-container" id="chat-container"></div>
-                    <textarea id="action-input" placeholder="What do you do?" rows="3"></textarea>
-                    <button onclick="takeAction()" id="action-btn">Take Action</button>
-                </div>
-            </div>
-            
-            <!-- Right Sidebar: Combat & Tools -->
-            <div>
-                <div class="panel">
-                    <h2>⚔️ Initiative Tracker</h2>
-                    <ul class="initiative-list" id="initiative-list">
-                        <li style="text-align: center; color: #888; padding: 20px;">
-                            No combat active
-                        </li>
-                    </ul>
-                    <input type="text" id="init-name" placeholder="Name">
-                    <input type="number" id="init-value" placeholder="Initiative" min="1">
-                    <button onclick="addInitiative()">Add to Initiative</button>
-                    <button class="btn-secondary" onclick="clearInitiative()">Clear All</button>
-                </div>
-                
-                <div class="panel">
-                    <h2>📝 Session Notes</h2>
-                    <textarea id="session-notes" placeholder="Take notes about this session..." style="min-height: 150px;"></textarea>
-                    <button onclick="saveNotes()">Save Notes</button>
-                </div>
-                
-                <div class="panel">
-                    <h2>📍 Current Context</h2>
-                    <div style="font-size: 0.9em; color: #b0b0b0;">
-                        <p><strong>Phase:</strong> {{ context.phase_info.name }}</p>
-                        <p><strong>Location:</strong> <span id="current-location">Unknown</span></p>
-                        <p><strong>Combat:</strong> <span id="combat-status">No</span></p>
-                    </div>
-                </div>
+          
+        </div>
+    </div>
+    
+    <!-- Quest Details Modal -->
+    <div id="quest-modal" class="quest-modal">
+        <div class="quest-modal-content">
+            <span class="quest-modal-close" onclick="closeQuestModal()">&times;</span>
+            <h2>🎯 Complete Quest Setup</h2>
+            <div id="full-quest-content" style="margin-top: 20px;">
+                <!-- Will be populated by JavaScript -->
             </div>
         </div>
     </div>
@@ -231,8 +353,58 @@
         const isFirstSession = sessionNumber === 1;
         let sessionStarted = false;
         
+        // Quest preparation content (if available)
+        const preparationsContent = `{{ context.preparations_content | replace('`', '\\`') | replace('$', '\\$') | safe }}`;
+        
+        // Parse quest details from preparations content
+        function parseQuestDetails() {
+            if (!preparationsContent) return;
+            
+            const sections = {
+                'quest-hook': /### Quest Hook\s*\n(.*?)(?=###|$)/s,
+                'quest-objective': /### Main Objective\s*\n(.*?)(?=###|$)/s,
+                'quest-location': /### Starting Location\s*\n(.*?)(?=###|$)/s,
+                'quest-npcs': /### Key NPCs\s*\n(.*?)(?=###|$)/s
+            };
+            
+            for (const [id, regex] of Object.entries(sections)) {
+                const match = preparationsContent.match(regex);
+                if (match && match[1]) {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.textContent = match[1].trim().replace(/\*\*([^*]+)\*\*/g, '$1');
+                    }
+                }
+            }
+            
+            // Populate full quest modal
+            const fullContent = document.getElementById('full-quest-content');
+            if (fullContent) {
+                fullContent.innerHTML = `<pre style="white-space: pre-wrap; line-height: 1.6;">${escapeHtml(preparationsContent)}</pre>`;
+            }
+        }
+        
+        function toggleFullQuestDetails() {
+            document.getElementById('quest-modal').style.display = 'block';
+        }
+        
+        function closeQuestModal() {
+            document.getElementById('quest-modal').style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('quest-modal');
+            if (event.target === modal) {
+                closeQuestModal();
+            }
+        }
+        
         // Auto-start Session 1 with opening scene
         window.onload = () => {
+            // Parse quest details
+            parseQuestDetails();
+            
             // Load saved notes
             const savedNotes = localStorage.getItem('session_{{ context.campaign.session_number }}_notes');
             if (savedNotes) {
