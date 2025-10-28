@@ -162,6 +162,47 @@
             color: #888;
             line-height: 20px;
         }
+        
+        .quest-modal-close:hover {
+            color: #fff;
+        }
+
+        .srd-result {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+    }
+
+    .srd-result:hover {
+        background: rgba(0, 0, 0, 0.5);
+        border-left-color: #4dabf7;
+    }
+
+    .srd-result-title {
+        font-weight: bold;
+        color: #51cf66;
+        font-size: 0.95em;
+        margin-bottom: 4px;
+    }
+
+    .srd-result-snippet {
+        color: #b0b0b0;
+        font-size: 0.8em;
+        line-height: 1.4;
+    }
+
+    .srd-result-category {
+        display: inline-block;
+        padding: 2px 6px;
+        background: rgba(77, 171, 247, 0.2);
+        border-radius: 3px;
+        font-size: 0.7em;
+        margin-bottom: 4px;
+    }
     </style>
 </head>
 <body>
@@ -323,6 +364,30 @@
                         <button class="quick-btn" onclick="quickAction('I take a rest')">🛌 Rest</button>
                     </div>
                 </div>
+
+                <!-- ADD THIS AFTER THE QUICK ACTIONS PANEL -->
+                <div class="panel">
+                    <h2>🔍 SRD Search</h2>
+                    <div id="embedded-search">
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <input type="text" 
+                                id="srd-search-input" 
+                                placeholder="Search rules, spells, monsters..."
+                                style="flex: 1;"
+                                onkeypress="if(event.key==='Enter') searchSRD()">
+                            <button onclick="searchSRD()" style="width: auto; padding: 8px 16px; margin: 0;">Go</button>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 10px;">
+                            <button class="quick-btn" onclick="quickSearchSRD('fireball')">🔥 Fireball</button>
+                            <button class="quick-btn" onclick="quickSearchSRD('grapple')">🤼 Grapple</button>
+                            <button class="quick-btn" onclick="quickSearchSRD('conditions')">🎭 Conditions</button>
+                            <button class="quick-btn" onclick="quickSearchSRD('cover')">🛡️ Cover</button>
+                        </div>
+                        
+                        <div id="srd-results" style="max-height: 300px; overflow-y: auto;"></div>
+                    </div>
+                </div>
             </div>
           
         </div>
@@ -353,6 +418,73 @@
         const isFirstSession = sessionNumber === 1;
         let sessionStarted = false;
         
+
+        let srdSearchResults = [];
+
+function quickSearchSRD(query) {
+    document.getElementById('srd-search-input').value = query;
+    searchSRD();
+}
+
+async function searchSRD() {
+    const query = document.getElementById('srd-search-input').value.trim();
+    if (!query) return;
+    
+    const resultsDiv = document.getElementById('srd-results');
+    resultsDiv.innerHTML = '<div style="text-align: center; padding: 20px; color: #888;"><div class="spinner"></div>Searching...</div>';
+    
+    try {
+        const response = await fetch('/api/search', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                query: query,
+                top_k: 5
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+            resultsDiv.innerHTML = `<div style="color: #ff6b6b; padding: 10px;">${data.error}</div>`;
+            return;
+        }
+        
+        srdSearchResults = data.results;
+        displaySRDResults(data.results);
+        
+    } catch (error) {
+        resultsDiv.innerHTML = `<div style="color: #ff6b6b; padding: 10px;">Error: ${error.message}</div>`;
+    }
+}
+
+function displaySRDResults(results) {
+    const resultsDiv = document.getElementById('srd-results');
+    
+    if (results.length === 0) {
+        resultsDiv.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">No results found</div>';
+        return;
+    }
+    
+    resultsDiv.innerHTML = results.map((result, index) => `
+        <div class="srd-result" onclick="showSRDDetail(${index})">
+            <div class="srd-result-title">${escapeHtml(result.title)}</div>
+            <div class="srd-result-category">${result.category}</div>
+            <div class="srd-result-snippet">${escapeHtml(result.snippet)}</div>
+        </div>
+    `).join('');
+}
+
+function showSRDDetail(index) {
+    const result = srdSearchResults[index];
+    
+    // Show in a simple alert or insert into chat
+    if (confirm(`View: ${result.title}\n\nAsk the DM about this?`)) {
+        const input = document.getElementById('action-input');
+        input.value = `Tell me about ${result.title}`;
+        input.focus();
+    }
+}
         // Quest preparation content (if available)
         const preparationsContent = `{{ context.preparations_content | replace('`', '\\`') | replace('$', '\\$') | safe }}`;
         

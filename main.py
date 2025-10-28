@@ -14,6 +14,8 @@ from datetime import datetime
 # Import campaign manager
 from campaign_manager import get_campaign_manager, Character
 from prompt_templates import PromptTemplates, create_full_prompt
+from search_engine import SRDSearchEngine, create_search_api, FAISS_AVAILABLE, EMBEDDINGS_AVAILABLE
+
 
 # Import AI DM components with better error handling
 OllamaDM = None
@@ -74,6 +76,20 @@ if OllamaDM:
         dm = None
 else:
     print("⚠ AI DM not available - install ai_dm_free.py")
+
+# Initialize Search Engine
+search_engine = None
+if FAISS_AVAILABLE and EMBEDDINGS_AVAILABLE:
+    try:
+        search_engine = SRDSearchEngine(SRD_PATH)
+        search_engine.load_index()
+        print("✓ Search engine loaded successfully")
+    except FileNotFoundError:
+        print("⚠️  Search index not built. Run: python search_engine.py --build")
+    except Exception as e:
+        print(f"⚠️  Could not initialize search engine: {e}")
+else:
+    print("⚠️  Search engine not available")
 
 
 # ============================================================================
@@ -737,6 +753,19 @@ def create_templates():
         print("⚠ extract_templates.py not found - run it manually to create templates")
     print("✓ Templates check complete")
 
+# Add search API endpoints
+if search_engine:
+    create_search_api(app, search_engine)
+
+@app.route('/campaign/<campaign_name>/search-panel')
+def search_panel(campaign_name):
+    """Render search panel for active campaign"""
+    try:
+        campaign = campaign_mgr.load_campaign(campaign_name)
+        stats = search_engine.get_stats() if search_engine else {'status': 'not_available'}
+        return render_template('search_panel.html', campaign=campaign, stats=stats)
+    except Exception as e:
+        return f"Error: {e}", 404
 
 # ============================================================================
 # APPLICATION ENTRY POINT

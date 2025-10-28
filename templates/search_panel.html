@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRD Search - {{ campaign.name }}</title>
+    <link rel="stylesheet" href="/static/css/base.css">
+    <style>
+        .search-panel {
+            background: rgba(30, 30, 46, 0.8);
+            border: 2px solid #4a4a6a;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .search-stats {
+            font-size: 0.85em;
+            color: #888;
+        }
+        
+        .search-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .search-input {
+            flex: 1;
+        }
+        
+        .search-btn {
+            width: auto;
+            padding: 12px 24px;
+            margin: 0;
+        }
+        
+        .category-filter {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .category-chip {
+            padding: 6px 12px;
+            background: rgba(77, 171, 247, 0.2);
+            border: 1px solid #4dabf7;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+        
+        .category-chip:hover {
+            background: rgba(77, 171, 247, 0.3);
+        }
+        
+        .category-chip.active {
+            background: #4dabf7;
+            color: white;
+        }
+        
+        .search-results {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .search-result {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        
+        .search-result:hover {
+            background: rgba(0, 0, 0, 0.5);
+            border-left-color: #4dabf7;
+        }
+        
+        .result-title {
+            font-weight: bold;
+            color: #51cf66;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+        
+        .result-category {
+            display: inline-block;
+            padding: 2px 8px;
+            background: rgba(255, 107, 107, 0.2);
+            border-radius: 4px;
+            font-size: 0.75em;
+            margin-bottom: 8px;
+        }
+        
+        .result-snippet {
+            color: #b0b0b0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .result-score {
+            color: #888;
+            font-size: 0.8em;
+            margin-top: 8px;
+        }
+        
+        .result-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .result-btn {
+            padding: 4px 12px;
+            font-size: 0.85em;
+            width: auto;
+            margin: 0;
+        }
+        
+        .search-empty {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+        
+        .search-loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 3000;
+            overflow: auto;
+        }
+        
+        .modal-content {
+            background: #1a1a1a;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 800px;
+            border: 2px solid #4dabf7;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #888;
+            line-height: 20px;
+        }
+        
+        .modal-close:hover {
+            color: #fff;
+        }
+        
+        .content-full {
+            white-space: pre-wrap;
+            line-height: 1.6;
+            color: #d0d0d0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .quick-searches {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .quick-search-btn {
+            padding: 8px 12px;
+            font-size: 0.85em;
+            background: rgba(81, 207, 102, 0.2);
+            border: 1px solid #51cf66;
+            width: 100%;
+            margin: 0;
+        }
+        
+        .quick-search-btn:hover {
+            background: rgba(81, 207, 102, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="search-panel">
+        <div class="search-header">
+            <h2>🔍 SRD Search</h2>
+            <div class="search-stats" id="search-stats">
+                {% if stats.status == 'loaded' %}
+                    {{ stats.total_documents }} documents indexed
+                {% elif stats.status == 'not_available' %}
+                    Search not available
+                {% else %}
+                    Not loaded
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if stats.status == 'loaded' %}
+        <div class="quick-searches">
+            <button class="quick-search-btn" onclick="quickSearch('fireball spell')">🔥 Fireball</button>
+            <button class="quick-search-btn" onclick="quickSearch('grapple rules')">🤼 Grapple</button>
+            <button class="quick-search-btn" onclick="quickSearch('opportunity attack')">⚔️ Opportunity</button>
+            <button class="quick-search-btn" onclick="quickSearch('conditions')">🎭 Conditions</button>
+            <button class="quick-search-btn" onclick="quickSearch('cover rules')">🛡️ Cover</button>
+            <button class="quick-search-btn" onclick="quickSearch('death saving throw')">💀 Death Saves</button>
+        </div>
+        
+        <div class="search-input-group">
+            <input type="text" 
+                   id="search-input" 
+                   class="search-input" 
+                   placeholder="Search spells, monsters, items, rules..."
+                   onkeypress="handleEnter(event)">
+            <button class="search-btn" onclick="performSearch()">Search</button>
+        </div>
+        
+        <div class="category-filter" id="category-filter">
+            <div class="category-chip active" data-category="">All</div>
+            {% for category, count in stats.categories.items() %}
+            <div class="category-chip" data-category="{{ category }}">
+                {{ category.title() }} ({{ count }})
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="search-results" id="search-results">
+            <div class="search-empty">
+                Enter a search query to find spells, monsters, items, and rules
+            </div>
+        </div>
+        {% else %}
+        <div class="info-box">
+            <strong>Search Engine Not Available</strong>
+            <p>To enable search:</p>
+            <ol>
+                <li>Install dependencies: <code>pip install faiss-cpu sentence-transformers</code></li>
+                <li>Build index: <code>python search_engine.py --build</code></li>
+                <li>Restart the server</li>
+            </ol>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Detail Modal -->
+    <div id="detail-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h2 id="modal-title"></h2>
+            <div id="modal-category" class="result-category"></div>
+            <div id="modal-content" class="content-full"></div>
+        </div>
+    </div>
+    
+    <script>
+        let currentCategory = '';
+        let lastResults = [];
+        
+        // Category filter handling
+        document.querySelectorAll('.category-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                // Update active state
+                document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                
+                currentCategory = this.dataset.category;
+                
+                // Re-run search if we have a query
+                const query = document.getElementById('search-input').value;
+                if (query) {
+                    performSearch();
+                }
+            });
+        });
+        
+        function handleEnter(event) {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        }
+        
+        function quickSearch(query) {
+            document.getElementById('search-input').value = query;
+            performSearch();
+        }
+        
+        async function performSearch() {
+            const query = document.getElementById('search-input').value.trim();
+            if (!query) return;
+            
+            const resultsDiv = document.getElementById('search-results');
+            resultsDiv.innerHTML = '<div class="search-loading"><div class="spinner"></div><p>Searching...</p></div>';
+            
+            try {
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        query: query,
+                        top_k: 10,
+                        category: currentCategory || undefined
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    resultsDiv.innerHTML = `<div class="search-empty">Error: ${data.error}</div>`;
+                    return;
+                }
+                
+                lastResults = data.results;
+                displayResults(data.results);
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="search-empty">Connection error: ${error.message}</div>`;
+            }
+        }
+        
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('search-results');
+            
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div class="search-empty">No results found</div>';
+                return;
+            }
+            
+            resultsDiv.innerHTML = results.map((result, index) => `
+                <div class="search-result" onclick="showDetails(${index})">
+                    <div class="result-title">${escapeHtml(result.title)}</div>
+                    <div class="result-category">${result.category}</div>
+                    <div class="result-snippet">${escapeHtml(result.snippet)}</div>
+                    <div class="result-score">Relevance: ${(result.score * 100).toFixed(0)}%</div>
+                    <div class="result-actions">
+                        <button class="result-btn btn-info" onclick="event.stopPropagation(); showDetails(${index})">
+                            📖 View Full
+                        </button>
+                        <button class="result-btn btn-success" onclick="event.stopPropagation(); insertToChat('${escapeHtml(result.title)}')">
+                            💬 Ask About This
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function showDetails(index) {
+            const result = lastResults[index];
+            
+            document.getElementById('modal-title').textContent = result.title;
+            document.getElementById('modal-category').textContent = result.category;
+            document.getElementById('modal-content').textContent = result.content;
+            document.getElementById('detail-modal').style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('detail-modal').style.display = 'none';
+        }
+        
+        function insertToChat(title) {
+            // If this is embedded in active_campaign.html, send to chat
+            if (window.parent && window.parent.document.getElementById('action-input')) {
+                const input = window.parent.document.getElementById('action-input');
+                input.value = `Tell me about ${title}`;
+                input.focus();
+                
+                // Show feedback
+                alert(`Added "${title}" to chat input`);
+            } else {
+                alert('Search result: ' + title);
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('detail-modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+        
+        // Auto-focus search input
+        window.onload = () => {
+            const input = document.getElementById('search-input');
+            if (input) input.focus();
+        };
+    </script>
+</body>
+</html>
