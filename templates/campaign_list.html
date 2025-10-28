@@ -76,6 +76,7 @@
             cursor: pointer;
             transition: all 0.3s;
         }
+
         .new-campaign-btn:hover {
             transform: scale(1.05);
             box-shadow: 0 5px 15px rgba(255, 107, 107, 0.5);
@@ -94,6 +95,9 @@
         <button class="new-campaign-btn" onclick="location.href='/campaign/new'">
             ⚔️ New Campaign
         </button>
+
+        <button class="new-campaign-btn" style= "background: linear-gradient(135deg, #18f400 0%, #ee5a52 100%);" onclick="window.open('/srd-search', '_blank')">📚 Open SRD Search</button>
+
         
         {% if campaigns %}
         <div class="campaigns-grid">

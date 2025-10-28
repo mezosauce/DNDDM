@@ -766,6 +766,10 @@ def search_panel(campaign_name):
         return render_template('search_panel.html', campaign=campaign, stats=stats)
     except Exception as e:
         return f"Error: {e}", 404
+    
+@app.route('/srd-search')
+def srd_search_page():
+    return render_template('srd_search.html')
 
 # ============================================================================
 # APPLICATION ENTRY POINT
