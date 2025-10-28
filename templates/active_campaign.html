@@ -203,6 +203,12 @@
         font-size: 0.7em;
         margin-bottom: 4px;
     }
+    .searchPanel{
+        display: block;
+        padding: 10px;
+        flex-direction: row;
+        
+    }
     </style>
 </head>
 <body>
@@ -365,29 +371,6 @@
                     </div>
                 </div>
 
-                <!-- ADD THIS AFTER THE QUICK ACTIONS PANEL -->
-                <div class="panel">
-                    <h2>🔍 SRD Search</h2>
-                    <div id="embedded-search">
-                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                            <input type="text" 
-                                id="srd-search-input" 
-                                placeholder="Search rules, spells, monsters..."
-                                style="flex: 1;"
-                                onkeypress="if(event.key==='Enter') searchSRD()">
-                            <button onclick="searchSRD()" style="width: auto; padding: 8px 16px; margin: 0;">Go</button>
-                        </div>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 10px;">
-                            <button class="quick-btn" onclick="quickSearchSRD('fireball')">🔥 Fireball</button>
-                            <button class="quick-btn" onclick="quickSearchSRD('grapple')">🤼 Grapple</button>
-                            <button class="quick-btn" onclick="quickSearchSRD('conditions')">🎭 Conditions</button>
-                            <button class="quick-btn" onclick="quickSearchSRD('cover')">🛡️ Cover</button>
-                        </div>
-                        
-                        <div id="srd-results" style="max-height: 300px; overflow-y: auto;"></div>
-                    </div>
-                </div>
             </div>
           
         </div>
@@ -404,6 +387,45 @@
         </div>
     </div>
     
+    <div class="bottom-search-panel" id="bottom-search">
+        <h2>
+            🔍 SRD Quick Search
+            <span class="search-toggle" onclick="toggleBottomSearch()">
+                <span id="search-toggle-text">▼ Collapse</span>
+            </span>
+        </h2>
+        
+        <div class="search-content" id="search-content">
+            <div class="search-input-area">
+                <div class="search-main-input">
+                    <input type="text" 
+                           id="srd-search-input" 
+                           placeholder="Search rules, spells, monsters, items..."
+                           onkeypress="if(event.key==='Enter') searchSRD()">
+                    <button onclick="searchSRD()">Search</button>
+                </div>
+                
+                <div class="quick-searches-horizontal">
+                    <button class="quick-search-btn-small" onclick="quickSearchSRD('fireball')">🔥 Fireball</button>
+                    <button class="quick-search-btn-small" onclick="quickSearchSRD('grapple')">🤼 Grapple</button>
+                    <button class="quick-search-btn-small" onclick="quickSearchSRD('opportunity attack')">⚔️ Opportunity</button>
+                    <button class="quick-search-btn-small" onclick="quickSearchSRD('conditions')">🎭 Conditions</button>
+                    <button class="quick-search-btn-small" onclick="quickSearchSRD('cover')">🛡️ Cover</button>
+                    <button class="quick-search-btn-small" onclick="quickSearchSRD('death saving throw')">💀 Death Saves</button>
+                    <button class="quick-search-btn-small" onclick="quickSearchSRD('concentration')">🧠 Concentration</button>
+                    <button class="quick-search-btn-small" onclick="quickSearchSRD('stealth')">👁️ Stealth</button>
+                </div>
+            </div>
+            
+            <div class="search-results-bottom" id="srd-results">
+                <div style="text-align: center; color: #888; padding: 20px; font-size: 0.9em;">
+                    Enter search or click quick button
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
     <!-- Debug Toggle -->
     <div class="debug-toggle" onclick="toggleDebug()" id="debug-toggle">
         🔧 Debug: <span id="debug-status">OFF</span>
