@@ -600,16 +600,26 @@
             `;
 
             try {
-                // Fetch the actual MD file content
-                const filePath = `srd_story_cycle/${result.file_path}`;
-                const response = await fetch(`/${filePath}`);
+                // Fetch the actual MD file content via API
+                const response = await fetch(`${API_BASE}/api/srd/file`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        file_path: result.file_path
+                    })
+                });
                 
                 if (!response.ok) {
                     throw new Error('Content not found');
                 }
 
-                const markdown = await response.text();
-                const html = convertMarkdownToHTML(markdown);
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                const html = convertMarkdownToHTML(data.content);
 
                 viewer.innerHTML = `
                     <div class="viewer-content">
@@ -629,7 +639,7 @@
                         <p>${error.message}</p>
                         <hr style="margin: 20px 0; border: 1px solid #ff6b6b;">
                         <h4>Preview from Search:</h4>
-                        <div style="margin-top: 15px; text-align: left;">
+                        <div style="margin-top: 15px; text-align: left; white-space: pre-wrap;">
                             ${escapeHtml(result.content)}
                         </div>
                     </div>

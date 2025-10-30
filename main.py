@@ -771,6 +771,43 @@ def search_panel(campaign_name):
 def srd_search_page():
     return render_template('srd_search.html')
 
+@app.route('/api/srd/file', methods=['POST'])
+def get_srd_file():
+    """Serve SRD markdown file content"""
+    data = request.json
+    file_path = data.get('file_path', '')
+    
+    if not file_path:
+        return jsonify({'error': 'No file path provided'}), 400
+    
+    # Security: ensure path doesn't escape SRD directory
+    if '..' in file_path or file_path.startswith('/'):
+        return jsonify({'error': 'Invalid file path'}), 400
+    
+    try:
+        full_path = Path(SRD_PATH) / file_path
+        
+        if not full_path.exists():
+            return jsonify({'error': 'File not found'}), 404
+        
+        if not full_path.is_file():
+            return jsonify({'error': 'Not a file'}), 400
+        
+        with open(full_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        return jsonify({
+            'success': True,
+            'content': content,
+            'file_path': file_path
+        })
+        
+    except Exception as e:
+        print(f"Error serving SRD file: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+
 # ============================================================================
 # APPLICATION ENTRY POINT
 # ============================================================================
