@@ -28,9 +28,8 @@ __pycache__/
 *.egg-info/
 dist/
 build/
-venv/
+
 env/
-.venv
 
 # Virtual Environments
 5thsrd-py3.8/

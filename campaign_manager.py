@@ -2,7 +2,7 @@
 """
 Campaign Manager - Phased Session System
 Manages campaigns with structured phases and persistent storage
-UPDATED: Now includes preparations.md support for Phase 3
+UPDATED: Enhanced Character class with backgrounds, proficiencies, languages, personality, alignment, inspiration, and currency
 """
 
 import os
@@ -10,13 +10,14 @@ import json
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Optional
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 import shutil
 
 
 @dataclass
 class Character:
-    """Player character data"""
+    """Player character data - ENHANCED with full D&D 5e character sheet"""
+    # EXISTING CORE ATTRIBUTES
     name: str
     race: str
     char_class: str
@@ -28,6 +29,32 @@ class Character:
     stats: Dict[str, int] = None
     inventory: List[str] = None
     notes: str = ""
+    
+    # NEW: Background System
+    background_feature: str = ""  # Description of background feature (e.g., "Shelter of the Faithful")
+    background_equipment: List[str] = field(default_factory=list)  # Equipment from background
+    
+    # NEW: Proficiencies
+    skill_proficiencies: List[str] = field(default_factory=list)  # All skills (class + background)
+    tool_proficiencies: List[str] = field(default_factory=list)  # Tools from background
+    
+    # NEW: Languages
+    languages_known: List[str] = field(default_factory=list)  # Combines racial + background languages
+    
+    # NEW: Personality (from background tables)
+    personality_traits: List[str] = field(default_factory=list)  # 2 traits
+    ideal: str = ""  # 1 ideal
+    bond: str = ""  # 1 bond
+    flaw: str = ""  # 1 flaw
+    
+    # NEW: Alignment
+    alignment: str = "True Neutral"  # Default alignment
+    
+    # NEW: Inspiration
+    has_inspiration: bool = False
+    
+    # NEW: Currency (D&D 5e standard denominations)
+    currency: Dict[str, int] = None  # {'cp': 0, 'sp': 0, 'ep': 0, 'gp': 0, 'pp': 0}
     
     def __post_init__(self):
         if self.stats is None:
@@ -41,6 +68,116 @@ class Character:
             }
         if self.inventory is None:
             self.inventory = []
+        if self.currency is None:
+            self.currency = {
+                'cp': 0,  # Copper pieces
+                'sp': 0,  # Silver pieces
+                'ep': 0,  # Electrum pieces
+                'gp': 0,  # Gold pieces
+                'pp': 0   # Platinum pieces
+            }
+    
+    # Currency Helper Methods
+    def get_total_gold_value(self) -> float:
+        """Calculate total wealth in gold pieces"""
+        return (
+            self.currency['cp'] * 0.01 +
+            self.currency['sp'] * 0.1 +
+            self.currency['ep'] * 0.5 +
+            self.currency['gp'] * 1.0 +
+            self.currency['pp'] * 10.0
+        )
+    
+    def add_currency(self, coin_type: str, amount: int):
+        """Add currency to character"""
+        if coin_type in self.currency:
+            self.currency[coin_type] += amount
+        else:
+            raise ValueError(f"Invalid coin type: {coin_type}")
+    
+    def remove_currency(self, coin_type: str, amount: int) -> bool:
+        """Remove currency from character. Returns False if insufficient funds."""
+        if coin_type not in self.currency:
+            raise ValueError(f"Invalid coin type: {coin_type}")
+        
+        if self.currency[coin_type] >= amount:
+            self.currency[coin_type] -= amount
+            return True
+        return False
+    
+    def can_afford(self, cost_in_gp: float) -> bool:
+        """Check if character can afford something (cost in gold pieces)"""
+        return self.get_total_gold_value() >= cost_in_gp
+    
+    def pay_cost(self, cost_in_gp: float) -> bool:
+        """
+        Pay a cost in gold pieces by automatically converting currency.
+        Returns True if successful, False if insufficient funds.
+        """
+        if not self.can_afford(cost_in_gp):
+            return False
+        
+        # Try to pay with exact denominations first (largest to smallest)
+        remaining = cost_in_gp
+        
+        # Pay with platinum
+        pp_to_use = min(int(remaining / 10), self.currency['pp'])
+        remaining -= pp_to_use * 10
+        self.currency['pp'] -= pp_to_use
+        
+        # Pay with gold
+        gp_to_use = min(int(remaining), self.currency['gp'])
+        remaining -= gp_to_use
+        self.currency['gp'] -= gp_to_use
+        
+        # Pay with electrum
+        ep_to_use = min(int(remaining / 0.5), self.currency['ep'])
+        remaining -= ep_to_use * 0.5
+        self.currency['ep'] -= ep_to_use
+        
+        # Pay with silver
+        sp_to_use = min(int(remaining / 0.1), self.currency['sp'])
+        remaining -= sp_to_use * 0.1
+        self.currency['sp'] -= sp_to_use
+        
+        # Pay remaining with copper
+        cp_to_use = min(int(remaining / 0.01), self.currency['cp'])
+        remaining -= cp_to_use * 0.01
+        self.currency['cp'] -= cp_to_use
+        
+        # If still remaining, we need to make change (convert larger coins)
+        if remaining > 0.001:  # Small float tolerance
+            return False
+        
+        return True
+    
+    def convert_currency(self, from_type: str, to_type: str, amount: int) -> bool:
+        """
+        Convert currency from one denomination to another.
+        Returns True if successful, False if insufficient funds.
+        """
+        conversion_rates = {
+            'cp': 1, 'sp': 10, 'ep': 50, 'gp': 100, 'pp': 1000
+        }
+        
+        if from_type not in conversion_rates or to_type not in conversion_rates:
+            raise ValueError("Invalid coin type")
+        
+        if self.currency[from_type] < amount:
+            return False
+        
+        # Calculate conversion
+        from_value_in_cp = amount * conversion_rates[from_type]
+        to_amount = from_value_in_cp // conversion_rates[to_type]
+        
+        if to_amount < 1:
+            return False  # Can't convert (not enough value)
+        
+        # Perform conversion
+        self.currency[from_type] -= amount
+        self.currency[to_type] += to_amount
+        
+        return True
 
 
 @dataclass
@@ -206,10 +343,44 @@ class CampaignManager:
         
         return campaign
     
+    def update_character(self, campaign_name: str, character: Character):
+        """Update an existing character"""
+        campaign = self.load_campaign(campaign_name)
+        
+        # Find and update character in campaign
+        for i, char_data in enumerate(campaign.characters):
+            if char_data['name'] == character.name:
+                campaign.characters[i] = asdict(character)
+                break
+        else:
+            raise ValueError(f"Character '{character.name}' not found in campaign")
+        
+        # Save character file
+        folder = self._get_campaign_folder(campaign_name)
+        char_file = folder / "characters" / f"{self._sanitize_name(character.name)}.json"
+        
+        with open(char_file, 'w', encoding='utf-8') as f:
+            json.dump(asdict(character), f, indent=2)
+        
+        # Update campaign setup markdown
+        self._update_campaign_setup_file(campaign)
+        
+        self._save_campaign(campaign)
+        
+        return campaign
+    
     def get_characters(self, campaign_name: str) -> List[Character]:
         """Get all characters in campaign"""
         campaign = self.load_campaign(campaign_name)
         return [Character(**char_data) for char_data in campaign.characters]
+    
+    def get_character(self, campaign_name: str, character_name: str) -> Optional[Character]:
+        """Get a specific character by name"""
+        characters = self.get_characters(campaign_name)
+        for char in characters:
+            if char.name == character_name:
+                return char
+        return None
     
     def advance_phase(self, campaign_name: str) -> Campaign:
         """Advance campaign to next phase"""
@@ -297,7 +468,7 @@ Add your campaign notes, world-building, and story hooks here.
             f.write(content)
     
     def _update_campaign_setup_file(self, campaign: Campaign):
-        """Update campaign setup file with characters"""
+        """Update campaign setup file with characters - ENHANCED with new fields"""
         folder = self._get_campaign_folder(campaign.name)
         setup_file = folder / "CAMPAIGN_SETUP.md"
         
@@ -309,15 +480,17 @@ Add your campaign notes, world-building, and story hooks here.
         party_section_start = content.find("## Party Composition")
         party_section_end = content.find("---", party_section_start)
         
-        # Build new party section
+        # Build new party section with ENHANCED details
         party_content = "\n## Party Composition\n\n"
         
         for char_data in campaign.characters:
             char = Character(**char_data)
+            
             party_content += f"""### {char.name}
 - **Race:** {char.race}
 - **Class:** {char.char_class}
 - **Background:** {char.background}
+- **Alignment:** {char.alignment}
 - **Level:** {char.level}
 - **HP:** {char.hp}/{char.max_hp}
 - **AC:** {char.ac}
@@ -326,7 +499,23 @@ Add your campaign notes, world-building, and story hooks here.
 - STR: {char.stats['strength']} | DEX: {char.stats['dexterity']} | CON: {char.stats['constitution']}
 - INT: {char.stats['intelligence']} | WIS: {char.stats['wisdom']} | CHA: {char.stats['charisma']}
 
+**Proficiencies:**
+- Skills: {', '.join(char.skill_proficiencies) if char.skill_proficiencies else 'None'}
+- Tools: {', '.join(char.tool_proficiencies) if char.tool_proficiencies else 'None'}
+
+**Languages:** {', '.join(char.languages_known) if char.languages_known else 'Common'}
+
+**Personality:**
+- Traits: {', '.join(char.personality_traits) if char.personality_traits else 'None'}
+- Ideal: {char.ideal or 'None'}
+- Bond: {char.bond or 'None'}
+- Flaw: {char.flaw or 'None'}
+
+**Currency:** {char.currency['pp']}pp, {char.currency['gp']}gp, {char.currency['ep']}ep, {char.currency['sp']}sp, {char.currency['cp']}cp (Total: {char.get_total_gold_value():.2f} gp)
+
 **Inventory:** {', '.join(char.inventory) if char.inventory else 'None'}
+
+**Background Feature:** {char.background_feature or 'None'}
 
 **Notes:** {char.notes or 'None'}
 
@@ -364,6 +553,9 @@ Add your campaign notes, world-building, and story hooks here.
 ## Items Found
 - 
 
+## Currency Changes
+- 
+
 ## Combat Encounters
 - 
 
@@ -394,7 +586,7 @@ Add your campaign notes, world-building, and story hooks here.
             with open(setup_file, 'r', encoding='utf-8') as f:
                 setup_content = f.read()
         
-        # Read quest preparations (Phase 2 output) - NEW!
+        # Read quest preparations (Phase 2 output)
         preparations_content = ""
         preparations_file = folder / "preparations.md"
         if preparations_file.exists():
@@ -413,7 +605,7 @@ Add your campaign notes, world-building, and story hooks here.
             "campaign": asdict(campaign),
             "characters": [asdict(char) for char in characters],
             "setup_content": setup_content,
-            "preparations_content": preparations_content,  # NEW!
+            "preparations_content": preparations_content,
             "latest_session": latest_session,
             "phase_info": self.PHASES[campaign.current_phase],
             "available_story_phases": self.PHASES[campaign.current_phase]["story_phases"]
@@ -526,6 +718,7 @@ def main():
         print(f"\nCharacters:")
         for char in context['characters']:
             print(f"  • {char['name']} - {char['race']} {char['char_class']}")
+            print(f"    Wealth: {Character(**char).get_total_gold_value():.2f} gp")
     
     elif cmd == "advance":
         campaign_name = sys.argv[2]

@@ -14,12 +14,21 @@
             padding: 20px;
         }
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         h1 {
             color: #ff6b6b;
             margin-bottom: 10px;
+        }
+        h2 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+        }
+        h3 {
+            color: #51cf66;
+            margin: 15px 0 10px;
+            font-size: 1.1em;
         }
         .phase-header {
             background: rgba(30, 30, 46, 0.8);
@@ -57,10 +66,8 @@
             border: 2px solid #4a4a6a;
             border-radius: 10px;
             padding: 20px;
-        }
-        h2 {
-            color: #ff6b6b;
-            margin-bottom: 15px;
+            max-height: 85vh;
+            overflow-y: auto;
         }
         .character-list {
             margin: 15px 0;
@@ -76,13 +83,22 @@
             font-size: 1.2em;
             font-weight: bold;
             color: #51cf66;
+            margin-bottom: 5px;
         }
         .character-info {
             color: #b0b0b0;
             font-size: 0.9em;
             margin-top: 5px;
         }
-        input, select {
+        .char-detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 3px 0;
+            font-size: 0.85em;
+        }
+        
+        /* Form Elements */
+        input, select, textarea {
             width: 100%;
             padding: 10px;
             margin: 8px 0;
@@ -90,17 +106,35 @@
             border: 2px solid #4a4a6a;
             border-radius: 6px;
             color: #e0e0e0;
+            font-family: inherit;
         }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #51cf66;
+        }
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        label {
+            display: block;
+            margin: 12px 0 5px;
+            color: #b0b0b0;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
+            gap: 10px;
             margin: 10px 0;
         }
         .stat-wrapper {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             background: rgba(0, 0, 0, 0.2);
             padding: 8px;
             border-radius: 6px;
@@ -108,24 +142,105 @@
         .stat-label {
             font-weight: bold;
             color: #ff6b6b;
-            min-width: 45px;
-            font-size: 14px;
+            min-width: 40px;
+            font-size: 13px;
         }
         .stat-input {
             flex: 1;
             text-align: center;
             margin: 0 !important;
-            padding: 8px !important;
+            padding: 6px !important;
         }
-        #points-remaining {
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.3);
+        
+        /* Multi-select boxes */
+        .multi-select-container {
+            background: rgba(0, 0, 0, 0.2);
+            border: 2px solid #4a4a6a;
             border-radius: 6px;
+            padding: 10px;
+            margin: 8px 0;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .multi-select-item {
+            padding: 6px;
+            margin: 4px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .multi-select-item:hover {
+            background: rgba(77, 171, 247, 0.2);
+        }
+        .multi-select-item.selected {
+            background: rgba(81, 207, 102, 0.3);
+            border-left: 3px solid #51cf66;
+        }
+        .multi-select-item input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+        
+        /* Personality trait selector */
+        .trait-selector {
+            background: rgba(0, 0, 0, 0.2);
+            border: 2px solid #4a4a6a;
+            border-radius: 6px;
+            padding: 10px;
+            margin: 8px 0;
+        }
+        .trait-option {
+            padding: 8px;
+            margin: 6px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .trait-option:hover {
+            background: rgba(77, 171, 247, 0.2);
+        }
+        .trait-option.selected {
+            background: rgba(81, 207, 102, 0.3);
+            border-left-color: #51cf66;
+        }
+        
+        /* Currency inputs */
+        .currency-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .currency-input {
+            text-align: center;
+        }
+        .currency-label {
+            font-size: 0.9em;
+            color: #ffd700;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        
+        /* Points remaining indicator */
+        #points-remaining {
+            padding: 12px;
+            background: rgba(81, 207, 102, 0.2);
+            border: 2px solid #51cf66;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
         }
         #points-remaining.over-budget {
             background: rgba(255, 107, 107, 0.3);
+            border-color: #ff6b6b;
             color: #ff6b6b;
         }
+        
+        /* Buttons */
         button {
             width: 100%;
             padding: 12px;
@@ -146,9 +261,89 @@
             background: #666;
             cursor: not-allowed;
             transform: none;
+            opacity: 0.6;
         }
         .advance-btn {
             background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+        }
+        .btn-secondary {
+            background: #666;
+            margin-top: 5px;
+        }
+        
+        /* Tabs for form sections */
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #4a4a6a;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: none;
+            border-radius: 6px 6px 0 0;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 0;
+        }
+        .tab:hover {
+            background: rgba(77, 171, 247, 0.2);
+            color: #4dabf7;
+        }
+        .tab.active {
+            background: rgba(81, 207, 102, 0.3);
+            color: #51cf66;
+            border-bottom: 3px solid #51cf66;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Warning messages */
+        .warning-box {
+            background: rgba(255, 193, 7, 0.1);
+            border: 2px solid #ffc107;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 10px 0;
+            color: #ffc107;
+        }
+        .warning-box button {
+            background: #ffc107;
+            color: #1e1e2e;
+            margin-top: 8px;
+            padding: 6px 12px;
+        }
+        
+        /* Success messages */
+        .success-box {
+            background: rgba(81, 207, 102, 0.1);
+            border: 2px solid #51cf66;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 10px 0;
+            color: #51cf66;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4a4a6a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #51cf66;
         }
     </style>
 </head>
@@ -168,99 +363,239 @@
         </div>
         
         <div class="content">
+            <!-- Character Creation Form -->
             <div class="panel">
-                <h2>Create Character</h2>
+                <h2>📝 Create Character</h2>
+                
+                <!-- Tabs for different sections -->
+                <div class="tabs">
+                    <button class="tab active" onclick="showTab('basics')">Basics</button>
+                    <button class="tab" onclick="showTab('stats')">Stats</button>
+                    <button class="tab" onclick="showTab('background')">Background</button>
+                    <button class="tab" onclick="showTab('personality')">Personality</button>
+                    <button class="tab" onclick="showTab('details')">Details</button>
+                </div>
                 
                 <form id="character-form">
-                    <input type="text" id="char-name" placeholder="Character Name" required>
-                    
-                    <select id="char-race" required>
-                        <option value="">Select Race</option>
-                        <option value="Human">Human</option>
-                        <option value="Elf">Elf</option>
-                        <option value="Dwarf">Dwarf</option>
-                        <option value="Halfling">Halfling</option>
-                        <option value="Dragonborn">Dragonborn</option>
-                        <option value="Gnome">Gnome</option>
-                        <option value="Half-Elf">Half-Elf</option>
-                        <option value="Half-Orc">Half-Orc</option>
-                        <option value="Tiefling">Tiefling</option>
-                    </select>
-                    
-                    <select id="char-class" required>
-                        <option value="">Select Class</option>
-                        <option value="Barbarian">Barbarian</option>
-                        <option value="Bard">Bard</option>
-                        <option value="Cleric">Cleric</option>
-                        <option value="Druid">Druid</option>
-                        <option value="Fighter">Fighter</option>
-                        <option value="Monk">Monk</option>
-                        <option value="Paladin">Paladin</option>
-                        <option value="Ranger">Ranger</option>
-                        <option value="Rogue">Rogue</option>
-                        <option value="Sorcerer">Sorcerer</option>
-                        <option value="Warlock">Warlock</option>
-                        <option value="Wizard">Wizard</option>
-                    </select>
-                    
-                    <select id="char-background" required>
-                        <option value="">Select Background</option>
-                        <option value="Acolyte">Acolyte</option>
-                        <option value="Criminal">Criminal</option>
-                        <option value="Folk Hero">Folk Hero</option>
-                        <option value="Noble">Noble</option>
-                        <option value="Sage">Sage</option>
-                        <option value="Soldier">Soldier</option>
-                    </select>
-                    
-                    <h3 style="margin-top: 15px;">Ability Scores (60 points total)</h3>
-                    <div id="points-remaining" style="text-align: center; font-size: 1.2em; color: #51cf66; margin-bottom: 10px;">
-                        Points Remaining: <span id="points-left">0</span>
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 10px 0;">
-                        <div class="stat-wrapper">
-                            <label class="stat-label">STR</label>
-                            <input type="number" class="stat-input" id="str" min="1" max="20" value="10" onchange="updatePoints()">
-                        </div>
-                        <div class="stat-wrapper">
-                            <label class="stat-label">DEX</label>
-                            <input type="number" class="stat-input" id="dex" min="1" max="20" value="10" onchange="updatePoints()">
-                        </div>
-                        <div class="stat-wrapper">
-                            <label class="stat-label">CON</label>
-                            <input type="number" class="stat-input" id="con" min="1" max="20" value="10" onchange="updatePoints()">
-                        </div>
-                        <div class="stat-wrapper">
-                            <label class="stat-label">INT</label>
-                            <input type="number" class="stat-input" id="int" min="1" max="20" value="10" onchange="updatePoints()">
-                        </div>
-                        <div class="stat-wrapper">
-                            <label class="stat-label">WIS</label>
-                            <input type="number" class="stat-input" id="wis" min="1" max="20" value="10" onchange="updatePoints()">
-                        </div>
-                        <div class="stat-wrapper">
-                            <label class="stat-label">CHA</label>
-                            <input type="number" class="stat-input" id="cha" min="1" max="20" value="10" onchange="updatePoints()">
-                        </div>
+                    <!-- TAB 1: BASICS -->
+                    <div id="tab-basics" class="tab-content active">
+                        <label>Character Name *</label>
+                        <input type="text" id="char-name" placeholder="Aragorn" required>
+                        
+                        <label>Race *</label>
+                        <select id="char-race" required onchange="updateRacialLanguages()">
+                            <option value="">Select Race</option>
+                            <option value="Human">Human</option>
+                            <option value="Elf">Elf</option>
+                            <option value="Dwarf">Dwarf</option>
+                            <option value="Halfling">Halfling</option>
+                            <option value="Dragonborn">Dragonborn</option>
+                            <option value="Gnome">Gnome</option>
+                            <option value="Half-Elf">Half-Elf</option>
+                            <option value="Half-Orc">Half-Orc</option>
+                            <option value="Tiefling">Tiefling</option>
+                        </select>
+                        
+                        <label>Class *</label>
+                        <select id="char-class" required onchange="updateClassSkills()">
+                            <option value="">Select Class</option>
+                            <option value="Barbarian">Barbarian</option>
+                            <option value="Bard">Bard</option>
+                            <option value="Cleric">Cleric</option>
+                            <option value="Druid">Druid</option>
+                            <option value="Fighter">Fighter</option>
+                            <option value="Monk">Monk</option>
+                            <option value="Paladin">Paladin</option>
+                            <option value="Ranger">Ranger</option>
+                            <option value="Rogue">Rogue</option>
+                            <option value="Sorcerer">Sorcerer</option>
+                            <option value="Warlock">Warlock</option>
+                            <option value="Wizard">Wizard</option>
+                        </select>
+                        
+                        <label>Alignment *</label>
+                        <select id="char-alignment" required>
+                            <option value="Lawful Good">Lawful Good</option>
+                            <option value="Neutral Good">Neutral Good</option>
+                            <option value="Chaotic Good">Chaotic Good</option>
+                            <option value="Lawful Neutral">Lawful Neutral</option>
+                            <option value="True Neutral" selected>True Neutral</option>
+                            <option value="Chaotic Neutral">Chaotic Neutral</option>
+                            <option value="Lawful Evil">Lawful Evil</option>
+                            <option value="Neutral Evil">Neutral Evil</option>
+                            <option value="Chaotic Evil">Chaotic Evil</option>
+                        </select>
+                        <small style="color: #888;">Choose alignment that fits your character concept</small>
+                        
+                        <label>Level</label>
+                        <input type="number" id="char-level" min="1" max="20" value="1">
                     </div>
                     
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
-                        <div class="stat-wrapper">
-                            <label class="stat-label">HP</label>
-                            <input type="number" class="stat-input" id="char-hp" min="1" value="10">
+                    <!-- TAB 2: STATS -->
+                    <div id="tab-stats" class="tab-content">
+                        <h3>Ability Scores (60 points total)</h3>
+                        <div id="points-remaining">
+                            Points Remaining: <span id="points-left">0</span>
                         </div>
-                        <div class="stat-wrapper">
-                            <label class="stat-label">AC</label>
-                            <input type="number" class="stat-input" id="char-ac" min="1" value="10">
+                        
+                        <div class="stats-grid">
+                            <div class="stat-wrapper">
+                                <label class="stat-label">STR</label>
+                                <input type="number" class="stat-input" id="str" min="1" max="20" value="10" onchange="updatePoints()">
+                            </div>
+                            <div class="stat-wrapper">
+                                <label class="stat-label">DEX</label>
+                                <input type="number" class="stat-input" id="dex" min="1" max="20" value="10" onchange="updatePoints()">
+                            </div>
+                            <div class="stat-wrapper">
+                                <label class="stat-label">CON</label>
+                                <input type="number" class="stat-input" id="con" min="1" max="20" value="10" onchange="updatePoints()">
+                            </div>
+                            <div class="stat-wrapper">
+                                <label class="stat-label">INT</label>
+                                <input type="number" class="stat-input" id="int" min="1" max="20" value="10" onchange="updatePoints()">
+                            </div>
+                            <div class="stat-wrapper">
+                                <label class="stat-label">WIS</label>
+                                <input type="number" class="stat-input" id="wis" min="1" max="20" value="10" onchange="updatePoints()">
+                            </div>
+                            <div class="stat-wrapper">
+                                <label class="stat-label">CHA</label>
+                                <input type="number" class="stat-input" id="cha" min="1" max="20" value="10" onchange="updatePoints()">
+                            </div>
+                        </div>
+                        
+                        <h3 style="margin-top: 20px;">Combat Stats</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                            <div>
+                                <label>Hit Points</label>
+                                <input type="number" id="char-hp" min="1" value="10">
+                            </div>
+                            <div>
+                                <label>Max HP</label>
+                                <input type="number" id="char-max-hp" min="1" value="10">
+                            </div>
+                            <div>
+                                <label>Armor Class</label>
+                                <input type="number" id="char-ac" min="1" value="10">
+                            </div>
                         </div>
                     </div>
                     
-                    <button type="submit">Add Character</button>
+                    <!-- TAB 3: BACKGROUND -->
+                    <div id="tab-background" class="tab-content">
+                        <label>Background *</label>
+                        <select id="char-background" required onchange="updateBackgroundInfo()">
+                            <option value="">Select Background</option>
+                            <option value="Acolyte">Acolyte</option>
+                            <option value="Charlatan">Charlatan</option>
+                            <option value="Criminal">Criminal</option>
+                            <option value="Entertainer">Entertainer</option>
+                            <option value="Folk Hero">Folk Hero</option>
+                            <option value="Guild Artisan">Guild Artisan</option>
+                            <option value="Hermit">Hermit</option>
+                            <option value="Noble">Noble</option>
+                            <option value="Outlander">Outlander</option>
+                            <option value="Sage">Sage</option>
+                            <option value="Sailor">Sailor</option>
+                            <option value="Soldier">Soldier</option>
+                            <option value="Urchin">Urchin</option>
+                        </select>
+                        
+                        <label>Background Feature</label>
+                        <textarea id="char-bg-feature" placeholder="Describe your background feature (e.g., 'Shelter of the Faithful' for Acolyte)"></textarea>
+                        
+                        <h3>Skill Proficiencies (Choose 2 from background)</h3>
+                        <div id="skill-warning" class="warning-box" style="display: none;">
+                            ⚠️ <span id="skill-warning-text"></span>
+                        </div>
+                        <div class="multi-select-container" id="skills-list">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                        
+                        <h3>Languages Known</h3>
+                        <div id="racial-languages" style="background: rgba(81, 207, 102, 0.1); padding: 10px; border-radius: 6px; margin: 10px 0;">
+                            <small>Racial languages: <span id="racial-lang-list">Select race first</span></small>
+                        </div>
+                        <label>Additional Languages (from background)</label>
+                        <div class="multi-select-container" id="languages-list">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                        
+                        <h3>Tool Proficiencies</h3>
+                        <input type="text" id="char-tools" placeholder="e.g., Thieves' tools, Smith's tools">
+                    </div>
+                    
+                    <!-- TAB 4: PERSONALITY -->
+                    <div id="tab-personality" class="tab-content">
+                        <p style="color: #888; margin-bottom: 15px;">
+                            Define your character's personality. These guide roleplaying and can earn Inspiration!
+                        </p>
+                        
+                        <label>Personality Traits (Choose 2)</label>
+                        <div class="trait-selector" id="personality-traits-list">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                        
+                        <label>Ideal (Choose 1)</label>
+                        <select id="char-ideal">
+                            <option value="">Choose an ideal...</option>
+                            <option value="Good - I always try to help others">Good - I always try to help others</option>
+                            <option value="Law - Rules must be followed">Law - Rules must be followed</option>
+                            <option value="Freedom - Everyone should be free">Freedom - Everyone should be free</option>
+                            <option value="Power - I seek strength and dominance">Power - I seek strength and dominance</option>
+                            <option value="Honor - I live by a personal code">Honor - I live by a personal code</option>
+                            <option value="Greed - I want wealth and treasure">Greed - I want wealth and treasure</option>
+                        </select>
+                        
+                        <label>Bond</label>
+                        <textarea id="char-bond" placeholder="What ties you to people, places, or ideals? (e.g., 'I owe my life to the priest who took me in')"></textarea>
+                        
+                        <label>Flaw</label>
+                        <textarea id="char-flaw" placeholder="What weakness or vice does your character have? (e.g., 'I'm too trusting of those who claim to share my faith')"></textarea>
+                    </div>
+                    
+                    <!-- TAB 5: DETAILS -->
+                    <div id="tab-details" class="tab-content">
+                        <h3>Starting Currency</h3>
+                        <div class="currency-grid">
+                            <div>
+                                <div class="currency-label">PP</div>
+                                <input type="number" class="currency-input" id="curr-pp" min="0" value="0">
+                            </div>
+                            <div>
+                                <div class="currency-label">GP</div>
+                                <input type="number" class="currency-input" id="curr-gp" min="0" value="0">
+                            </div>
+                            <div>
+                                <div class="currency-label">EP</div>
+                                <input type="number" class="currency-input" id="curr-ep" min="0" value="0">
+                            </div>
+                            <div>
+                                <div class="currency-label">SP</div>
+                                <input type="number" class="currency-input" id="curr-sp" min="0" value="0">
+                            </div>
+                            <div>
+                                <div class="currency-label">CP</div>
+                                <input type="number" class="currency-input" id="curr-cp" min="0" value="0">
+                            </div>
+                        </div>
+                        <small style="color: #888;">Total: <span id="total-gold">0</span> gp</small>
+                        
+                        <h3 style="margin-top: 20px;">Starting Equipment</h3>
+                        <textarea id="char-inventory" placeholder="List starting equipment (comma-separated)"></textarea>
+                        
+                        <label>Character Notes</label>
+                        <textarea id="char-notes" placeholder="Backstory, goals, appearance, etc."></textarea>
+                    </div>
+                    
+                    <button type="submit">✨ Create Character</button>
                 </form>
             </div>
             
+            <!-- Party Members List -->
             <div class="panel">
-                <h2>Party Members ({{ characters|length}}/{{ campaign.party_size }})</h2>
+                <h2>👥 Party Members ({{ characters|length}}/{{ campaign.party_size }})</h2>
                 
                 <div class="character-list">
                     {% if characters %}
@@ -270,8 +605,25 @@
                             <div class="character-info">
                                 {{ char.race }} {{ char.char_class }} | {{ char.background }}
                             </div>
-                            <div class="character-info">
-                                HP: {{ char.hp }}/{{ char.max_hp }} | AC: {{ char.ac }}
+                            <div class="char-detail-row">
+                                <span>Alignment:</span>
+                                <span>{{ char.alignment }}</span>
+                            </div>
+                            <div class="char-detail-row">
+                                <span>HP:</span>
+                                <span>{{ char.hp }}/{{ char.max_hp }}</span>
+                            </div>
+                            <div class="char-detail-row">
+                                <span>AC:</span>
+                                <span>{{ char.ac }}</span>
+                            </div>
+                            <div class="char-detail-row">
+                                <span>Languages:</span>
+                                <span>{{ ', '.join(char.languages_known) if char.languages_known else 'None' }}</span>
+                            </div>
+                            <div class="char-detail-row">
+                                <span>Currency:</span>
+                                <span>{{ char.currency.gp }}gp, {{ char.currency.sp }}sp, {{ char.currency.cp }}cp</span>
                             </div>
                         </div>
                         {% endfor %}
@@ -296,8 +648,81 @@
     </div>
     
     <script>
-        const MAX_POINTS = 60;
+        // Reference Data
+        const ALL_SKILLS = [
+            'Acrobatics', 'Animal Handling', 'Arcana', 'Athletics',
+            'Deception', 'History', 'Insight', 'Intimidation',
+            'Investigation', 'Medicine', 'Nature', 'Perception',
+            'Performance', 'Persuasion', 'Religion', 'Sleight of Hand',
+            'Stealth', 'Survival'
+        ];
         
+        const ALL_LANGUAGES = [
+            'Common', 'Dwarvish', 'Elvish', 'Giant', 'Gnomish',
+            'Goblin', 'Halfling', 'Orc', 'Abyssal', 'Celestial',
+            'Draconic', 'Deep Speech', 'Infernal', 'Primordial',
+            'Sylvan', 'Undercommon'
+        ];
+        
+        const RACIAL_LANGUAGES = {
+            'Human': ['Common'],
+            'Elf': ['Common', 'Elvish'],
+            'Dwarf': ['Common', 'Dwarvish'],
+            'Halfling': ['Common', 'Halfling'],
+            'Dragonborn': ['Common', 'Draconic'],
+            'Gnome': ['Common', 'Gnomish'],
+            'Half-Elf': ['Common', 'Elvish'],
+            'Half-Orc': ['Common', 'Orc'],
+            'Tiefling': ['Common', 'Infernal']
+        };
+        
+        const PERSONALITY_TRAITS = [
+            "I idolize a particular hero and constantly refer to their deeds",
+            "I can find common ground between the fiercest enemies",
+            "I see omens in every event and action",
+            "Nothing can shake my optimistic attitude",
+            "I quote (or misquote) sacred texts and proverbs",
+            "I am tolerant of other faiths and respect other gods",
+            "I've enjoyed fine food and high society",
+            "I have little practical experience dealing with people"
+        ];
+        
+        const MAX_POINTS = 60;
+        let selectedSkills = [];
+        let selectedLanguages = [];
+        let selectedTraits = [];
+        let racialLanguages = [];
+        
+        // Tab Management
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById('tab-' + tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Initialize on load
+        window.onload = () => {
+            updatePoints();
+            populateSkillsList();
+            populateLanguagesList();
+            populatePersonalityTraits();
+            updateCurrencyTotal();
+            
+            // Add currency change listeners
+            ['pp', 'gp', 'ep', 'sp', 'cp'].forEach(coin => {
+                document.getElementById('curr-' + coin).addEventListener('input', updateCurrencyTotal);
+            });
+        };
+        
+        // Ability Score Points
         function updatePoints() {
             const str = parseInt(document.getElementById('str').value) || 0;
             const dex = parseInt(document.getElementById('dex').value) || 0;
@@ -316,20 +741,184 @@
             
             if (remaining < 0) {
                 pointsDiv.classList.add('over-budget');
-                pointsLeftSpan.style.color = '#ff6b6b';
             } else {
                 pointsDiv.classList.remove('over-budget');
-                pointsLeftSpan.style.color = '#51cf66';
             }
         }
         
-        // Initialize on load
-        window.onload = updatePoints;
+        // Currency Total
+        function updateCurrencyTotal() {
+            const pp = parseFloat(document.getElementById('curr-pp').value) || 0;
+            const gp = parseFloat(document.getElementById('curr-gp').value) || 0;
+            const ep = parseFloat(document.getElementById('curr-ep').value) || 0;
+            const sp = parseFloat(document.getElementById('curr-sp').value) || 0;
+            const cp = parseFloat(document.getElementById('curr-cp').value) || 0;
+            
+            const total = (pp * 10) + gp + (ep * 0.5) + (sp * 0.1) + (cp * 0.01);
+            document.getElementById('total-gold').textContent = total.toFixed(2);
+        }
         
+        // Skills List
+        function populateSkillsList() {
+            const container = document.getElementById('skills-list');
+            container.innerHTML = ALL_SKILLS.map(skill => `
+                <label class="multi-select-item">
+                    <input type="checkbox" value="${skill}" onchange="toggleSkill('${skill}')">
+                    ${skill}
+                </label>
+            `).join('');
+        }
+        
+        function toggleSkill(skill) {
+            if (selectedSkills.includes(skill)) {
+                selectedSkills = selectedSkills.filter(s => s !== skill);
+            } else {
+                selectedSkills.push(skill);
+            }
+            
+            // Update visual selection
+            updateSkillsVisual();
+            
+            // Check for conflicts
+            checkSkillConflicts();
+        }
+        
+        function updateSkillsVisual() {
+            document.querySelectorAll('#skills-list .multi-select-item').forEach(el => {
+                const checkbox = el.querySelector('input');
+                if (checkbox.checked) {
+                    el.classList.add('selected');
+                } else {
+                    el.classList.remove('selected');
+                }
+            });
+        }
+        
+        function checkSkillConflicts() {
+            // This would check against class skills
+            // For now, just warn if more than 2 selected
+            const warningBox = document.getElementById('skill-warning');
+            const warningText = document.getElementById('skill-warning-text');
+            
+            if (selectedSkills.length > 2) {
+                warningBox.style.display = 'block';
+                warningText.textContent = `You have selected ${selectedSkills.length} skills. Backgrounds typically grant 2 skill proficiencies.`;
+            } else {
+                warningBox.style.display = 'none';
+            }
+        }
+        
+        function updateClassSkills() {
+            // This would be enhanced to show which skills the class already grants
+            // For now, just a placeholder
+        }
+        
+        // Languages List
+        function populateLanguagesList() {
+            const container = document.getElementById('languages-list');
+            container.innerHTML = ALL_LANGUAGES.map(lang => `
+                <label class="multi-select-item">
+                    <input type="checkbox" value="${lang}" onchange="toggleLanguage('${lang}')" id="lang-${lang}">
+                    ${lang}
+                </label>
+            `).join('');
+        }
+        
+        function toggleLanguage(language) {
+            if (selectedLanguages.includes(language)) {
+                selectedLanguages = selectedLanguages.filter(l => l !== language);
+            } else {
+                selectedLanguages.push(language);
+            }
+            
+            updateLanguagesVisual();
+        }
+        
+        function updateLanguagesVisual() {
+            document.querySelectorAll('#languages-list .multi-select-item').forEach(el => {
+                const checkbox = el.querySelector('input');
+                if (checkbox.checked) {
+                    el.classList.add('selected');
+                } else {
+                    el.classList.remove('selected');
+                }
+            });
+        }
+        
+        function updateRacialLanguages() {
+            const race = document.getElementById('char-race').value;
+            racialLanguages = RACIAL_LANGUAGES[race] || ['Common'];
+            
+            document.getElementById('racial-lang-list').textContent = racialLanguages.join(', ');
+            
+            // Disable racial languages in the selection list
+            ALL_LANGUAGES.forEach(lang => {
+                const checkbox = document.getElementById('lang-' + lang);
+                if (checkbox) {
+                    if (racialLanguages.includes(lang)) {
+                        checkbox.disabled = true;
+                        checkbox.checked = false;
+                        checkbox.parentElement.style.opacity = '0.5';
+                    } else {
+                        checkbox.disabled = false;
+                        checkbox.parentElement.style.opacity = '1';
+                    }
+                }
+            });
+        }
+        
+        // Personality Traits
+        function populatePersonalityTraits() {
+            const container = document.getElementById('personality-traits-list');
+            container.innerHTML = PERSONALITY_TRAITS.map((trait, index) => `
+                <div class="trait-option" onclick="toggleTrait(${index})">
+                    ${trait}
+                </div>
+            `).join('');
+        }
+        
+        function toggleTrait(index) {
+            const trait = PERSONALITY_TRAITS[index];
+            const element = document.querySelectorAll('.trait-option')[index];
+            
+            if (selectedTraits.includes(trait)) {
+                selectedTraits = selectedTraits.filter(t => t !== trait);
+                element.classList.remove('selected');
+            } else {
+                if (selectedTraits.length < 2) {
+                    selectedTraits.push(trait);
+                    element.classList.add('selected');
+                } else {
+                    alert('You can only select 2 personality traits. Deselect one first.');
+                }
+            }
+        }
+        
+        // Background Info
+        function updateBackgroundInfo() {
+            const background = document.getElementById('char-background').value;
+            const featureField = document.getElementById('char-bg-feature');
+            
+            // Simple examples - would be enhanced with full background data
+            const features = {
+                'Acolyte': 'Shelter of the Faithful: You can receive free healing and care at temples of your faith.',
+                'Criminal': 'Criminal Contact: You have a reliable contact in the criminal underworld.',
+                'Folk Hero': 'Rustic Hospitality: Common folk will shelter and hide you from the law.',
+                'Noble': 'Position of Privilege: You are welcome in high society.',
+                'Sage': 'Researcher: You know how to obtain information from libraries and archives.',
+                'Soldier': 'Military Rank: You have a rank from your military career.'
+            };
+            
+            if (features[background]) {
+                featureField.value = features[background];
+            }
+        }
+        
+        // Form Submission
         document.getElementById('character-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // Check point total
+            // Validate points
             const str = parseInt(document.getElementById('str').value);
             const dex = parseInt(document.getElementById('dex').value);
             const con = parseInt(document.getElementById('con').value);
@@ -344,13 +933,26 @@
                 return;
             }
             
+            // Collect inventory
+            const inventoryText = document.getElementById('char-inventory').value;
+            const inventory = inventoryText ? inventoryText.split(',').map(i => i.trim()) : [];
+            
+            // Collect tool proficiencies
+            const toolsText = document.getElementById('char-tools').value;
+            const tools = toolsText ? toolsText.split(',').map(t => t.trim()) : [];
+            
+            // Combine racial and selected languages
+            const allLanguages = [...racialLanguages, ...selectedLanguages];
+            
             const data = {
                 name: document.getElementById('char-name').value,
                 race: document.getElementById('char-race').value,
                 class: document.getElementById('char-class').value,
                 background: document.getElementById('char-background').value,
+                alignment: document.getElementById('char-alignment').value,
+                level: parseInt(document.getElementById('char-level').value),
                 hp: parseInt(document.getElementById('char-hp').value),
-                max_hp: parseInt(document.getElementById('char-hp').value),
+                max_hp: parseInt(document.getElementById('char-max-hp').value),
                 ac: parseInt(document.getElementById('char-ac').value),
                 stats: {
                     strength: str,
@@ -359,7 +961,24 @@
                     intelligence: int,
                     wisdom: wis,
                     charisma: cha
-                }
+                },
+                background_feature: document.getElementById('char-bg-feature').value,
+                skill_proficiencies: selectedSkills,
+                tool_proficiencies: tools,
+                languages_known: allLanguages,
+                personality_traits: selectedTraits,
+                ideal: document.getElementById('char-ideal').value,
+                bond: document.getElementById('char-bond').value,
+                flaw: document.getElementById('char-flaw').value,
+                currency: {
+                    pp: parseInt(document.getElementById('curr-pp').value) || 0,
+                    gp: parseInt(document.getElementById('curr-gp').value) || 0,
+                    ep: parseInt(document.getElementById('curr-ep').value) || 0,
+                    sp: parseInt(document.getElementById('curr-sp').value) || 0,
+                    cp: parseInt(document.getElementById('curr-cp').value) || 0
+                },
+                inventory: inventory,
+                notes: document.getElementById('char-notes').value
             };
             
             const response = await fetch('/campaign/{{ campaign.name }}/character/add', {
