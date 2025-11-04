@@ -1,0 +1,196 @@
+
+        .search-panel {
+            background: rgba(30, 30, 46, 0.8);
+            border: 2px solid #4a4a6a;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .search-stats {
+            font-size: 0.85em;
+            color: #888;
+        }
+        
+        .search-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .search-input {
+            flex: 1;
+        }
+        
+        .search-btn {
+            width: auto;
+            padding: 12px 24px;
+            margin: 0;
+        }
+        
+        .category-filter {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .category-chip {
+            padding: 6px 12px;
+            background: rgba(77, 171, 247, 0.2);
+            border: 1px solid #4dabf7;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+        
+        .category-chip:hover {
+            background: rgba(77, 171, 247, 0.3);
+        }
+        
+        .category-chip.active {
+            background: #4dabf7;
+            color: white;
+        }
+        
+        .search-results {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .search-result {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        
+        .search-result:hover {
+            background: rgba(0, 0, 0, 0.5);
+            border-left-color: #4dabf7;
+        }
+        
+        .result-title {
+            font-weight: bold;
+            color: #51cf66;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+        
+        .result-category {
+            display: inline-block;
+            padding: 2px 8px;
+            background: rgba(255, 107, 107, 0.2);
+            border-radius: 4px;
+            font-size: 0.75em;
+            margin-bottom: 8px;
+        }
+        
+        .result-snippet {
+            color: #b0b0b0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .result-score {
+            color: #888;
+            font-size: 0.8em;
+            margin-top: 8px;
+        }
+        
+        .result-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .result-btn {
+            padding: 4px 12px;
+            font-size: 0.85em;
+            width: auto;
+            margin: 0;
+        }
+        
+        .search-empty {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+        
+        .search-loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 3000;
+            overflow: auto;
+        }
+        
+        .modal-content {
+            background: #1a1a1a;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 800px;
+            border: 2px solid #4dabf7;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #888;
+            line-height: 20px;
+        }
+        
+        .modal-close:hover {
+            color: #fff;
+        }
+        
+        .content-full {
+            white-space: pre-wrap;
+            line-height: 1.6;
+            color: #d0d0d0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .quick-searches {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .quick-search-btn {
+            padding: 8px 12px;
+            font-size: 0.85em;
+            background: rgba(81, 207, 102, 0.2);
+            border: 1px solid #51cf66;
+            width: 100%;
+            margin: 0;
+        }
+        
+        .quick-search-btn:hover {
+            background: rgba(81, 207, 102, 0.3);
+        }

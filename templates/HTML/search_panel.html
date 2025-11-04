@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRD Search - {{ campaign.name }}</title>
+    <link rel="stylesheet" href="/static/css/base.css">
+  
+</head>
+<body>
+    <div class="search-panel">
+        <div class="search-header">
+            <h2>🔍 SRD Search</h2>
+            <div class="search-stats" id="search-stats">
+                {% if stats.status == 'loaded' %}
+                    {{ stats.total_documents }} documents indexed
+                {% elif stats.status == 'not_available' %}
+                    Search not available
+                {% else %}
+                    Not loaded
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if stats.status == 'loaded' %}
+        <div class="quick-searches">
+            <button class="quick-search-btn" onclick="quickSearch('fireball spell')">🔥 Fireball</button>
+            <button class="quick-search-btn" onclick="quickSearch('grapple rules')">🤼 Grapple</button>
+            <button class="quick-search-btn" onclick="quickSearch('opportunity attack')">⚔️ Opportunity</button>
+            <button class="quick-search-btn" onclick="quickSearch('conditions')">🎭 Conditions</button>
+            <button class="quick-search-btn" onclick="quickSearch('cover rules')">🛡️ Cover</button>
+            <button class="quick-search-btn" onclick="quickSearch('death saving throw')">💀 Death Saves</button>
+        </div>
+        
+        <div class="search-input-group">
+            <input type="text" 
+                   id="search-input" 
+                   class="search-input" 
+                   placeholder="Search spells, monsters, items, rules..."
+                   onkeypress="handleEnter(event)">
+            <button class="search-btn" onclick="performSearch()">Search</button>
+        </div>
+        
+        <div class="category-filter" id="category-filter">
+            <div class="category-chip active" data-category="">All</div>
+            {% for category, count in stats.categories.items() %}
+            <div class="category-chip" data-category="{{ category }}">
+                {{ category.title() }} ({{ count }})
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="search-results" id="search-results">
+            <div class="search-empty">
+                Enter a search query to find spells, monsters, items, and rules
+            </div>
+        </div>
+        {% else %}
+        <div class="info-box">
+            <strong>Search Engine Not Available</strong>
+            <p>To enable search:</p>
+            <ol>
+                <li>Install dependencies: <code>pip install faiss-cpu sentence-transformers</code></li>
+                <li>Build index: <code>python search_engine.py --build</code></li>
+                <li>Restart the server</li>
+            </ol>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Detail Modal -->
+    <div id="detail-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h2 id="modal-title"></h2>
+            <div id="modal-category" class="result-category"></div>
+            <div id="modal-content" class="content-full"></div>
+        </div>
+    </div>
+    
+    <script src="/templates/JS/search_panel.js"></script>
+</body>
+</html>

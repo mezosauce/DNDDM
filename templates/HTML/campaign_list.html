@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campaign Manager</title>
+    <link rel="stylesheet" href="/templates/CSS/base.css">
+    <link rel="stylesheet" href="/templates/CSS/campaign_list.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎲 Campaign Manager</h1>
+        
+        <button class="new-campaign-btn" onclick="location.href='/campaign/new'">
+            ⚔️ New Campaign
+        </button>
+
+        <button class="new-campaign-btn" style= "background: linear-gradient(135deg, #18f400 0%, #ee5a52 100%);" onclick="window.open('/srd-search', '_blank')">📚 Open SRD Search</button>
+
+        
+        {% if campaigns %}
+        <div class="campaigns-grid">
+            {% for campaign in campaigns %}
+            <div class="campaign-card" onclick="location.href='/campaign/{{ campaign.name }}'">
+                <div class="campaign-name">{{ campaign.name }}</div>
+                <div class="campaign-info">👥 Party: {{ campaign.party_size }}</div>
+                <div class="campaign-info">📅 Created: {{ campaign.created_date.split('T')[0] }}</div>
+                <div class="campaign-info">📖 Sessions: {{ campaign.session_number }}</div>
+                <span class="phase-badge phase-{{ campaign.current_phase }}">
+                    {{ campaign.current_phase.replace('_', ' ').title() }}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h2>No campaigns yet!</h2>
+            <p>Create your first campaign to begin your adventure.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

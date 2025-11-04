@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&D SRD Search - Quick Reference</title>
+    <link rel="stylesheet" href="/templates/CSS/base.css">
+    <link rel="stylesheet" href="/templates/CSS/srd_search.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎲 D&D 5e SRD Search</h1>
+            <p class="subtitle">Quick reference for rules, spells, monsters, and more</p>
+        </header>
+
+        <div class="search-section">
+            <div class="search-input-container">
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    placeholder="Search for rules, spells, monsters, items..."
+                    autofocus
+                >
+                <button onclick="performSearch()">🔍 Search</button>
+            </div>
+
+            <div class="quick-searches">
+                <button class="quick-btn" onclick="quickSearch('fireball')">🔥 Fireball</button>
+                <button class="quick-btn" onclick="quickSearch('grapple')">🤼 Grapple</button>
+                <button class="quick-btn" onclick="quickSearch('opportunity attack')">⚔️ Opportunity Attack</button>
+                <button class="quick-btn" onclick="quickSearch('conditions')">🎭 Conditions</button>
+                <button class="quick-btn" onclick="quickSearch('cover')">🛡️ Cover</button>
+                <button class="quick-btn" onclick="quickSearch('death saving throw')">💀 Death Saves</button>
+                <button class="quick-btn" onclick="quickSearch('concentration')">🧠 Concentration</button>
+                <button class="quick-btn" onclick="quickSearch('stealth')">👁️ Stealth</button>
+                <button class="quick-btn" onclick="quickSearch('legendary creatures')">⭐ Legendary</button>
+                <button class="quick-btn" onclick="quickSearch('alignment')">⚖️ Alignment</button>
+            </div>
+        </div>
+
+        <div class="stats-bar" id="stats-bar" style="display: none;">
+            <div class="stat-item">
+                <div class="stat-value" id="result-count">0</div>
+                <div class="stat-label">Results Found</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="search-time">0ms</div>
+                <div class="stat-label">Search Time</div>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="results-panel">
+                <h2>📚 Search Results</h2>
+                <div id="results-list">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <h3>Start Your Search</h3>
+                        <p>Enter a search term or click a quick search button to begin</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="viewer-panel">
+                <h2>📖 Content Viewer</h2>
+                <div id="content-viewer">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📄</div>
+                        <h3>Select a Result</h3>
+                        <p>Click on a search result to view its full content</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-to-top" id="back-to-top" onclick="scrollToTop()">↑</button>
+
+    <script src="/templates/JS/srd_search.js"></script>
+</body>
+</html>

@@ -102,7 +102,7 @@ else:
 def index():
     """Main landing page - campaign selection"""
     campaigns = campaign_mgr.list_campaigns()
-    return render_template('campaign_list.html', campaigns=campaigns)
+    return render_template('/HTML/campaign_list.html', campaigns=campaigns)
 
 
 @app.route('/campaign/new', methods=['GET', 'POST'])
@@ -218,7 +218,7 @@ def update_character(campaign_name, character_name):
         if not char:
             return jsonify({'error': 'Character not found'}), 404
         
-        # Update fields (keeping existing if not provided)
+        # Update fields 
         char.hp = int(data.get('hp', char.hp))
         char.max_hp = int(data.get('max_hp', char.max_hp))
         char.ac = int(data.get('ac', char.ac))

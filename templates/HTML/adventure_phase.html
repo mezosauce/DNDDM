@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quest Builder - {{ context.campaign.name }}</title>
+    <link rel="stylesheet" href="/templates/CSS/base.css">
+    <link rel="stylesheet" href="/templates/CSS/adventure_phase.css">
+</head>
+<body>
+    <div class="container">
+        <div class="phase-header">
+            <h1>📜 {{ context.campaign.name }}</h1>
+            <p>📍 Phase 2: Guided Quest Builder</p>
+            <span class="phase-badge">Step-by-Step Setup</span>
+        </div>
+        
+        <div class="content">
+            <!-- Main Quest Builder -->
+            <div>
+                <div class="panel">
+                    <div id="step-display"></div>
+                    <div id="options-container"></div>
+                    <div id="button-container"></div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div>
+                <div class="panel">
+                    <h2>👥 Party</h2>
+                    <div class="party-summary">
+                        {% for char in context.characters %}
+                        <div class="character-mini">
+                            <span>{{ char.name }}</span>
+                            <span style="color: #888;">{{ char.char_class }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <h2>✅ Progress</h2>
+                    <ul class="checklist" id="progress-checklist">
+                        <li data-step="quest_hook">Quest Hook</li>
+                        <li data-step="objective">Main Objective</li>
+                        <li data-step="location">Starting Location</li>
+                        <li data-step="npcs">Key NPCs</li>
+                        <li data-step="equipment">Equipment Needed</li>
+                        <li data-step="roles">Party Roles</li>
+                    </ul>
+                </div>
+                
+                <div class="panel">
+                    <h2>📋 Your Selections</h2>
+                    <div class="selections-summary" id="selections-display">
+                        <p style="text-align: center; color: #888;">No selections yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/templates/JS/adventure_phase.js"></script>
+</body>
+</html>
