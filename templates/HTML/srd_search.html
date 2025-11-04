@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>D&D SRD Search - Quick Reference</title>
-    <link rel="stylesheet" href="/templates/CSS/base.css">
-    <link rel="stylesheet" href="/templates/CSS/srd_search.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/srd_search.css') }}">
 </head>
 <body>
     <div class="container">
@@ -77,6 +77,6 @@
 
     <button class="back-to-top" id="back-to-top" onclick="scrollToTop()">↑</button>
 
-    <script src="/templates/JS/srd_search.js"></script>
+    <script src="{{ url_for('static', filename='js/srd_search.js') }}"></script>
 </body>
 </html>

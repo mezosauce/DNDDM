@@ -2,8 +2,6 @@
         let isLoading = false;
         let currentTurn = 0;
         let debugMode = false;
-        const sessionNumber = {{ context.campaign.session_number }};
-        const isFirstSession = sessionNumber === 1;
         let sessionStarted = false;
         
 
@@ -73,9 +71,11 @@ function showSRDDetail(index) {
         input.focus();
     }
 }
-        // Quest preparation content (if available)
-        const preparationsContent = `{{ context.preparations_content | replace('`', '\\`') | replace('$', '\\$') | safe }}`;
-        
+        // Get data passed from HTML
+        const sessionNumber = window.campaignData.sessionNumber;
+        const campaignName = window.campaignData.campaignName;
+        const preparationsContent = window.campaignData.preparationsContent;
+        const isFirstSession = window.campaignData.isFirstSession;      
         // Parse quest details from preparations content
         function parseQuestDetails() {
             if (!preparationsContent) return;
@@ -126,7 +126,7 @@ function showSRDDetail(index) {
             parseQuestDetails();
             
             // Load saved notes
-            const savedNotes = localStorage.getItem('session_{{ context.campaign.session_number }}_notes');
+            const savedNotes = localStorage.getItem(`session_${sessionNumber}_notes`);
             if (savedNotes) {
                 document.getElementById('session-notes').value = savedNotes;
             }
@@ -143,7 +143,8 @@ function showSRDDetail(index) {
             loadInitiative();
             
             // Check if this is Session 1 and hasn't been started yet
-            const sessionStartedKey = 'session_1_started_{{ context.campaign.name }}';
+            const sessionStartedKey = `session_1_started_${campaignName}`;
+
             sessionStarted = localStorage.getItem(sessionStartedKey) === 'true';
             
             if (isFirstSession && !sessionStarted) {
@@ -191,12 +192,13 @@ function showSRDDetail(index) {
             document.getElementById('chat-container').appendChild(thinkingDiv);
             
             try {
-                const response = await fetch('/campaign/{{ context.campaign.name }}/ai-assist', {
+                const response = await fetch(`/campaign/${campaignName}/ai-assist`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         query: 'START_SESSION_1',
-                        is_first_message: true
+                        is_first_message: true,
+                        campaign_name: campaignName
                     })
                 });
                 
@@ -270,7 +272,7 @@ function showSRDDetail(index) {
             document.getElementById('chat-container').appendChild(thinkingDiv);
             
             try {
-                const response = await fetch('/campaign/{{ context.campaign.name }}/ai-assist', {
+                const response = await fetch(`/campaign/${campaignName}/ai-assist`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({query: action})
@@ -496,7 +498,7 @@ function showSRDDetail(index) {
         
         function saveNotes() {
             const notes = document.getElementById('session-notes').value;
-            localStorage.setItem('session_{{ context.campaign.session_number }}_notes', notes);
+            localStorage.setItem(`session_${sessionNumber}_notes`, notes);
             
             // Visual feedback
             const btn = event.target;
@@ -514,10 +516,10 @@ function showSRDDetail(index) {
             if (!confirm('End this session? Your notes will be saved.')) return;
             
             const notes = document.getElementById('session-notes').value;
-            localStorage.setItem('session_{{ context.campaign.session_number }}_notes', notes);
-            
+            localStorage.setItem(`session_${sessionNumber}_notes`, notes);
+
             alert('Session ended! Notes saved to browser storage.');
-            location.href = '/campaign/{{ context.campaign.name }}';
+            location.href = `/campaign/${campaignName}`;
         }
         
         // Keyboard shortcuts

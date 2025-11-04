@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Session {{ context.campaign.session_number }} - {{ context.campaign.name }}</title>
-    <link rel="stylesheet" href="/templates/CSS/base.css">
-    <link rel="stylesheet" href="/templates/CSS/active_campaign.css">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/active_campaign.css') }}">
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 </head>
+
 <body>
     <div class="container container-full">
         <div class="phase-header">
@@ -227,7 +229,17 @@
     <div class="debug-toggle" onclick="toggleDebug()" id="debug-toggle">
         🔧 Debug: <span id="debug-status">OFF</span>
     </div>
-    
-    <script src="/templates/JS/active_campaign.js"></script>
+
+    <script>
+    // Pass server-side data to JavaScript
+    window.campaignData = {
+        sessionNumber: {{ context.campaign.session_number }},
+        campaignName: "{{ context.campaign.name }}",
+        preparationsContent: {{ context.preparations_content | default('null') | tojson | safe }},
+        isFirstSession: {{ 'true' if context.campaign.session_number == 1 else 'false' }}
+    };
+</script>
+
+    <script src="{{ url_for('static', filename='js/active_campaign.js') }}"></script>
 </body>
 </html>

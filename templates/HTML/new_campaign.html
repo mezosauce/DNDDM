@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Campaign</title>
-    <link rel="stylesheet" href="/templates/CSS/base.css">
-    <link rel="stylesheet" href="/templates/CSS/new_campaign.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/new_campaign.css') }}">
 </head>
 <body>
     <div class="container">
@@ -36,6 +36,6 @@
         </form>
     </div>
     
-    <script src="/templates/JS/new_campaign.js"></script>
+    <script src="{{ url_for('static', filename='js/new_campaign.js') }}"></script>
 </body>
 </html>

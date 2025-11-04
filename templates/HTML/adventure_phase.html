@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quest Builder - {{ context.campaign.name }}</title>
-    <link rel="stylesheet" href="/templates/CSS/base.css">
-    <link rel="stylesheet" href="/templates/CSS/adventure_phase.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/adventure_phase.css') }}">
 </head>
 <body>
     <div class="container">
@@ -61,6 +61,6 @@
         </div>
     </div>
     
-    <script src="/templates/JS/adventure_phase.js"></script>
+    <script src="{{ url_for('static', filename='js/adventure_phase.js') }}"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
->
+
         let currentCategory = '';
         let lastResults = [];
         
@@ -135,4 +135,4 @@
             const input = document.getElementById('search-input');
             if (input) input.focus();
         };
-    </script>
+    

@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SRD Search Panel</title>
-    <link rel="stylesheet" href="/templates/CSS/base.css">
-    <link rel="stylesheet" href="/templates/CSS/search_panel_integration.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/search_panel_integration.css') }}">
 </head>
 <body>
 <div class="panel">
@@ -34,7 +34,7 @@
 
 
 
-<script src="/templates/JS/search_panel_integration.js"></script>
+<script src="{{ url_for('static', filename='js/search_panel_integration.js') }}"></script>
 
 <!-- For Full integration-->
 

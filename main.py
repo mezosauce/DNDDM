@@ -102,7 +102,7 @@ else:
 def index():
     """Main landing page - campaign selection"""
     campaigns = campaign_mgr.list_campaigns()
-    return render_template('/HTML/campaign_list.html', campaigns=campaigns)
+    return render_template('HTML/campaign_list.html', campaigns=campaigns)
 
 
 @app.route('/campaign/new', methods=['GET', 'POST'])
@@ -120,7 +120,7 @@ def new_campaign():
         except Exception as e:
             return jsonify({'error': str(e)}), 400
     
-    return render_template('new_campaign.html')
+    return render_template('HTML/new_campaign.html')
 
 
 @app.route('/campaign/<campaign_name>')
@@ -150,7 +150,7 @@ def setup_phase(campaign_name):
         campaign = campaign_mgr.load_campaign(campaign_name)
         characters = campaign_mgr.get_characters(campaign_name)
         
-        return render_template('setup_phase.html', 
+        return render_template('HTML/setup_phase.html', 
                              campaign=campaign,
                              characters=characters)
     except Exception as e:
@@ -461,7 +461,7 @@ def adventure_phase(campaign_name):
     """Call to adventure and preparation phase"""
     try:
         context = campaign_mgr.get_campaign_context(campaign_name)
-        return render_template('adventure_phase.html', context=context)
+        return render_template('HTML/adventure_phase.html', context=context)
     except Exception as e:
         return f"Error: {e}", 404
 
@@ -715,7 +715,7 @@ def active_campaign(campaign_name):
     """Active campaign gameplay"""
     try:
         context = campaign_mgr.get_campaign_context(campaign_name)
-        return render_template('active_campaign.html', context=context)
+        return render_template('HTML/active_campaign.html', context=context)
     except Exception as e:
         return f"Error: {e}", 404
 
@@ -933,7 +933,7 @@ def create_templates():
     templates_dir = Path('templates')
     templates_dir.mkdir(exist_ok=True)
     
-    if (templates_dir / 'campaign_list.html').exists():
+    if (templates_dir / 'HTML/campaign_list.html').exists():
         return
     
     print("Creating HTML templates...")
@@ -954,13 +954,13 @@ def search_panel(campaign_name):
     try:
         campaign = campaign_mgr.load_campaign(campaign_name)
         stats = search_engine.get_stats() if search_engine else {'status': 'not_available'}
-        return render_template('search_panel.html', campaign=campaign, stats=stats)
+        return render_template('HTML/search_panel.html', campaign=campaign, stats=stats)
     except Exception as e:
         return f"Error: {e}", 404
     
 @app.route('/srd-search')
 def srd_search_page():
-    return render_template('srd_search.html')
+    return render_template('HTML/srd_search.html')
 
 @app.route('/api/srd/file', methods=['POST'])
 def get_srd_file():

@@ -30,27 +30,22 @@ class Character:
     inventory: List[str] = None
     notes: str = ""
     
-    # NEW: Background System
-    background_feature: str = ""  # Description of background feature (e.g., "Shelter of the Faithful")
+    background_feature: str = ""  # Description of background feature
     background_equipment: List[str] = field(default_factory=list)  # Equipment from background
     
-    # NEW: Proficiencies
     skill_proficiencies: List[str] = field(default_factory=list)  # All skills (class + background)
     tool_proficiencies: List[str] = field(default_factory=list)  # Tools from background
     
-    # NEW: Languages
     languages_known: List[str] = field(default_factory=list)  # Combines racial + background languages
     
-    # NEW: Personality (from background tables)
+    # Personality (from background tables)
     personality_traits: List[str] = field(default_factory=list)  # 2 traits
     ideal: str = ""  # 1 ideal
     bond: str = ""  # 1 bond
     flaw: str = ""  # 1 flaw
     
-    # NEW: Alignment
     alignment: str = "True Neutral"  # Default alignment
     
-    # NEW: Inspiration
     has_inspiration: bool = False
     
     # NEW: Currency (D&D 5e standard denominations)

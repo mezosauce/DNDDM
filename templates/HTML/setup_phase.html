@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Setup - {{ campaign.name }}</title>
-    <link rel="stylesheet" href="/templates/CSS/base.css">
-    <link rel="stylesheet" href="/templates/CSS/setup_panel.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/setup_phase.css') }}">
 </head>
 <body>
     <div class="container">
@@ -15,7 +15,8 @@
             
             <div class="progress">
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: {{ (characters|length / campaign.party_size * 100)|int }}%">
+                    {% set progress = (100 * characters|length / campaign.party_size)|round(0, 'floor')|int if campaign.party_size > 0 else 0 %}
+                    <div class="progress-fill" style="width: {{ progress }}%">
                         {{ characters|length }} / {{ campaign.party_size }} Characters
                     </div>
                 </div>
@@ -307,6 +308,6 @@
         </div>
     </div>
     
-    <script src="/templates/JS/setup_phase.js"></script>
+    <script src="{{ url_for('static', filename='js/setup_phase.js') }}"></script>
 </body>
 </html>
