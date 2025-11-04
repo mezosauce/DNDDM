@@ -80,6 +80,7 @@ else:
 
 # Initialize Search Engine
 search_engine = None
+
 if FAISS_AVAILABLE and EMBEDDINGS_AVAILABLE:
     try:
         search_engine = SRDSearchEngine(SRD_PATH)
@@ -136,67 +137,6 @@ def campaign_home(campaign_name):
             return redirect(url_for('active_campaign', campaign_name=campaign_name))
     except Exception as e:
         return f"Error loading campaign: {e}", 404
-
-
-# ============================================================================
-# SETTINGS ROUTES
-# ============================================================================
-
-@app.route('/settings/prompts')
-def prompt_settings():
-    """Prompt template editor"""
-    prep_prompt = prompt_templates.get_prompt('prep')
-    active_prompt = prompt_templates.get_prompt('active')
-    
-    return render_template('prompt_settings.html', 
-                         prep_prompt=prep_prompt,
-                         active_prompt=active_prompt)
-
-
-@app.route('/settings/prompts/save', methods=['POST'])
-def save_prompt():
-    """Save edited prompt template"""
-    try:
-        data = request.json
-        phase = data.get('phase')
-        content = data.get('content')
-        
-        if not phase or not content:
-            return jsonify({'success': False, 'error': 'Missing phase or content'})
-        
-        prompt_templates.update_prompt(phase, content)
-        return jsonify({'success': True})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
-
-
-@app.route('/settings/prompts/reset', methods=['POST'])
-def reset_prompt():
-    """Reset prompt to default"""
-    try:
-        data = request.json
-        phase = data.get('phase')
-        
-        if not phase:
-            return jsonify({'success': False, 'error': 'Missing phase'})
-        
-        # Delete the file to force recreation of default
-        if phase == 'prep':
-            filepath = 'prompts/prep_phase_prompt.txt'
-        elif phase == 'active':
-            filepath = 'prompts/active_phase_prompt.txt'
-        else:
-            return jsonify({'success': False, 'error': 'Invalid phase'})
-        
-        if os.path.exists(filepath):
-            os.remove(filepath)
-        
-        # Recreate defaults
-        prompt_templates._create_default_templates()
-        
-        return jsonify({'success': True})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
 
 
 # ============================================================================
@@ -264,7 +204,7 @@ def advance_phase(campaign_name):
 
 
 # ============================================================================
-# CHARACTER MANAGEMENT ENDPOINTS (Enhanced)
+# CHARACTER MANAGEMENT ENDPOINTS 
 # ============================================================================
 
 @app.route('/campaign/<campaign_name>/character/<character_name>/update', methods=['POST'])
