@@ -95,12 +95,14 @@ h3 {
    PHASE HEADER
    ============================================================================ */
 
+
 .phase-header {
     background: rgba(30, 30, 46, 0.8);
     border: 2px solid #4a4a6a;
     border-radius: 10px;
     padding: 20px;
     margin-bottom: 20px;
+    width: 100%;
 }
 
 .phase-badge {

@@ -1031,4 +1031,9 @@ if __name__ == '__main__':
     print("="*60 + "\n")
     
     # Run the server
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
+    try:
+        socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
+    except Exception as e:
+        print(f"⚠️  Socket.io not available: {e}")
+        print("   Running without websocket support")
+        app.run(host='0.0.0.0', port=5000, debug=True)

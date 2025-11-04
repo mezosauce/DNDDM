@@ -76,26 +76,23 @@
                 </div>
                 {% endif %}
                 
-                <div class="panel">
-                    <h2>⚔️ Initiative Tracker</h2>
-                    <ul class="initiative-list" id="initiative-list">
-                        <li style="text-align: center; color: #888; padding: 20px;">
-                            No combat active
-                        </li>
-                    </ul>
-                    <input type="text" id="init-name" placeholder="Name">
-                    <input type="number" id="init-value" placeholder="Initiative" min="1">
-                    <button onclick="addInitiative()">Add to Initiative</button>
-                    <button class="btn-secondary" onclick="clearInitiative()">Clear All</button>
+                 <div class="panel">
+                    <h2>⚡ Quick Actions</h2>
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="quickAction('I attack')">⚔️ Attack</button>
+                        <button class="quick-btn" onclick="quickAction('I cast a spell')">✨ Cast Spell</button>
+                        <button class="quick-btn" onclick="quickAction('I search the room')">🔍 Search</button>
+                        <button class="quick-btn" onclick="quickAction('I investigate')">📖 Investigate</button>
+                        <button class="quick-btn" onclick="quickAction('I try to persuade')">💬 Persuade</button>
+                        <button class="quick-btn" onclick="quickAction('I take a rest')">🛌 Rest</button>
+                    </div>
                 </div>
-                
-                <div class="panel">
-                    <h2>📝 Session Notes</h2>
-                    <textarea id="session-notes" placeholder="Take notes about this session..." style="min-height: 150px;"></textarea>
-                    <button onclick="saveNotes()">Save Notes</button>
-                </div>
-                
-                
+
+            </div>
+           
+            <!-- Center: Main Chat -->
+             
+            <div>
                 <div class="panel">
                     <h2>📍 Current Context</h2>
                     <div style="font-size: 0.9em; color: #b0b0b0;">
@@ -104,18 +101,11 @@
                         <p><strong>Combat:</strong> <span id="combat-status">No</span></p>
                     </div>
                 </div>
-                
-            </div>
-           
-           
-            
-            <!-- Center: Main Chat -->
-            <div>
                 <div class="panel">
                     <h2>🎭 Adventure Log</h2>
                     <div class="chat-container" id="chat-container"></div>
                     <textarea id="action-input" placeholder="What do you do?" rows="3"></textarea>
-                    <button onclick="takeAction()" id="action-btn">Take Action</button>
+                    <button onclick="takeAction()" id="action-btn" style="margin-bottom: 10%;">Take Action</button>
                 </div>
             </div>
             
@@ -158,17 +148,7 @@
                     <div id="dice-result"></div>
                 </div>
                 
-                <div class="panel">
-                    <h2>⚡ Quick Actions</h2>
-                    <div class="quick-actions">
-                        <button class="quick-btn" onclick="quickAction('I attack')">⚔️ Attack</button>
-                        <button class="quick-btn" onclick="quickAction('I cast a spell')">✨ Cast Spell</button>
-                        <button class="quick-btn" onclick="quickAction('I search the room')">🔍 Search</button>
-                        <button class="quick-btn" onclick="quickAction('I investigate')">📖 Investigate</button>
-                        <button class="quick-btn" onclick="quickAction('I try to persuade')">💬 Persuade</button>
-                        <button class="quick-btn" onclick="quickAction('I take a rest')">🛌 Rest</button>
-                    </div>
-                </div>
+               
 
             </div>
           
@@ -187,48 +167,45 @@
     </div>
     
     <div class="bottom-search-panel" id="bottom-search">
-        <h2>
-            🔍 SRD Quick Search
-            <span class="search-toggle" onclick="toggleBottomSearch()">
-                <span id="search-toggle-text">▼ Collapse</span>
-            </span>
-        </h2>
-        
-        <div class="search-content" id="search-content">
-            <div class="search-input-area">
-                <div class="search-main-input">
-                    <input type="text" 
-                           id="srd-search-input" 
-                           placeholder="Search rules, spells, monsters, items..."
-                           onkeypress="if(event.key==='Enter') searchSRD()">
-                    <button onclick="searchSRD()">Search</button>
-                </div>
-                
-                <div class="quick-searches-horizontal">
-                    <button class="quick-search-btn-small" onclick="quickSearchSRD('fireball')">🔥 Fireball</button>
-                    <button class="quick-search-btn-small" onclick="quickSearchSRD('grapple')">🤼 Grapple</button>
-                    <button class="quick-search-btn-small" onclick="quickSearchSRD('opportunity attack')">⚔️ Opportunity</button>
-                    <button class="quick-search-btn-small" onclick="quickSearchSRD('conditions')">🎭 Conditions</button>
-                    <button class="quick-search-btn-small" onclick="quickSearchSRD('cover')">🛡️ Cover</button>
-                    <button class="quick-search-btn-small" onclick="quickSearchSRD('death saving throw')">💀 Death Saves</button>
-                    <button class="quick-search-btn-small" onclick="quickSearchSRD('concentration')">🧠 Concentration</button>
-                    <button class="quick-search-btn-small" onclick="quickSearchSRD('stealth')">👁️ Stealth</button>
-                </div>
+    <h2>
+        🔍 SRD Quick Search
+        <span class="search-toggle" onclick="toggleBottomSearch()">
+            <span id="search-toggle-text">▼ Collapse</span>
+        </span>
+    </h2>
+    
+    <div class="search-content" id="search-content">
+        <div class="search-input-area">
+            <div class="search-main-input">
+                <input type="text" 
+                       id="srd-search-input" 
+                       placeholder="Search rules, spells, monsters, items..."
+                       onkeypress="if(event.key==='Enter') searchSRD()">
+                <button onclick="searchSRD()">Search</button>
             </div>
             
-            <div class="search-results-bottom" id="srd-results">
-                <div style="text-align: center; color: #888; padding: 20px; font-size: 0.9em;">
-                    Enter search or click quick button
-                </div>
+            <div class="quick-searches-horizontal">
+                <button class="quick-search-btn-small" onclick="quickSearchSRD('fireball')">🔥 Fireball</button>
+                <button class="quick-search-btn-small" onclick="quickSearchSRD('grapple')">🤼 Grapple</button>
+                <button class="quick-search-btn-small" onclick="quickSearchSRD('opportunity attack')">⚔️ Opportunity</button>
+                <button class="quick-search-btn-small" onclick="quickSearchSRD('conditions')">🎭 Conditions</button>
+                <button class="quick-search-btn-small" onclick="quickSearchSRD('cover')">🛡️ Cover</button>
+                <button class="quick-search-btn-small" onclick="quickSearchSRD('death saving throw')">💀 Death Saves</button>
+                <button class="quick-search-btn-small" onclick="quickSearchSRD('concentration')">🧠 Concentration</button>
+                <button class="quick-search-btn-small" onclick="quickSearchSRD('stealth')">👁️ Stealth</button>
+            </div>
+        </div>
+        
+        <div class="search-results-bottom" id="srd-results">
+            <div style="text-align: center; color: #888; padding: 20px; font-size: 0.9em;">
+                Enter search or click quick button
             </div>
         </div>
     </div>
+</div>
 
 </div>
-    <!-- Debug Toggle -->
-    <div class="debug-toggle" onclick="toggleDebug()" id="debug-toggle">
-        🔧 Debug: <span id="debug-status">OFF</span>
-    </div>
+
 
     <script>
     // Pass server-side data to JavaScript

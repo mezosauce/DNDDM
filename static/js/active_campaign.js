@@ -3,9 +3,31 @@
         let currentTurn = 0;
         let debugMode = false;
         let sessionStarted = false;
-        
-
         let srdSearchResults = [];
+        let selectedSrdIndex = -1;
+
+
+
+function toggleBottomSearch() {
+    const searchContent = document.getElementById('search-content');
+    const toggleText = document.getElementById('search-toggle-text');
+    
+    if (searchContent.style.display === 'none') {
+        searchContent.style.display = 'block';
+        toggleText.textContent = '▼ Collapse';
+    } else {
+        searchContent.style.display = 'none';
+        toggleText.textContent = '▲ Expand';
+    }
+}
+
+// Add to the existing escapeHtml function if it doesn't exist:
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
 
 function quickSearchSRD(query) {
     document.getElementById('srd-search-input').value = query;
@@ -60,6 +82,8 @@ function displaySRDResults(results) {
         </div>
     `).join('');
 }
+
+
 
 function showSRDDetail(index) {
     const result = srdSearchResults[index];
@@ -139,8 +163,6 @@ function showSRDDetail(index) {
                 }
             });
             
-            // Load initiative
-            loadInitiative();
             
             // Check if this is Session 1 and hasn't been started yet
             const sessionStartedKey = `session_1_started_${campaignName}`;
@@ -450,67 +472,6 @@ function showSRDDetail(index) {
             takeAction();
         }
         
-        async function addInitiative() {
-            const name = document.getElementById('init-name').value;
-            const value = document.getElementById('init-value').value;
-            
-            if (!name || !value) return;
-            
-            // Store in local storage for now
-            let initiative = JSON.parse(localStorage.getItem('initiative') || '[]');
-            initiative.push({name: name, initiative: parseInt(value)});
-            initiative.sort((a, b) => b.initiative - a.initiative);
-            localStorage.setItem('initiative', JSON.stringify(initiative));
-            
-            document.getElementById('init-name').value = '';
-            document.getElementById('init-value').value = '';
-            
-            loadInitiative();
-            document.getElementById('combat-status').textContent = 'Yes';
-            addMessage(`${name} joins combat with initiative ${value}!`, 'system');
-        }
-        
-        function loadInitiative() {
-            const initiative = JSON.parse(localStorage.getItem('initiative') || '[]');
-            const list = document.getElementById('initiative-list');
-            
-            if (initiative.length === 0) {
-                list.innerHTML = '<li style="text-align: center; color: #888; padding: 20px;">No combat active</li>';
-            } else {
-                list.innerHTML = initiative.map((item, index) => `
-                    <li class="initiative-item ${index === currentTurn ? 'active' : ''}">
-                        <span>${item.name}</span>
-                        <span>${item.initiative}</span>
-                    </li>
-                `).join('');
-            }
-        }
-        
-        function clearInitiative() {
-            if (!confirm('Clear initiative tracker?')) return;
-            
-            localStorage.removeItem('initiative');
-            currentTurn = 0;
-            loadInitiative();
-            document.getElementById('combat-status').textContent = 'No';
-            addMessage('Combat ended', 'system');
-        }
-        
-        function saveNotes() {
-            const notes = document.getElementById('session-notes').value;
-            localStorage.setItem(`session_${sessionNumber}_notes`, notes);
-            
-            // Visual feedback
-            const btn = event.target;
-            const originalText = btn.textContent;
-            btn.textContent = '✓ Saved!';
-            btn.style.background = '#51cf66';
-            
-            setTimeout(() => {
-                btn.textContent = originalText;
-                btn.style.background = '';
-            }, 1500);
-        }
         
         async function endSession() {
             if (!confirm('End this session? Your notes will be saved.')) return;
@@ -529,3 +490,215 @@ function showSRDDetail(index) {
                 takeAction();
             }
         });
+
+        function quickSearchSRD(query) {
+    document.getElementById('srd-search-input').value = query;
+    searchSRD();
+}
+
+async function searchSRD() {
+    const query = document.getElementById('srd-search-input').value.trim();
+    if (!query) return;
+    
+    const resultsDiv = document.getElementById('srd-results');
+    resultsDiv.innerHTML = '<div style="text-align: center; padding: 20px; color: #888;"><div class="spinner"></div>Searching...</div>';
+    
+    try {
+        const response = await fetch('/api/search', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                query: query,
+                top_k: 8
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+            resultsDiv.innerHTML = `<div style="color: #ff6b6b; padding: 10px;">${data.error}</div>`;
+            return;
+        }
+        
+        srdSearchResults = data.results;
+        displaySRDResults(data.results);
+        
+    } catch (error) {
+        resultsDiv.innerHTML = `<div style="color: #ff6b6b; padding: 10px;">Error: ${error.message}</div>`;
+    }
+}
+
+function displaySRDResults(results) {
+    const resultsDiv = document.getElementById('srd-results');
+    
+    if (results.length === 0) {
+        resultsDiv.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">No results found</div>';
+        return;
+    }
+    
+    resultsDiv.innerHTML = results.map((result, index) => `
+        <div class="srd-result ${index === selectedSrdIndex ? 'active' : ''}" onclick="selectSrdResult(${index})">
+            <div class="srd-result-title">${escapeHtml(result.title)}</div>
+            <div class="srd-result-category">${result.category}</div>
+            <div class="srd-result-snippet">${escapeHtml(result.snippet)}</div>
+            <div class="srd-result-score">Relevance: ${(result.score * 100).toFixed(0)}%</div>
+        </div>
+    `).join('');
+}
+
+async function selectSrdResult(index) {
+    if (index < 0 || index >= srdSearchResults.length) return;
+    
+    selectedSrdIndex = index;
+    const result = srdSearchResults[index];
+    
+    // Update visual selection
+    document.querySelectorAll('.srd-result').forEach((el, i) => {
+        if (i === index) {
+            el.classList.add('active');
+        } else {
+            el.classList.remove('active');
+        }
+    });
+    
+    // Show full content in modal
+    await showSRDDetailModal(result);
+}
+
+async function showSRDDetailModal(result) {
+    // Create or get modal
+    let modal = document.getElementById('srd-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'srd-modal';
+        modal.className = 'srd-modal';
+        modal.innerHTML = `
+            <div class="srd-modal-content">
+                <span class="srd-modal-close" onclick="closeSRDModal()">&times;</span>
+                <div class="srd-modal-header">
+                    <h2 id="srd-modal-title"></h2>
+                    <div id="srd-modal-category" class="srd-result-category"></div>
+                    <div id="srd-modal-file" style="font-size: 0.8em; color: #888; margin-top: 5px;"></div>
+                </div>
+                <div id="srd-modal-body">
+                    <div class="srd-modal-loading">
+                        <div class="spinner"></div>
+                        <p>Loading content...</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    // Show modal
+    modal.style.display = 'block';
+    
+    // Update header
+    document.getElementById('srd-modal-title').textContent = result.title;
+    document.getElementById('srd-modal-category').textContent = result.category;
+    document.getElementById('srd-modal-file').textContent = `📁 ${result.file_path}`;
+    
+    // Load full content
+    const bodyDiv = document.getElementById('srd-modal-body');
+    bodyDiv.innerHTML = '<div class="srd-modal-loading"><div class="spinner"></div><p>Loading content...</p></div>';
+    
+    try {
+        const response = await fetch('/api/srd/file', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ file_path: result.file_path })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Content not found');
+        }
+        
+        const data = await response.json();
+        
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        
+        // Convert markdown to HTML
+        const html = convertMarkdownToHTML(data.content);
+        bodyDiv.innerHTML = `<div class="srd-content-viewer">${html}</div>`;
+        
+    } catch (error) {
+        bodyDiv.innerHTML = `
+            <div class="error-message">
+                <h3>⚠️ Could not load full content</h3>
+                <p>${error.message}</p>
+                <hr style="margin: 20px 0; border: 1px solid #ff6b6b;">
+                <h4>Preview from Search:</h4>
+                <div style="margin-top: 15px; white-space: pre-wrap; line-height: 1.6;">
+                    ${escapeHtml(result.content)}
+                </div>
+            </div>
+        `;
+    }
+}
+
+function closeSRDModal() {
+    const modal = document.getElementById('srd-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+function convertMarkdownToHTML(markdown) {
+    let html = markdown;
+    
+    // Headers
+    html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+    html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+    html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+    
+    // Bold
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // Italic
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Code blocks
+    html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+    
+    // Inline code
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+    
+    // Tables (basic)
+    html = html.replace(/\|(.+)\|/g, (match) => {
+        const cells = match.split('|').filter(s => s.trim());
+        const cellsHtml = cells.map(cell => `<td>${cell.trim()}</td>`).join('');
+        return `<tr>${cellsHtml}</tr>`;
+    });
+    html = html.replace(/(<tr>.*<\/tr>)+/g, '<table>$&</table>');
+    
+    // Lists
+    html = html.replace(/^\* (.+)$/gim, '<li>$1</li>');
+    html = html.replace(/^\- (.+)$/gim, '<li>$1</li>');
+    html = html.replace(/(<li>.*<\/li>)+/g, '<ul>$&</ul>');
+    
+    // Paragraphs
+    html = html.replace(/\n\n/g, '</p><p>');
+    html = '<p>' + html + '</p>';
+    
+    // Clean up
+    html = html.replace(/<p><\/p>/g, '');
+    html = html.replace(/<p>(<h[1-6]>)/g, '$1');
+    html = html.replace(/(<\/h[1-6]>)<\/p>/g, '$1');
+    html = html.replace(/<p>(<table>)/g, '$1');
+    html = html.replace(/(<\/table>)<\/p>/g, '$1');
+    html = html.replace(/<p>(<ul>)/g, '$1');
+    html = html.replace(/(<\/ul>)<\/p>/g, '$1');
+    html = html.replace(/<p>(<pre>)/g, '$1');
+    html = html.replace(/(<\/pre>)<\/p>/g, '$1');
+    
+    return html;
+}
+
+// Close modal when clicking outside
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('srd-modal');
+    if (modal && event.target === modal) {
+        closeSRDModal();
+    }
+});
