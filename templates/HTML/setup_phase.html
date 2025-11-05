@@ -308,6 +308,10 @@
         </div>
     </div>
     
+    <script>
+        // Expose campaign name to static JS (safe JSON encoding)
+        window.campaignName = {{ campaign.name | tojson | safe }};
+    </script>
     <script src="{{ url_for('static', filename='js/setup_phase.js') }}"></script>
 </body>
 </html>

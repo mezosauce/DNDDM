@@ -61,6 +61,10 @@
         </div>
     </div>
     
+    <script>
+        // Expose campaign name for static JS
+        window.campaignName = {{ context.campaign.name | tojson | safe }};
+    </script>
     <script src="{{ url_for('static', filename='js/adventure_phase.js') }}"></script>
 </body>
 </html>

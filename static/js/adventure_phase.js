@@ -65,7 +65,7 @@
             buttonContainer.innerHTML = '';
             
             try {
-                const response = await fetch('/campaign/{{ context.campaign.name }}/generate-options', {
+                const response = await fetch(`/campaign/${encodeURIComponent(window.campaignName)}/generate-options`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
@@ -209,29 +209,29 @@
     
     try {
         // Save quest setup to markdown file
-        await fetch('/campaign/{{ context.campaign.name }}/save-quest-setup', {
+        await fetch(`/campaign/${encodeURIComponent(window.campaignName)}/save-quest-setup`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({selections: selections})
         });
         
         // Mark phase complete
-        await fetch('/campaign/{{ context.campaign.name }}/complete-phase', {
+        await fetch(`/campaign/${encodeURIComponent(window.campaignName)}/complete-phase`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({phase: 'call_to_adventure'})
         });
                 
                 // Advance to next phase
-                const response = await fetch('/campaign/{{ context.campaign.name }}/advance', {
+                const response = await fetch(`/campaign/${encodeURIComponent(window.campaignName)}/advance`, {
                     method: 'POST'
                 });
                 
                 const result = await response.json();
         
-        if (result.success) {
+            if (result.success) {
             alert('✓ Quest preparation saved to preparations.md!');
-            location.href = '/campaign/{{ context.campaign.name }}';
+            location.href = `/campaign/${encodeURIComponent(window.campaignName)}`;
         } else {
             alert('Error: ' + result.error);
         }

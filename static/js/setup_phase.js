@@ -332,7 +332,7 @@
                 notes: document.getElementById('char-notes').value
             };
             
-            const response = await fetch('/campaign/{{ campaign.name }}/character/add', {
+            const response = await fetch(`/campaign/${encodeURIComponent(window.campaignName)}/character/add`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
@@ -350,14 +350,14 @@
         async function advancePhase() {
             if (!confirm('Ready to move to the next phase?')) return;
             
-            const response = await fetch('/campaign/{{ campaign.name }}/advance', {
+            const response = await fetch(`/campaign/${encodeURIComponent(window.campaignName)}/advance`, {
                 method: 'POST'
             });
             
             const result = await response.json();
             
             if (result.success) {
-                location.href = '/campaign/{{ campaign.name }}';
+                location.href = `/campaign/${encodeURIComponent(window.campaignName)}`;
             } else {
                 alert('Error: ' + result.error);
             }
