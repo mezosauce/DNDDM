@@ -13,7 +13,7 @@ from datetime import datetime
 from prompt_templates import PromptTemplates, create_full_prompt
 
 # Import campaign manager
-from campaign_manager import CampaignManager, Character, get_campaign_manager
+from BackEnd.Classes.campaign_manager import CampaignManager, Character, get_campaign_manager
 
 # Import AI DM components
 try:

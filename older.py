@@ -47,7 +47,7 @@ except (ImportError, AttributeError):
 
 # Import Phase 3 enhanced router
 try:
-    from phase3_DM import (
+    from BackEnd.Classes.phase3_DM import (
         Phase3QueryRouter, 
         create_phase3_prompt,
         SRDContentLoader as Phase3SRDLoader

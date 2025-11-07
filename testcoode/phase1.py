@@ -4,7 +4,7 @@ This module should NOT create its own Flask app - it only defines routes
 """
 
 from flask import render_template, request, jsonify
-from campaign_manager import Character
+from BackEnd.Classes.campaign_manager import Character
 
 
 # ============================================================================

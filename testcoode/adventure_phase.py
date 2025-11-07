@@ -11,12 +11,12 @@ import os
 from pathlib import Path
 
 # Import campaign manager
-from campaign_manager import CampaignManager, Character, get_campaign_manager
+from BackEnd.Classes.campaign_manager import CampaignManager, Character, get_campaign_manager
 
 # Import AI DM components
 try:
-    from ai_dm_query_router import QueryRouter
-    from ai_dm_free import OllamaDM, GameState
+    from BackEnd.Classes.ai_dm_query_router import QueryRouter
+    from BackEnd.Classes.ai_dm_free import OllamaDM, GameState
 except ImportError:
     print("Warning: AI DM modules not found")
     OllamaDM = None

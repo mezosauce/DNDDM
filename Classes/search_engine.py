@@ -65,7 +65,7 @@ class SRDSearchEngine:
     
     def __init__(
         self,
-        srd_path: str = "./srd_story_cycle",
+        srd_path: str = "../../srd_story_cycle",
         index_path: str = "./search_index",
         model_name: str = "all-MiniLM-L6-v2"  # Fast, good quality
     ):
@@ -462,7 +462,7 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description="D&D SRD Search Engine")
-    parser.add_argument('--srd-path', default='./srd_story_cycle', help='Path to SRD')
+    parser.add_argument('--srd-path', default='../../srd_story_cycle', help='Path to SRD')
     parser.add_argument('--build', action='store_true', help='Build search index')
     parser.add_argument('--rebuild', action='store_true', help='Force rebuild index')
     parser.add_argument('--search', type=str, help='Search query')
