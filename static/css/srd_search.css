@@ -385,3 +385,18 @@
                 grid-template-columns: 1fr;
             }
         }
+        /* Disabled/Already Rolled Button State */
+        .dice-roll-btn:disabled,
+        .dice-roll-btn.rolled {
+            background: linear-gradient(135deg, #666 0%, #555 100%);
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .dice-roll-btn:disabled:hover,
+        .dice-roll-btn.rolled:hover {
+            transform: none !important;
+            box-shadow: none !important;
+        }

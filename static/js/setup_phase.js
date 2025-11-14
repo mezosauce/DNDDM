@@ -28,14 +28,41 @@
         };
         
         const PERSONALITY_TRAITS = [
-            "I idolize a particular hero and constantly refer to their deeds",
-            "I can find common ground between the fiercest enemies",
-            "I see omens in every event and action",
-            "Nothing can shake my optimistic attitude",
-            "I quote (or misquote) sacred texts and proverbs",
-            "I am tolerant of other faiths and respect other gods",
-            "I've enjoyed fine food and high society",
-            "I have little practical experience dealing with people"
+            "I idolize a particular hero of my faith, and constantly refer to that person's deeds and example.",
+            "I can find common ground between the fiercest enemies, empathizing with them and always working toward peace.",
+            "I see omens in every event and action. The gods try to speak to us, we just need to listen",
+            "Nothing can shake my optimistic attitude.",
+            "I quote (or misquote) sacred texts and proverbs in almost every situation.",
+            "I am tolerant (or intolerant) of other faiths and respect (or condemn) the worship of other gods.",
+            "I've enjoyed fine food, drink, and high society among my temple's elite. Rough living grates on me.",
+            "I've spent so long in the temple that I have little practical experience dealing with people in the outside world."
+    ];
+
+        const IDEALS = [
+            "Tradition. The ancient traditions of worship and sacrifice must be preserved and upheld. (Lawful)",
+            "Charity. I always try to help those in need, no matter what the personal cost. (Good)",
+            "Change. We must help bring about the changes the gods are constantly working in the world. (Chaotic)",
+            "Power. I hope to one day rise to the top of my faith's religious hierarchy. (Lawful)",
+            "Faith. I trust that my deity will guide my actions. I have faith that if I work hard, things will go well. (Lawful)",
+            "Aspiration. I seek to prove myself worthy of my god's favor by matching my actions against his or her teachings. (Any)"
+    ];
+
+        const BONDS = [
+            "I would die to recover an ancient relic of my faith that was lost long ago.",
+            "I will someday get revenge on the corrupt temple hierarchy who branded me a heretic.",
+            "I owe my life to the priest who took me in when my parents died.",
+            "Everything I do is for the common people.",
+            "I will do anything to protect the temple where I served.",
+            "I seek to preserve a sacred text that my enemies consider heretical and seek to destroy."
+    ];
+
+        const FLAWS = [
+            "I judge others harshly, and myself even more severely.",
+            "I put too much trust in those who wield power within my temple's hierarchy.",
+            "My piety sometimes leads me to blindly trust those that profess faith in my god.",
+            "I am inflexible in my thinking.",
+            "I am suspicious of strangers and expect the worst of them.",
+            "Once I pick a goal, I become obsessed with it to the detriment of everything else in my life."
         ];
         
         const MAX_POINTS = 60;
@@ -43,7 +70,191 @@
         let selectedLanguages = [];
         let selectedTraits = [];
         let racialLanguages = [];
+        let selectedIdeal = null;
+        let selectedBond = null;
+        let selectedFlaw = null;
         
+        let traitsRolled = false;
+        let idealRolled = false;
+        let bondRolled = false;
+        let flawRolled = false;
+
+        // Dice Rolling
+        function rollD8() {
+    if (traitsRolled) {
+        alert('You have already rolled for personality traits. Click on the options to manually change your selection.');
+        return;
+    }
+    
+    const roll = Math.floor(Math.random() * 8);
+    selectPersonalityTrait(roll);
+    
+    // Add visual feedback
+    const option = document.querySelectorAll('.dice-option')[roll];
+    option.classList.add('roll-animation');
+    setTimeout(() => option.classList.remove('roll-animation'), 600);
+    
+    // Disable the roll button
+    traitsRolled = true;
+    const btn = document.getElementById('roll-traits-btn');
+    btn.disabled = true;
+    btn.textContent = '🎲 Already Rolled (click options to change)';
+    btn.classList.add('rolled');
+}
+
+        function rollD6Ideal() {
+            if (idealRolled) {
+                alert('You have already rolled for your ideal. Click on the options to manually change your selection.');
+                return;
+            }
+            
+            const roll = Math.floor(Math.random() * 6);
+            selectIdeal(roll);
+            
+            const option = document.querySelectorAll('#ideals-list .dice-option')[roll];
+            option.classList.add('roll-animation');
+            setTimeout(() => option.classList.remove('roll-animation'), 600);
+            
+            // Disable the roll button
+            idealRolled = true;
+            const btn = document.getElementById('roll-ideal-btn');
+            btn.disabled = true;
+            btn.textContent = '🎲 Already Rolled (click options to change)';
+            btn.classList.add('rolled');
+        }
+
+        function rollD6Bond() {
+            if (bondRolled) {
+                alert('You have already rolled for your bond. Click on the options to manually change your selection.');
+                return;
+            }
+            
+            const roll = Math.floor(Math.random() * 6);
+            selectBond(roll);
+            
+            const option = document.querySelectorAll('#bonds-list .dice-option')[roll];
+            option.classList.add('roll-animation');
+            setTimeout(() => option.classList.remove('roll-animation'), 600);
+            
+            // Disable the roll button
+            bondRolled = true;
+            const btn = document.getElementById('roll-bond-btn');
+            btn.disabled = true;
+            btn.textContent = '🎲 Already Rolled (click options to change)';
+            btn.classList.add('rolled');
+        }
+
+        function rollD6Flaw() {
+            if (flawRolled) {
+                alert('You have already rolled for your flaw. Click on the options to manually change your selection.');
+                return;
+            }
+            
+            const roll = Math.floor(Math.random() * 6);
+            selectFlaw(roll);
+            
+            const option = document.querySelectorAll('#flaws-list .dice-option')[roll];
+            option.classList.add('roll-animation');
+            setTimeout(() => option.classList.remove('roll-animation'), 600);
+            
+            // Disable the roll button
+            flawRolled = true;
+            const btn = document.getElementById('roll-flaw-btn');
+            btn.disabled = true;
+            btn.textContent = '🎲 Already Rolled (click options to change)';
+            btn.classList.add('rolled');
+        }
+
+        
+
+        // ============================================================================
+        // DISPLAY UPDATE FUNCTIONS
+        // ============================================================================
+
+        function updateTraitsDisplay() {
+            const display = document.getElementById('selected-traits-display');
+            if (selectedTraits.length === 0) {
+                display.innerHTML = '<em style="color: #888;">No traits selected yet</em>';
+            } else {
+                display.innerHTML = selectedTraits.map((trait, i) => 
+                    `<div class="selection-item"><strong>Trait ${i + 1}:</strong> ${trait}</div>`
+                ).join('');
+            }
+        }
+
+        function updateIdealDisplay() {
+            const display = document.getElementById('selected-ideal-display');
+            if (!selectedIdeal) {
+                display.innerHTML = '<em style="color: #888;">No ideal selected yet</em>';
+            } else {
+                display.innerHTML = `<div class="selection-item">${selectedIdeal}</div>`;
+            }
+        }
+
+        function updateBondDisplay() {
+            const display = document.getElementById('selected-bond-display');
+            if (!selectedBond) {
+                display.innerHTML = '<em style="color: #888;">No bond selected yet</em>';
+            } else {
+                display.innerHTML = `<div class="selection-item">${selectedBond}</div>`;
+            }
+        }
+
+        function updateFlawDisplay() {
+            const display = document.getElementById('selected-flaw-display');
+            if (!selectedFlaw) {
+                display.innerHTML = '<em style="color: #888;">No flaw selected yet</em>';
+            } else {
+                display.innerHTML = `<div class="selection-item">${selectedFlaw}</div>`;
+            }
+        }
+
+        // ============================================================================
+        // POPULATE LISTS
+        // ============================================================================
+
+        function populatePersonalityTraits() {
+            const container = document.getElementById('personality-traits-list');
+            container.innerHTML = PERSONALITY_TRAITS.map((trait, index) => `
+                <div class="dice-option" onclick="selectPersonalityTrait(${index})">
+                    <span class="dice-number">${index + 1}</span>
+                    <span class="dice-text">${trait}</span>
+                </div>
+            `).join('');
+        }
+
+        function populateIdealsList() {
+            const container = document.getElementById('ideals-list');
+            container.innerHTML = IDEALS.map((ideal, index) => `
+                <div class="dice-option" onclick="selectIdeal(${index})">
+                    <span class="dice-number">${index + 1}</span>
+                    <span class="dice-text">${ideal}</span>
+                </div>
+            `).join('');
+        }
+
+        function populateBondsList() {
+            const container = document.getElementById('bonds-list');
+            container.innerHTML = BONDS.map((bond, index) => `
+                <div class="dice-option" onclick="selectBond(${index})">
+                    <span class="dice-number">${index + 1}</span>
+                    <span class="dice-text">${bond}</span>
+                </div>
+            `).join('');
+        }
+
+        function populateFlawsList() {
+            const container = document.getElementById('flaws-list');
+            container.innerHTML = FLAWS.map((flaw, index) => `
+                <div class="dice-option" onclick="selectFlaw(${index})">
+                    <span class="dice-number">${index + 1}</span>
+                    <span class="dice-text">${flaw}</span>
+                </div>
+            `).join('');
+        }
+
+
+
         // Tab Management
         function showTab(tabName) {
             // Hide all tabs
@@ -65,7 +276,16 @@
             populateSkillsList();
             populateLanguagesList();
             populatePersonalityTraits();
+            populateIdealsList();
+            populateBondsList();
+            populateFlawsList();
             updateCurrencyTotal();
+            
+            // Initialize displays
+            updateTraitsDisplay();
+            updateIdealDisplay();
+            updateBondDisplay();
+            updateFlawDisplay();
             
             // Add currency change listeners
             ['pp', 'gp', 'ep', 'sp', 'cp'].forEach(coin => {
@@ -317,10 +537,10 @@
                 skill_proficiencies: selectedSkills,
                 tool_proficiencies: tools,
                 languages_known: allLanguages,
-                personality_traits: selectedTraits,
-                ideal: document.getElementById('char-ideal').value,
-                bond: document.getElementById('char-bond').value,
-                flaw: document.getElementById('char-flaw').value,
+                personality_traits: selectedTraits,           
+                ideal: selectedIdeal || '',                   
+                bond: selectedBond || '',                     
+                flaw: selectedFlaw || '',                     
                 currency: {
                     pp: parseInt(document.getElementById('curr-pp').value) || 0,
                     gp: parseInt(document.getElementById('curr-gp').value) || 0,

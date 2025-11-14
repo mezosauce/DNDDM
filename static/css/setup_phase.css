@@ -339,3 +339,160 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #51cf66;
         }
+
+        /* ============================================================================
+   DICE ROLL PERSONALITY SYSTEM
+   ============================================================================ */
+
+.dice-section {
+    margin: 25px 0;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.dice-roll-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #4dabf7 0%, #339af0 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 15px;
+}
+
+.dice-roll-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(77, 171, 247, 0.5);
+}
+
+.dice-table {
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid #4a4a6a;
+    border-radius: 6px;
+    margin: 10px 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.dice-option {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px;
+    border-bottom: 1px solid rgba(74, 74, 106, 0.3);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dice-option:last-child {
+    border-bottom: none;
+}
+
+.dice-option:hover {
+    background: rgba(77, 171, 247, 0.2);
+}
+
+.dice-option.selected {
+    background: rgba(81, 207, 102, 0.3);
+    border-left: 4px solid #51cf66;
+}
+
+.dice-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 35px;
+    height: 35px;
+    background: rgba(255, 107, 107, 0.3);
+    border: 2px solid #ff6b6b;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #ff6b6b;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.dice-option.selected .dice-number {
+    background: rgba(81, 207, 102, 0.3);
+    border-color: #51cf66;
+    color: #51cf66;
+}
+
+.dice-text {
+    flex: 1;
+    line-height: 1.5;
+    color: #e0e0e0;
+}
+
+.selection-display-container {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px solid #4a4a6a;
+}
+
+.selection-display-container strong {
+    display: block;
+    color: #51cf66;
+    margin-bottom: 8px;
+}
+
+.selection-display {
+    background: rgba(81, 207, 102, 0.1);
+    border: 2px solid #51cf66;
+    border-radius: 6px;
+    padding: 12px;
+    min-height: 50px;
+}
+
+.selection-item {
+    margin: 6px 0;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    line-height: 1.5;
+}
+
+.selection-item strong {
+    color: #51cf66;
+    margin-right: 5px;
+}
+
+/* Roll Animation */
+@keyframes rollPulse {
+    0%, 100% { 
+        transform: scale(1);
+        background: rgba(77, 171, 247, 0.2);
+    }
+    50% { 
+        transform: scale(1.02);
+        background: rgba(77, 171, 247, 0.5);
+    }
+}
+
+.dice-option.roll-animation {
+    animation: rollPulse 0.6s ease-in-out;
+}
+
+/* Scrollbar for dice tables */
+.dice-table::-webkit-scrollbar {
+    width: 8px;
+}
+
+.dice-table::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.dice-table::-webkit-scrollbar-thumb {
+    background: #4a4a6a;
+    border-radius: 4px;
+}
+
+.dice-table::-webkit-scrollbar-thumb:hover {
+    background: #4dabf7;
+}

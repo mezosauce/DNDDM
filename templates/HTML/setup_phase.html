@@ -16,7 +16,7 @@
             <div class="progress">
                 <div class="progress-bar">
                     {% set progress = (100 * characters|length / campaign.party_size)|round(0, 'floor')|int if campaign.party_size > 0 else 0 %}
-                    <div class="progress-fill" style="width: {{ progress }}%">
+                    <div class="progress-fill" >
                         {{ characters|length }} / {{ campaign.party_size }} Characters
                     </div>
                 </div>
@@ -187,33 +187,96 @@
                         <input type="text" id="char-tools" placeholder="e.g., Thieves' tools, Smith's tools">
                     </div>
                     
+                    
                     <!-- TAB 4: PERSONALITY -->
                     <div id="tab-personality" class="tab-content">
                         <p style="color: #888; margin-bottom: 15px;">
-                            Define your character's personality. These guide roleplaying and can earn Inspiration!
+                            Define your character's personality using dice rolls or manual selection. These guide roleplaying and can earn Inspiration!
                         </p>
                         
-                        <label>Personality Traits (Choose 2)</label>
-                        <div class="trait-selector" id="personality-traits-list">
-                            <!-- Will be populated by JavaScript -->
+                        <!-- PERSONALITY TRAITS (d8) -->
+                        <div class="dice-section">
+                            <h3>Personality Traits (d8)</h3>
+                            <p style="color: #888; font-size: 0.9em; margin-bottom: 10px;">Choose 2 traits (or roll twice)</p>
+                            
+                            <button type="button" class="dice-roll-btn" id="roll-traits-btn" onclick="rollD8()">
+                                🎲 Roll d8 for Personality Trait
+                            </button>
+                            
+                            <div class="dice-table" id="personality-traits-list">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                            
+                            <div class="selection-display-container">
+                                <strong>Selected Traits:</strong>
+                                <div id="selected-traits-display" class="selection-display">
+                                    <em style="color: #888;">No traits selected yet</em>
+                                </div>
+                            </div>
                         </div>
                         
-                        <label>Ideal (Choose 1)</label>
-                        <select id="char-ideal">
-                            <option value="">Choose an ideal...</option>
-                            <option value="Good - I always try to help others">Good - I always try to help others</option>
-                            <option value="Law - Rules must be followed">Law - Rules must be followed</option>
-                            <option value="Freedom - Everyone should be free">Freedom - Everyone should be free</option>
-                            <option value="Power - I seek strength and dominance">Power - I seek strength and dominance</option>
-                            <option value="Honor - I live by a personal code">Honor - I live by a personal code</option>
-                            <option value="Greed - I want wealth and treasure">Greed - I want wealth and treasure</option>
-                        </select>
+                        <!-- IDEAL (d6) -->
+                        <div class="dice-section">
+                            <h3>Ideal (d6)</h3>
+                            <p style="color: #888; font-size: 0.9em; margin-bottom: 10px;">Choose 1 ideal that drives you</p>
+                            
+                            <button type="button" class="dice-roll-btn" id="roll-ideal-btn" onclick="rollD6Ideal()">
+                                🎲 Roll d6 for Ideal
+                            </button>
+                            
+                            <div class="dice-table" id="ideals-list">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                            
+                            <div class="selection-display-container">
+                                <strong>Selected Ideal:</strong>
+                                <div id="selected-ideal-display" class="selection-display">
+                                    <em style="color: #888;">No ideal selected yet</em>
+                                </div>
+                            </div>
+                        </div>
                         
-                        <label>Bond</label>
-                        <textarea id="char-bond" placeholder="What ties you to people, places, or ideals? (e.g., 'I owe my life to the priest who took me in')"></textarea>
+                        <!-- BOND (d6) -->
+                        <div class="dice-section">
+                            <h3>Bond (d6)</h3>
+                            <p style="color: #888; font-size: 0.9em; margin-bottom: 10px;">Choose 1 bond that ties you to people or places</p>
+                            
+                            <button type="button" class="dice-roll-btn" id="roll-bond-btn" onclick="rollD6Bond()">
+                                🎲 Roll d6 for Bond
+                            </button>
+                            
+                            <div class="dice-table" id="bonds-list">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                            
+                            <div class="selection-display-container">
+                                <strong>Selected Bond:</strong>
+                                <div id="selected-bond-display" class="selection-display">
+                                    <em style="color: #888;">No bond selected yet</em>
+                                </div>
+                            </div>
+                        </div>
                         
-                        <label>Flaw</label>
-                        <textarea id="char-flaw" placeholder="What weakness or vice does your character have? (e.g., 'I'm too trusting of those who claim to share my faith')"></textarea>
+                        <!-- FLAW (d6) -->
+                        <div class="dice-section">
+                            <h3>Flaw (d6)</h3>
+                            <p style="color: #888; font-size: 0.9em; margin-bottom: 10px;">Choose 1 flaw that makes your character interesting</p>
+                            
+                            <button type="button" class="dice-roll-btn" id="roll-flaw-btn" onclick="rollD6Flaw()">
+                                🎲 Roll d6 for Flaw
+                            </button>
+                            
+                            <div class="dice-table" id="flaws-list">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                            
+                            <div class="selection-display-container">
+                                <strong>Selected Flaw:</strong>
+                                <div id="selected-flaw-display" class="selection-display">
+                                    <em style="color: #888;">No flaw selected yet</em>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                     <!-- TAB 5: DETAILS -->
