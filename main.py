@@ -26,11 +26,13 @@ Phase3QueryRouter = None
 create_phase3_prompt = None
 Phase3SRDLoader = None
 
+
 try:
     from Classes.ai_dm_free import OllamaDM, GameState
     print("✓ AI DM core modules loaded")
 except ImportError as e:
     print(f"⚠ AI DM modules not found: {e}")
+
 
 try:
     from ai_dm_query_router import QueryRouter
@@ -91,7 +93,7 @@ dm = None
 # Initialize AI DM if available
 if OllamaDM:
     try:
-        dm = OllamaDM(SRD_PATH, default_model="llama3.2:3b")
+        dm = OllamaDM(SRD_PATH, default_model="llama3.2:3b")  
         print("✓ AI DM initialized successfully")
     except Exception as e:
         print(f"⚠ Could not initialize AI DM: {e}")
@@ -164,21 +166,21 @@ def campaign_home(campaign_name):
 # REGISTER PHASE ROUTES
 # ============================================================================
 
-# Register Phase 1 routes (Setup & Character Creation)
+# Phase 1: Setup & Character Creation
 if register_phase1_routes:
     register_phase1_routes(app, campaign_mgr, Character)
     print("✓ Phase 1 routes registered")
 else:
     print("⚠ Phase 1 routes not registered")
 
-# Register Phase 2 routes (Call to Adventure & Preparation)
+# Phase 2: Call to Adventure & Preparation
 if register_phase2_routes:
     register_phase2_routes(app, campaign_mgr, dm, GameState)
     print("✓ Phase 2 routes registered")
 else:
     print("⚠ Phase 2 routes not registered")
 
-# Register Phase 3 routes (Active Campaign)
+# Phase 3: Active Campaign
 if register_phase3_routes:
     register_phase3_routes(
         app, campaign_mgr, dm, SRD_PATH, prompt_templates,
