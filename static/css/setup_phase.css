@@ -392,9 +392,6 @@
     border-bottom: none;
 }
 
-.dice-option:hover {
-    background: rgba(77, 171, 247, 0.2);
-}
 
 .dice-option.selected {
     background: rgba(81, 207, 102, 0.3);

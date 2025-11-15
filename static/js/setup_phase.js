@@ -102,6 +102,62 @@
     btn.classList.add('rolled');
 }
 
+
+            function selectPersonalityTrait(index) {
+                const trait = PERSONALITY_TRAITS[index];
+                const options = document.querySelectorAll('#personality-traits-list .dice-option');
+                
+                // Allow up to 2 traits
+                if (selectedTraits.length < 2) {
+                    selectedTraits.push(trait);
+                    options[index].classList.add('selected');
+                }
+                
+                updateTraitsDisplay();
+            }
+
+            function selectIdeal(index) {
+                const ideal = IDEALS[index];
+                selectedIdeal = ideal;
+                
+                // Remove previous selection
+                document.querySelectorAll('#ideals-list .dice-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                // Add new selection
+                document.querySelectorAll('#ideals-list .dice-option')[index].classList.add('selected');
+                updateIdealDisplay();
+            }
+
+            function selectBond(index) {
+                const bond = BONDS[index];
+                selectedBond = bond;
+                
+                // Remove previous selection
+                document.querySelectorAll('#bonds-list .dice-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                // Add new selection
+                document.querySelectorAll('#bonds-list .dice-option')[index].classList.add('selected');
+                updateBondDisplay();
+            }
+
+            function selectFlaw(index) {
+                const flaw = FLAWS[index];
+                selectedFlaw = flaw;
+                
+                // Remove previous selection
+                document.querySelectorAll('#flaws-list .dice-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                // Add new selection
+                document.querySelectorAll('#flaws-list .dice-option')[index].classList.add('selected');
+                updateFlawDisplay();
+            }
+
         function rollD6Ideal() {
             if (idealRolled) {
                 alert('You have already rolled for your ideal. Click on the options to manually change your selection.');
@@ -216,7 +272,7 @@
         function populatePersonalityTraits() {
             const container = document.getElementById('personality-traits-list');
             container.innerHTML = PERSONALITY_TRAITS.map((trait, index) => `
-                <div class="dice-option" onclick="selectPersonalityTrait(${index})">
+                <div class="dice-option">
                     <span class="dice-number">${index + 1}</span>
                     <span class="dice-text">${trait}</span>
                 </div>
@@ -226,7 +282,7 @@
         function populateIdealsList() {
             const container = document.getElementById('ideals-list');
             container.innerHTML = IDEALS.map((ideal, index) => `
-                <div class="dice-option" onclick="selectIdeal(${index})">
+                <div class="dice-option">
                     <span class="dice-number">${index + 1}</span>
                     <span class="dice-text">${ideal}</span>
                 </div>
@@ -236,7 +292,7 @@
         function populateBondsList() {
             const container = document.getElementById('bonds-list');
             container.innerHTML = BONDS.map((bond, index) => `
-                <div class="dice-option" onclick="selectBond(${index})">
+                <div class="dice-option">
                     <span class="dice-number">${index + 1}</span>
                     <span class="dice-text">${bond}</span>
                 </div>
@@ -246,7 +302,7 @@
         function populateFlawsList() {
             const container = document.getElementById('flaws-list');
             container.innerHTML = FLAWS.map((flaw, index) => `
-                <div class="dice-option" onclick="selectFlaw(${index})">
+                <div class="dice-option">
                     <span class="dice-number">${index + 1}</span>
                     <span class="dice-text">${flaw}</span>
                 </div>
@@ -438,15 +494,6 @@
             });
         }
         
-        // Personality Traits
-        function populatePersonalityTraits() {
-            const container = document.getElementById('personality-traits-list');
-            container.innerHTML = PERSONALITY_TRAITS.map((trait, index) => `
-                <div class="trait-option" onclick="toggleTrait(${index})">
-                    ${trait}
-                </div>
-            `).join('');
-        }
         
         function toggleTrait(index) {
             const trait = PERSONALITY_TRAITS[index];
