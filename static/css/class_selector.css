@@ -1,0 +1,137 @@
+/* Class Selector Styles */
+
+.class-info-panel {
+    background: rgba(0, 0, 0, 0.2);
+    border: 2px solid #4a4a6a;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.class-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.class-info-item {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    border-radius: 6px;
+}
+
+.class-info-label {
+    font-size: 0.85em;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+.class-info-value {
+    color: #51cf66;
+    font-weight: bold;
+}
+
+/* Class-Specific Sections */
+
+.class-specific-section {
+    display: none;
+    background: rgba(77, 171, 247, 0.1);
+    border: 2px solid #4dabf7;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.class-specific-section.active {
+    display: block;
+}
+
+.class-section-header {
+    color: #4dabf7;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.class-section-header::before {
+    content: '⚔️';
+    font-size: 1.5em;
+}
+
+/* Subclass Selector */
+
+.subclass-selector {
+    background: rgba(255, 193, 7, 0.1);
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.subclass-selector label {
+    color: #ffc107;
+    font-weight: bold;
+}
+
+.subclass-selector select {
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid #ffc107;
+    color: #ffc107;
+}
+
+.subclass-selector select:focus {
+    border-color: #ffc107;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+}
+
+/* Feature Progression Indicators */
+
+.feature-unlock-notice {
+    background: rgba(81, 207, 102, 0.1);
+    border-left: 4px solid #51cf66;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+}
+
+.feature-unlock-notice::before {
+    content: '✨ ';
+}
+
+.feature-locked-notice {
+    background: rgba(74, 74, 106, 0.1);
+    border-left: 4px solid #666;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+    color: #888;
+}
+
+.feature-locked-notice::before {
+    content: '🔒 ';
+}
+
+/* Skill Selection Enhancement */
+
+#skill-class-info {
+    margin: 10px 0;
+}
+
+.skill-available {
+    opacity: 1;
+}
+
+.skill-unavailable {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.skill-unavailable::after {
+    content: ' (Not available for this class)';
+    font-size: 0.8em;
+    color: #888;
+}

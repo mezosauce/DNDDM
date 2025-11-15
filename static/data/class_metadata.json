@@ -1,0 +1,79 @@
+{
+  "Barbarian": {
+    "name": "Barbarian",
+    "description": "A fierce warrior of primitive background who can enter a battle rage",
+    "hit_die": "d12",
+    "primary_abilities": ["Strength", "Constitution"],
+    "saves": ["Strength", "Constitution"],
+    "armor_proficiencies": ["Light armor", "Medium armor", "Shields"],
+    "weapon_proficiencies": ["Simple weapons", "Martial weapons"],
+    "tool_proficiencies": [],
+    "skills": {
+      "choose": 2,
+      "from": [
+        "Animal Handling",
+        "Athletics",
+        "Intimidation",
+        "Nature",
+        "Perception",
+        "Survival"
+      ]
+    },
+    "starting_equipment": {
+      "choice_1": {
+        "desc": "Choose one",
+        "options": [
+          "Greataxe",
+          "Any martial melee weapon"
+        ]
+      },
+      "choice_2": {
+        "desc": "Choose one",
+        "options": [
+          "Two handaxes",
+          "Any simple weapon"
+        ]
+      },
+      "default": [
+        "Explorer's pack",
+        "Four javelins"
+      ]
+    },
+    "subclasses": {
+      "level": 3,
+      "name": "Primal Path",
+      "options": [
+        {
+          "name": "Path of the Berserker",
+          "description": "For some barbarians, rage is a means to an end—that end being violence."
+        },
+        {
+          "name": "Path of the Totem Warrior",
+          "description": "The Path of the Totem Warrior is a spiritual journey, as the barbarian accepts a spirit animal as guide, protector, and inspiration."
+        }
+      ]
+    },
+    "features_by_level": {
+      "1": ["Rage", "Unarmored Defense"],
+      "2": ["Reckless Attack", "Danger Sense"],
+      "3": ["Primal Path"],
+      "4": ["Ability Score Improvement"],
+      "5": ["Extra Attack", "Fast Movement"],
+      "6": ["Path Feature"],
+      "7": ["Feral Instinct"],
+      "8": ["Ability Score Improvement"],
+      "9": ["Brutal Critical (1 die)"],
+      "10": ["Path Feature"],
+      "11": ["Relentless Rage"],
+      "12": ["Ability Score Improvement"],
+      "13": ["Brutal Critical (2 dice)"],
+      "14": ["Path Feature"],
+      "15": ["Persistent Rage"],
+      "16": ["Ability Score Improvement"],
+      "17": ["Brutal Critical (3 dice)"],
+      "18": ["Indomitable Might"],
+      "19": ["Ability Score Improvement"],
+      "20": ["Primal Champion"]
+    }
+  }
+}

@@ -6,6 +6,8 @@
     <title>Setup - {{ campaign.name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/setup_phase.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/class_selector.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/class_features.css') }}">
 </head>
 <body>
     <div class="container">
@@ -58,7 +60,7 @@
                         </select>
                         
                         <label>Class *</label>
-                        <select id="char-class" required onchange="updateClassSkills()">
+                        <select id="char-class" required onchange="onClassChange()">
                             <option value="">Select Class</option>
                             <option value="Barbarian">Barbarian</option>
                             <option value="Bard">Bard</option>
@@ -73,6 +75,44 @@
                             <option value="Warlock">Warlock</option>
                             <option value="Wizard">Wizard</option>
                         </select>
+
+                        <!-- Class Information Panel -->
+                        <div id="class-info-panel" class="class-info-panel" style="display: none;">
+                            <h3 style="color: #4dabf7; margin-top: 0;">Class Information</h3>
+                            <div class="class-info-grid">
+                                <div class="class-info-item">
+                                    <div class="class-info-label">Hit Die</div>
+                                    <div class="class-info-value" id="class-hit-die">-</div>
+                                </div>
+                                <div class="class-info-item">
+                                    <div class="class-info-label">Primary Abilities</div>
+                                    <div class="class-info-value" id="class-primary-abilities">-</div>
+                                </div>
+                                <div class="class-info-item">
+                                    <div class="class-info-label">Saving Throws</div>
+                                    <div class="class-info-value" id="class-saves">-</div>
+                                </div>
+                                <div class="class-info-item">
+                                    <div class="class-info-label">Armor Proficiencies</div>
+                                    <div class="class-info-value" id="class-armor-prof">-</div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <div class="class-info-label">Weapon Proficiencies</div>
+                                <div class="class-info-value" id="class-weapon-prof">-</div>
+                            </div>
+                        </div>
+
+                        <!-- Subclass Selector (shows at appropriate level) -->
+                        <div id="subclass-selector-container" class="subclass-selector" style="display: none;">
+                            <label>Subclass / Archetype</label>
+                            <select id="subclass-select">
+                                <option value="">Choose subclass...</option>
+                            </select>
+                            <small style="color: #888; display: block; margin-top: 5px;">
+                                Available at level <span id="subclass-level-req">3</span>
+                            </small>
+                        </div>
                         
                         <label>Alignment *</label>
                         <select id="char-alignment" required>
@@ -376,5 +416,7 @@
         window.campaignName = {{ campaign.name | tojson | safe }};
     </script>
     <script src="{{ url_for('static', filename='js/setup_phase.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/class_features/base.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/class_selector.js') }}"></script>
 </body>
 </html>

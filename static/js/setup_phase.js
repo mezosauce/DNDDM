@@ -328,6 +328,80 @@
         
         // Initialize on load
         window.onload = () => {
+            // Class selection handler
+            function onClassChange() {
+    const classSelect = document.getElementById('char-class');
+    const selectedClass = classSelect.value;
+    
+    // Update class selector
+    if (window.classSelector) {
+        window.classSelector.selectClass(selectedClass);
+    }
+    
+    // Show/hide class info panel
+    const infoPanel = document.getElementById('class-info-panel');
+    if (infoPanel) {
+        infoPanel.style.display = selectedClass ? 'block' : 'none';
+    }
+    
+    // Check if subclass selector should be shown
+    const level = parseInt(document.getElementById('char-level').value) || 1;
+    updateSubclassDisplay(level);
+    
+    // Call existing function if it exists
+    if (typeof updateClassSkills === 'function') {
+        updateClassSkills();
+    }
+}
+
+        // Level change handler - GLOBAL
+        function onLevelChange() {
+            const level = parseInt(document.getElementById('char-level').value) || 1;
+            updateSubclassDisplay(level);
+            updatePoints(); // Existing function
+        }
+
+        function updateSubclassDisplay(level) {
+            const classSelect = document.getElementById('char-class');
+            const selectedClass = classSelect.value;
+            
+            if (!selectedClass || !window.classSelector) return;
+            
+            const subclassLevel = window.classSelector.getSubclassLevel();
+            const container = document.getElementById('subclass-selector-container');
+            const levelReq = document.getElementById('subclass-level-req');
+            
+            if (container && levelReq) {
+                levelReq.textContent = subclassLevel;
+                container.style.display = level >= subclassLevel ? 'block' : 'none';
+            }
+        }
+
+        // ============================================================================
+        // TAB MANAGEMENT
+        // ============================================================================
+
+        // Tab Management
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById('tab-' + tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // ============================================================================
+        // INITIALIZATION
+        // ============================================================================
+
+        // Initialize on load
+        window.onload = () => {
             updatePoints();
             populateSkillsList();
             populateLanguagesList();
@@ -347,6 +421,10 @@
             ['pp', 'gp', 'ep', 'sp', 'cp'].forEach(coin => {
                 document.getElementById('curr-' + coin).addEventListener('input', updateCurrencyTotal);
             });
+            
+            // Add level change listener
+            document.getElementById('char-level')?.addEventListener('change', onLevelChange);
+            document.getElementById('char-level')?.addEventListener('input', onLevelChange);
         };
         
         // Ability Score Points

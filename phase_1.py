@@ -10,6 +10,7 @@ from dataclasses import asdict
 # These will be imported from main.py when we integrate
 # from main import app, campaign_mgr, Character
 
+from Head.Class import create_character
 
 # ============================================================================
 # PHASE 1: SETUP & CHARACTER CREATION
@@ -113,32 +114,51 @@ def register_phase1_routes(app, campaign_mgr, Character):
             return jsonify({'error': str(e)}), 400
 
 
-    @app.route('/campaign/<campaign_name>/character/<character_name>/currency/add', methods=['POST'])
-    def add_character_currency(campaign_name, character_name):
-        """Add currency to a character"""
+    @app.route('/campaign/<campaign_name>/character/add', methods=['POST'])
+    def add_character(campaign_name):
+        """Add a new character"""
         data = request.json
-        coin_type = data.get('coin_type')  # 'cp', 'sp', 'ep', 'gp', 'pp'
-        amount = int(data.get('amount', 0))
-        
-        if not coin_type or amount <= 0:
-            return jsonify({'error': 'Invalid coin_type or amount'}), 400
         
         try:
-            char = campaign_mgr.get_character(campaign_name, character_name)
-            if not char:
-                return jsonify({'error': 'Character not found'}), 404
+            # Get class type from request (defaults to "Character" if not provided)
+            class_type = data.get('class', 'Character')
             
-            char.add_currency(coin_type, amount)
-            campaign_mgr.update_character(campaign_name, char)
+            # Use factory to create the correct class instance
+            character = create_character(
+                class_type=class_type,
+                name=data['name'],
+                race=data['race'],
+                char_class=data['class'],
+                background=data['background'],
+                level=int(data.get('level', 1)),
+                hp=int(data.get('hp', 10)),
+                max_hp=int(data.get('max_hp', 10)),
+                ac=int(data.get('ac', 10)),
+                stats=data.get('stats', {}),
+                inventory=data.get('inventory', []),
+                notes=data.get('notes', ''),
+                alignment=data.get('alignment', 'True Neutral'),
+                background_feature=data.get('background_feature', ''),
+                skill_proficiencies=data.get('skill_proficiencies', []),
+                tool_proficiencies=data.get('tool_proficiencies', []),
+                languages_known=data.get('languages_known', []),
+                personality_traits=data.get('personality_traits', []),
+                ideal=data.get('ideal', ''),
+                bond=data.get('bond', ''),
+                flaw=data.get('flaw', ''),
+                currency=data.get('currency', {'cp': 0, 'sp': 0, 'ep': 0, 'gp': 0, 'pp': 0})
+            )
+            
+            campaign = campaign_mgr.add_character(campaign_name, character)
             
             return jsonify({
                 'success': True,
-                'currency': char.currency,
-                'total_gp': char.get_total_gold_value()
+                'setup_complete': campaign.setup_complete,
+                'characters_count': len(campaign.characters),
+                'party_size': campaign.party_size
             })
         except Exception as e:
             return jsonify({'error': str(e)}), 400
-
 
     @app.route('/campaign/<campaign_name>/character/<character_name>/currency/remove', methods=['POST'])
     def remove_character_currency(campaign_name, character_name):

@@ -13,6 +13,8 @@ from typing import Dict, List, Optional
 from dataclasses import dataclass, asdict, field
 import shutil
 
+from Head.Class import character_to_dict, character_from_dict
+
 
 @dataclass
 class Character:
@@ -317,15 +319,18 @@ class CampaignManager:
         if len(campaign.characters) >= campaign.party_size:
             raise ValueError(f"Campaign already has {campaign.party_size} characters (max)")
         
-        # Save character as individual file
+        # Save character as individual file using new serialization
         folder = self._get_campaign_folder(campaign_name)
         char_file = folder / "characters" / f"{self._sanitize_name(character.name)}.json"
         
+        # Use character_to_dict to include class_type metadata
+        char_dict = character_to_dict(character)
+        
         with open(char_file, 'w', encoding='utf-8') as f:
-            json.dump(asdict(character), f, indent=2)
+            json.dump(char_dict, f, indent=2)
         
         # Add to campaign
-        campaign.characters.append(asdict(character))
+        campaign.characters.append(char_dict)
         
         # Update campaign setup markdown
         self._update_campaign_setup_file(campaign)
@@ -339,35 +344,39 @@ class CampaignManager:
         return campaign
     
     def update_character(self, campaign_name: str, character: Character):
-        """Update an existing character"""
-        campaign = self.load_campaign(campaign_name)
-        
-        # Find and update character in campaign
-        for i, char_data in enumerate(campaign.characters):
-            if char_data['name'] == character.name:
-                campaign.characters[i] = asdict(character)
-                break
-        else:
-            raise ValueError(f"Character '{character.name}' not found in campaign")
-        
-        # Save character file
-        folder = self._get_campaign_folder(campaign_name)
-        char_file = folder / "characters" / f"{self._sanitize_name(character.name)}.json"
-        
-        with open(char_file, 'w', encoding='utf-8') as f:
-            json.dump(asdict(character), f, indent=2)
-        
-        # Update campaign setup markdown
-        self._update_campaign_setup_file(campaign)
-        
-        self._save_campaign(campaign)
-        
-        return campaign
+            """Update an existing character"""
+            campaign = self.load_campaign(campaign_name)
+            
+            # Use character_to_dict for proper serialization
+            char_dict = character_to_dict(character)
+            
+            # Find and update character in campaign
+            for i, char_data in enumerate(campaign.characters):
+                if char_data['name'] == character.name:
+                    campaign.characters[i] = char_dict
+                    break
+            else:
+                raise ValueError(f"Character '{character.name}' not found in campaign")
+            
+            # Save character file
+            folder = self._get_campaign_folder(campaign_name)
+            char_file = folder / "characters" / f"{self._sanitize_name(character.name)}.json"
+            
+            with open(char_file, 'w', encoding='utf-8') as f:
+                json.dump(char_dict, f, indent=2)
+            
+            # Update campaign setup markdown
+            self._update_campaign_setup_file(campaign)
+            
+            self._save_campaign(campaign)
+            
+            return campaign
     
     def get_characters(self, campaign_name: str) -> List[Character]:
         """Get all characters in campaign"""
         campaign = self.load_campaign(campaign_name)
-        return [Character(**char_data) for char_data in campaign.characters]
+        # Use character_from_dict to instantiate correct class types
+        return [character_from_dict(char_data) for char_data in campaign.characters]
     
     def get_character(self, campaign_name: str, character_name: str) -> Optional[Character]:
         """Get a specific character by name"""
