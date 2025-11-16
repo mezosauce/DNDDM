@@ -75,5 +75,1069 @@
       "19": ["Ability Score Improvement"],
       "20": ["Primal Champion"]
     }
+  },
+
+  "Bard": {
+    "name": "Bard",
+    "description": "An inspiring magician whose power echoes the music of creation",
+    "hit_die": "d8",
+    "primary_abilities": ["Charisma"],
+    "saves": ["Dexterity", "Charisma"],
+    "armor_proficiencies": ["Light armor"],
+    "weapon_proficiencies": ["Simple weapons", "Hand crossbows", "Longswords", "Rapiers", "Shortswords"],
+    "tool_proficiencies": ["Three musical instruments of your choice"],
+    "skills": {
+      "choose": 3,
+      "from": "Any"
+    },
+    "starting_equipment": {
+      "choice_1": {
+        "desc": "Choose one",
+        "options": [
+          "Rapier",
+          "Longsword",
+          "Any simple weapon"
+        ]
+      },
+      "choice_2": {
+        "desc": "Choose one",
+        "options": [
+          "Diplomat's pack",
+          "Entertainer's pack"
+        ]
+      },
+      "choice_3": {
+        "desc": "Choose one",
+        "options": [
+          "Lute",
+          "Any other musical instrument"
+        ]
+      },
+      "default": [
+        "Leather armor",
+        "Dagger"
+      ]
+    },
+    "subclasses": {
+      "level": 3,
+      "name": "Bard College",
+      "options": [
+        {
+          "name": "College of Lore",
+          "description": "Bards of the College of Lore know something about most things, collecting bits of knowledge from sources as diverse as scholarly tomes and peasant tales."
+        },
+        {
+          "name": "College of Valor",
+          "description": "Bards of the College of Valor are daring skalds whose tales keep alive the memory of the great heroes of the past."
+        }
+      ]
+    },
+    "features_by_level": {
+      "1": ["Spellcasting", "Bardic Inspiration (d6)"],
+      "2": ["Jack of All Trades", "Song of Rest (d6)"],
+      "3": ["Bard College", "Expertise"],
+      "4": ["Ability Score Improvement"],
+      "5": ["Bardic Inspiration (d8)", "Font of Inspiration"],
+      "6": ["Countercharm", "Bard College Feature"],
+      "7": [],
+      "8": ["Ability Score Improvement"],
+      "9": ["Song of Rest (d8)"],
+      "10": ["Bardic Inspiration (d10)", "Expertise", "Magical Secrets"],
+      "11": [],
+      "12": ["Ability Score Improvement"],
+      "13": ["Song of Rest (d10)"],
+      "14": ["Magical Secrets", "Bard College Feature"],
+      "15": ["Bardic Inspiration (d12)"],
+      "16": ["Ability Score Improvement"],
+      "17": ["Song of Rest (d12)"],
+      "18": ["Magical Secrets"],
+      "19": ["Ability Score Improvement"],
+      "20": ["Superior Inspiration"]
+    }
+  },
+
+  "Cleric": {
+    "name": "Cleric",
+    "description": "A priestly champion who wields divine magic in service of a higher power",
+    "hit_die": "d8",
+    "primary_abilities": ["Wisdom"],
+    "saves": ["Wisdom", "Charisma"],
+    "armor_proficiencies": ["Light armor", "Medium armor", "Shields"],
+    "weapon_proficiencies": ["Simple weapons"],
+    "tool_proficiencies": [],
+    "skills": {
+      "choose": 2,
+      "from": [
+        "History",
+        "Insight",
+        "Medicine",
+        "Persuasion",
+        "Religion"
+      ]
+    },
+    "starting_equipment": {
+      "choice_1": {
+        "desc": "Choose one",
+        "options": [
+          "Mace",
+          "Warhammer (if proficient)"
+        ]
+      },
+      "choice_2": {
+        "desc": "Choose one",
+        "options": [
+          "Scale mail",
+          "Leather armor",
+          "Chain mail (if proficient)"
+        ]
+      },
+      "choice_3": {
+        "desc": "Choose one",
+        "options": [
+          "Light crossbow and 20 bolts",
+          "Any simple weapon"
+        ]
+      },
+      "choice_4": {
+        "desc": "Choose one",
+        "options": [
+          "Priest's pack",
+          "Explorer's pack"
+        ]
+      },
+      "default": [
+        "Shield",
+        "Holy symbol"
+      ]
+    },
+    "subclasses": {
+      "level": 1,
+      "name": "Divine Domain",
+      "options": [
+        {
+          "name": "Life Domain",
+          "description": "The Life domain focuses on the vibrant positive energy that sustains all life."
+        },
+        {
+          "name": "Knowledge Domain",
+          "description": "The gods of knowledge value learning and understanding above all."
+        },
+        {
+          "name": "Light Domain",
+          "description": "Gods of light promote the ideals of rebirth and renewal, truth, vigilance, and beauty."
+        },
+        {
+          "name": "Nature Domain",
+          "description": "Gods of nature are as varied as the natural world itself."
+        },
+        {
+          "name": "Tempest Domain",
+          "description": "Gods whose portfolios include the Tempest domain govern storms, sea, and sky."
+        },
+        {
+          "name": "Trickery Domain",
+          "description": "Gods of trickery are mischief-makers and instigators who stand as a constant challenge to the accepted order."
+        },
+        {
+          "name": "War Domain",
+          "description": "War has many manifestations, and the gods of war watch over warriors and reward them for their great deeds."
+        }
+      ]
+    },
+    "features_by_level": {
+      "1": ["Spellcasting", "Divine Domain"],
+      "2": ["Channel Divinity (1/rest)", "Divine Domain Feature"],
+      "3": [],
+      "4": ["Ability Score Improvement"],
+      "5": ["Destroy Undead (CR 1/2)"],
+      "6": ["Channel Divinity (2/rest)", "Divine Domain Feature"],
+      "7": [],
+      "8": ["Ability Score Improvement", "Destroy Undead (CR 1)", "Divine Domain Feature"],
+      "9": [],
+      "10": ["Divine Intervention"],
+      "11": ["Destroy Undead (CR 2)"],
+      "12": ["Ability Score Improvement"],
+      "13": [],
+      "14": ["Destroy Undead (CR 3)"],
+      "15": [],
+      "16": ["Ability Score Improvement"],
+      "17": ["Destroy Undead (CR 4)", "Divine Domain Feature"],
+      "18": ["Channel Divinity (3/rest)"],
+      "19": ["Ability Score Improvement"],
+      "20": ["Divine Intervention Improvement"]
+    }
+  },
+
+  "Druid": {
+    "name": "Druid",
+    "description": "A priest of the Old Faith, wielding the powers of nature and adopting animal forms",
+    "hit_die": "d8",
+    "primary_abilities": ["Wisdom"],
+    "saves": ["Intelligence", "Wisdom"],
+    "armor_proficiencies": ["Light armor", "Medium armor", "Shields (druids will not wear armor or use shields made of metal)"],
+    "weapon_proficiencies": ["Clubs", "Daggers", "Darts", "Javelins", "Maces", "Quarterstaffs", "Scimitars", "Sickles", "Slings", "Spears"],
+    "tool_proficiencies": ["Herbalism kit"],
+    "skills": {
+      "choose": 2,
+      "from": [
+        "Arcana",
+        "Animal Handling",
+        "Insight",
+        "Medicine",
+        "Nature",
+        "Perception",
+        "Religion",
+        "Survival"
+      ]
+    },
+    "starting_equipment": {
+      "choice_1": {
+        "desc": "Choose one",
+        "options": [
+          "Wooden shield",
+          "Any simple weapon"
+        ]
+      },
+      "choice_2": {
+        "desc": "Choose one",
+        "options": [
+          "Scimitar",
+          "Any simple melee weapon"
+        ]
+      },
+      "default": [
+        "Leather armor",
+        "Explorer's pack",
+        "Druidic focus"
+      ]
+    },
+    "subclasses": {
+      "level": 2,
+      "name": "Druid Circle",
+      "options": [
+        {
+          "name": "Circle of the Land",
+          "description": "The Circle of the Land is made up of mystics and sages who safeguard ancient knowledge and rites through a vast oral tradition.",
+          "land_types": [
+            "Arctic",
+            "Coast",
+            "Desert",
+            "Forest",
+            "Grassland",
+            "Mountain",
+            "Swamp"
+          ]
+        },
+        {
+          "name": "Circle of the Moon",
+          "description": "Druids of the Circle of the Moon are fierce guardians of the wilds, with primal power enabling them to transform into powerful beasts."
+        }
+      ]
+    },
+    "features_by_level": {
+      "1": ["Druidic", "Spellcasting"],
+      "2": ["Wild Shape", "Druid Circle"],
+      "3": ["Circle Feature"],
+      "4": ["Wild Shape Improvement", "Ability Score Improvement"],
+      "5": [],
+      "6": ["Circle Feature"],
+      "7": [],
+      "8": ["Wild Shape Improvement", "Ability Score Improvement"],
+      "9": [],
+      "10": ["Circle Feature"],
+      "11": [],
+      "12": ["Ability Score Improvement"],
+      "13": [],
+      "14": ["Circle Feature"],
+      "15": [],
+      "16": ["Ability Score Improvement"],
+      "17": [],
+      "18": ["Timeless Body", "Beast Spells"],
+      "19": ["Ability Score Improvement"],
+      "20": ["Archdruid"]
+    },
+    "spellcasting": {
+      "ability": "Wisdom",
+      "cantrips_known": {
+        "1": 2,
+        "4": 3,
+        "10": 4
+      },
+      "spell_slots_by_level": {
+        "1": [2, 0, 0, 0, 0, 0, 0, 0, 0],
+        "2": [3, 0, 0, 0, 0, 0, 0, 0, 0],
+        "3": [4, 2, 0, 0, 0, 0, 0, 0, 0],
+        "4": [4, 3, 0, 0, 0, 0, 0, 0, 0],
+        "5": [4, 3, 2, 0, 0, 0, 0, 0, 0],
+        "6": [4, 3, 3, 0, 0, 0, 0, 0, 0],
+        "7": [4, 3, 3, 1, 0, 0, 0, 0, 0],
+        "8": [4, 3, 3, 2, 0, 0, 0, 0, 0],
+        "9": [4, 3, 3, 3, 1, 0, 0, 0, 0],
+        "10": [4, 3, 3, 3, 2, 0, 0, 0, 0],
+        "11": [4, 3, 3, 3, 2, 1, 0, 0, 0],
+        "12": [4, 3, 3, 3, 2, 1, 0, 0, 0],
+        "13": [4, 3, 3, 3, 2, 1, 1, 0, 0],
+        "14": [4, 3, 3, 3, 2, 1, 1, 0, 0],
+        "15": [4, 3, 3, 3, 2, 1, 1, 1, 0],
+        "16": [4, 3, 3, 3, 2, 1, 1, 1, 0],
+        "17": [4, 3, 3, 3, 2, 1, 1, 1, 1],
+        "18": [4, 3, 3, 3, 3, 1, 1, 1, 1],
+        "19": [4, 3, 3, 3, 3, 2, 1, 1, 1],
+        "20": [4, 3, 3, 3, 3, 2, 2, 1, 1]
+      },
+      "prepared_spells_formula": "Wisdom modifier + druid level (minimum 1)"
+    },
+    "wild_shape": {
+      "uses_per_rest": 2,
+      "improvements": {
+        "2": {
+          "max_cr": 0.25,
+          "limitations": "No flying or swimming speed",
+          "examples": ["Wolf", "Giant Badger"]
+        },
+        "4": {
+          "max_cr": 0.5,
+          "limitations": "No flying speed",
+          "examples": ["Crocodile", "Giant Wasp"]
+        },
+        "8": {
+          "max_cr": 1,
+          "limitations": "None",
+          "examples": ["Giant Eagle", "Brown Bear"]
+        }
+      },
+      "duration_formula": "hours equal to half your druid level (rounded down)"
+    },
+    "circle_features": {
+      "Circle of the Land": {
+        "2": ["Bonus Cantrip", "Natural Recovery"],
+        "3": ["Circle Spells (based on land type)"],
+        "6": ["Land's Stride"],
+        "10": ["Nature's Ward"],
+        "14": ["Nature's Sanctuary"]
+      },
+      "Circle of the Moon": {
+        "2": ["Combat Wild Shape", "Circle Forms"],
+        "6": ["Primal Strike"],
+        "10": ["Elemental Wild Shape"],
+        "14": ["Thousand Forms"]
+      }
+    }
+  },
+
+  "Fighter": {
+    "name": "Fighter",
+    "description": "A master of martial combat, skilled with a variety of weapons and armor",
+    "hit_die": "d10",
+    "primary_abilities": ["Strength", "Dexterity"],
+    "saves": ["Strength", "Constitution"],
+    "armor_proficiencies": ["Light armor", "Medium armor", "Heavy armor", "Shields"],
+    "weapon_proficiencies": ["Simple weapons", "Martial weapons"],
+    "tool_proficiencies": [],
+    "skills": {
+      "choose": 2,
+      "from": [
+        "Acrobatics",
+        "Animal Handling",
+        "Athletics",
+        "History",
+        "Insight",
+        "Intimidation",
+        "Perception",
+        "Survival"
+      ]
+    },
+    "starting_equipment": {
+      "choice_1": {
+        "desc": "Choose one",
+        "options": [
+          "Chain mail",
+          "Leather armor, longbow, and 20 arrows"
+        ]
+      },
+      "choice_2": {
+        "desc": "Choose one",
+        "options": [
+          "Martial weapon and shield",
+          "Two martial weapons"
+        ]
+      },
+      "choice_3": {
+        "desc": "Choose one",
+        "options": [
+          "Light crossbow and 20 bolts",
+          "Two handaxes"
+        ]
+      },
+      "choice_4": {
+        "desc": "Choose one",
+        "options": [
+          "Dungeoneer's pack",
+          "Explorer's pack"
+        ]
+      },
+      "default": []
+    },
+    "subclasses": {
+      "level": 3,
+      "name": "Martial Archetype",
+      "options": [
+        {
+          "name": "Champion",
+          "description": "The Champion focuses on the development of raw physical power honed to deadly perfection."
+        },
+        {
+          "name": "Battle Master",
+          "description": "Those who emulate the Battle Master employ martial techniques passed down through generations."
+        },
+        {
+          "name": "Eldritch Knight",
+          "description": "The Eldritch Knight combines the martial mastery common to all fighters with a careful study of magic."
+        }
+      ]
+    },
+    "features_by_level": {
+      "1": ["Fighting Style", "Second Wind"],
+      "2": ["Action Surge (one use)"],
+      "3": ["Martial Archetype"],
+      "4": ["Ability Score Improvement"],
+      "5": ["Extra Attack"],
+      "6": ["Ability Score Improvement"],
+      "7": ["Archetype Feature"],
+      "8": ["Ability Score Improvement"],
+      "9": ["Indomitable (one use)"],
+      "10": ["Archetype Feature"],
+      "11": ["Extra Attack (2)"],
+      "12": ["Ability Score Improvement"],
+      "13": ["Indomitable (two uses)"],
+      "14": ["Ability Score Improvement"],
+      "15": ["Archetype Feature"],
+      "16": ["Ability Score Improvement"],
+      "17": ["Action Surge (two uses)", "Indomitable (three uses)"],
+      "18": ["Archetype Feature"],
+      "19": ["Ability Score Improvement"],
+      "20": ["Extra Attack (3)"]
+    },
+    "fighting_styles": {
+      "options": [
+        {
+          "name": "Archery",
+          "description": "+2 bonus to attack rolls with ranged weapons"
+        },
+        {
+          "name": "Defense",
+          "description": "+1 bonus to AC while wearing armor"
+        },
+        {
+          "name": "Dueling",
+          "description": "+2 bonus to damage rolls with one-handed melee weapons when wielding only one weapon"
+        },
+        {
+          "name": "Great Weapon Fighting",
+          "description": "Reroll 1s and 2s on damage dice for two-handed weapons"
+        },
+        {
+          "name": "Protection",
+          "description": "Use reaction to impose disadvantage on attack against ally within 5ft when wielding shield"
+        },
+        {
+          "name": "Two-Weapon Fighting",
+          "description": "Add ability modifier to damage of off-hand attack"
+        }
+      ]
+    },
+    "champion_features": {
+      "3": ["Improved Critical (19-20)"],
+      "7": ["Remarkable Athlete"],
+      "10": ["Additional Fighting Style"],
+      "15": ["Superior Critical (18-20)"],
+      "18": ["Survivor"]
+    }
+  },
+
+  "Monk": {
+    "name": "Monk",
+    "description": "A master of martial arts, harnessing the power of the body in pursuit of physical and spiritual perfection",
+    "hit_die": "d8",
+    "primary_abilities": ["Dexterity", "Wisdom"],
+    "saves": ["Strength", "Dexterity"],
+    "armor_proficiencies": [],
+    "weapon_proficiencies": ["Simple weapons", "Shortswords"],
+    "tool_proficiencies": ["Choose one type of artisan's tools or one musical instrument"],
+    "skills": {
+      "choose": 2,
+      "from": [
+        "Acrobatics",
+        "Athletics",
+        "History",
+        "Insight",
+        "Religion",
+        "Stealth"
+      ]
+    },
+    "starting_equipment": {
+      "choice_1": {
+        "desc": "Choose one",
+        "options": [
+          "Shortsword",
+          "Any simple weapon"
+        ]
+      },
+      "choice_2": {
+        "desc": "Choose one",
+        "options": [
+          "Dungeoneer's pack",
+          "Explorer's pack"
+        ]
+      },
+      "default": [
+        "10 darts"
+      ]
+    },
+    "subclasses": {
+      "level": 3,
+      "name": "Monastic Tradition",
+      "options": [
+        {
+          "name": "Way of the Open Hand",
+          "description": "Monks of the Way of the Open Hand are the ultimate masters of martial arts combat."
+        },
+        {
+          "name": "Way of Shadow",
+          "description": "Monks of the Way of Shadow follow a tradition that values stealth and subterfuge."
+        },
+        {
+          "name": "Way of the Four Elements",
+          "description": "You follow a monastic tradition that teaches you to harness the elements."
+        }
+      ]
+    },
+    "features_by_level": {
+      "1": ["Martial Arts", "Unarmored Defense"],
+      "2": ["Ki", "Unarmored Movement"],
+      "3": ["Monastic Tradition", "Deflect Missiles"],
+      "4": ["Slow Fall", "Ability Score Improvement"],
+      "5": ["Extra Attack", "Stunning Strike"],
+      "6": ["Ki-Empowered Strikes", "Tradition Feature"],
+      "7": ["Evasion", "Stillness of Mind"],
+      "8": ["Ability Score Improvement"],
+      "9": ["Unarmored Movement Improvement"],
+      "10": ["Purity of Body"],
+      "11": ["Tradition Feature"],
+      "12": ["Ability Score Improvement"],
+      "13": ["Tongue of the Sun and Moon"],
+      "14": ["Diamond Soul"],
+      "15": ["Timeless Body"],
+      "16": ["Ability Score Improvement"],
+      "17": ["Tradition Feature"],
+      "18": ["Empty Body"],
+      "19": ["Ability Score Improvement"],
+      "20": ["Perfect Self"]
+    },
+    "ki_points": {
+      "progression": {
+        "1": 0,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "10": 10,
+        "11": 11,
+        "12": 12,
+        "13": 13,
+        "14": 14,
+        "15": 15,
+        "16": 16,
+        "17": 17,
+        "18": 18,
+        "19": 19,
+        "20": 20
+      },
+      "save_dc_formula": "8 + proficiency bonus + Wisdom modifier"
+    },
+    "martial_arts": {
+      "die_progression": {
+        "1": 4,
+        "5": 6,
+        "11": 8,
+        "17": 10
+      },
+      "features": {
+        "bonus_unarmed_strike": "When using Attack action with monk weapon or unarmed strike, can make one unarmed strike as bonus action",
+        "dexterity_attacks": "Can use Dexterity instead of Strength for attack and damage rolls with monk weapons and unarmed strikes"
+      }
+    },
+    "unarmored_movement": {
+      "bonus_speed": {
+        "2": 10,
+        "6": 15,
+        "10": 20,
+        "14": 25,
+        "18": 30
+      },
+      "special_movement": {
+        "9": "Can move along vertical surfaces and across liquids without falling during movement"
+      }
+    },
+    "open_hand_features": {
+      "3": ["Open Hand Technique"],
+      "6": ["Wholeness of Body"],
+      "11": ["Tranquility"],
+      "17": ["Quivering Palm"]
+    }
+  },
+
+  "Paladin": {
+    "name": "Paladin",
+    "description": "A holy warrior bound to a sacred oath, wielding divine magic and martial prowess",
+    "hit_die": "d10",
+    "primary_abilities": ["Strength", "Charisma"],
+    "saves": ["Wisdom", "Charisma"],
+    "armor_proficiencies": ["Light armor", "Medium armor", "Heavy armor", "Shields"],
+    "weapon_proficiencies": ["Simple weapons", "Martial weapons"],
+    "tool_proficiencies": [],
+    "skills": {
+      "choose": 2,
+      "from": [
+        "Athletics",
+        "Insight",
+        "Intimidation",
+        "Medicine",
+        "Persuasion",
+        "Religion"
+      ]
+    },
+    "starting_equipment": {
+      "choice_1": {
+        "desc": "Choose one",
+        "options": [
+          "Martial weapon and shield",
+          "Two martial weapons"
+        ]
+      },
+      "choice_2": {
+        "desc": "Choose one",
+        "options": [
+          "Five javelins",
+          "Any simple melee weapon"
+        ]
+      },
+      "choice_3": {
+        "desc": "Choose one",
+        "options": [
+          "Priest's pack",
+          "Explorer's pack"
+        ]
+      },
+      "default": [
+        "Chain mail",
+        "Holy symbol"
+      ]
+    },
+    "subclasses": {
+      "level": 3,
+      "name": "Sacred Oath",
+      "options": [
+        {
+          "name": "Oath of Devotion",
+          "description": "The Oath of Devotion binds a paladin to the loftiest ideals of justice, virtue, and order."
+        },
+        {
+          "name": "Oath of the Ancients",
+          "description": "The Oath of the Ancients calls paladins to protect the light and preserve life in the world."
+        },
+        {
+          "name": "Oath of Vengeance",
+          "description": "The Oath of Vengeance is a solemn commitment to punish those who have committed a grievous sin."
+        }
+      ]
+    },
+    "features_by_level": {
+      "1": ["Divine Sense", "Lay on Hands"],
+      "2": ["Fighting Style", "Spellcasting", "Divine Smite"],
+      "3": ["Divine Health", "Sacred Oath", "Channel Divinity"],
+      "4": ["Ability Score Improvement"],
+      "5": ["Extra Attack"],
+      "6": ["Aura of Protection"],
+      "7": ["Sacred Oath Feature"],
+      "8": ["Ability Score Improvement"],
+      "9": [],
+      "10": ["Aura of Courage"],
+      "11": ["Improved Divine Smite"],
+      "12": ["Ability Score Improvement"],
+      "13": [],
+      "14": ["Cleansing Touch"],
+      "15": ["Sacred Oath Feature"],
+      "16": ["Ability Score Improvement"],
+      "17": [],
+      "18": ["Aura Improvements"],
+      "19": ["Ability Score Improvement"],
+      "20": ["Sacred Oath Feature"]
+    },
+    "spellcasting": {
+      "ability": "Charisma",
+      "spell_slots_by_level": {
+        "1": [0, 0, 0, 0, 0],
+        "2": [2, 0, 0, 0, 0],
+        "3": [3, 0, 0, 0, 0],
+        "4": [3, 0, 0, 0, 0],
+        "5": [4, 2, 0, 0, 0],
+        "6": [4, 2, 0, 0, 0],
+        "7": [4, 3, 0, 0, 0],
+        "8": [4, 3, 0, 0, 0],
+        "9": [4, 3, 2, 0, 0],
+        "10": [4, 3, 2, 0, 0],
+        "11": [4, 3, 3, 0, 0],
+        "12": [4, 3, 3, 0, 0],
+        "13": [4, 3, 3, 1, 0],
+        "14": [4, 3, 3, 1, 0],
+        "15": [4, 3, 3, 2, 0],
+        "16": [4, 3, 3, 2, 0],
+        "17": [4, 3, 3, 3, 1],
+        "18": [4, 3, 3, 3, 1],
+        "19": [4, 3, 3, 3, 2],
+        "20": [4, 3, 3, 3, 2]
+      },
+      "prepared_spells_formula": "Charisma modifier + half paladin level (minimum 1)"
+    },
+    "divine_sense": {
+      "uses_formula": "1 + Charisma modifier (minimum 1)",
+      "range": 60,
+      "duration": "Instantaneous",
+      "detects": ["Celestials", "Fiends", "Undead"]
+    },
+    "lay_on_hands": {
+      "pool_formula": "5 × paladin level",
+      "uses": ["Heal hit points", "Cure diseases (5 HP per disease)", "Neutralize poisons (5 HP per poison)"]
+    },
+    "fighting_styles": {
+      "options": [
+        {
+          "name": "Defense",
+          "description": "+1 bonus to AC while wearing armor"
+        },
+        {
+          "name": "Dueling",
+          "description": "+2 bonus to damage rolls with one-handed melee weapons when wielding only one weapon"
+        },
+        {
+          "name": "Great Weapon Fighting",
+          "description": "Reroll 1s and 2s on damage dice for two-handed weapons"
+        },
+        {
+          "name": "Protection",
+          "description": "Use reaction to impose disadvantage on attack against ally within 5ft when wielding shield"
+        }
+      ]
+    },
+    "divine_smite": {
+      "base_damage": "2d8 radiant damage",
+      "bonus_damage": "+1d8 per spell slot level above 1st (max 5d8)",
+      "extra_vs_undead_fiends": "+1d8 damage"
+    },
+    "channel_divinity": {
+      "uses": {
+        "1": 1,
+        "6": 2,
+        "18": 3
+      }
+    },
+    "oath_features": {
+      "Oath of Devotion": {
+        "3": ["Channel Divinity: Sacred Weapon", "Channel Divinity: Turn the Unholy"],
+        "7": ["Aura of Devotion"],
+        "15": ["Purity of Spirit"],
+        "20": ["Holy Nimbus"]
+      }
+    }
+  },
+
+  "Ranger": {
+    "name": "Ranger",
+    "description": "A warrior who uses martial prowess and nature magic to combat threats on the edges of civilization",
+    "hit_die": "d10",
+    "primary_abilities": ["Dexterity", "Wisdom"],
+    "saves": ["Strength", "Dexterity"],
+    "armor_proficiencies": ["Light armor", "Medium armor", "Shields"],
+    "weapon_proficiencies": ["Simple weapons", "Martial weapons"],
+    "tool_proficiencies": [],
+    "skills": {
+      "choose": 3,
+      "from": [
+        "Animal Handling",
+        "Athletics",
+        "Insight",
+        "Investigation",
+        "Nature",
+        "Perception",
+        "Stealth",
+        "Survival"
+      ]
+    },
+    "starting_equipment": {
+      "choice_1": {
+        "desc": "Choose one",
+        "options": [
+          "Scale mail",
+          "Leather armor"
+        ]
+      },
+      "choice_2": {
+        "desc": "Choose one",
+        "options": [
+          "Two shortswords",
+          "Two simple melee weapons"
+        ]
+      },
+      "choice_3": {
+        "desc": "Choose one",
+        "options": [
+          "Dungeoneer's pack",
+          "Explorer's pack"
+        ]
+      },
+      "default": [
+        "Longbow",
+        "Quiver of 20 arrows"
+      ]
+    },
+    "subclasses": {
+      "level": 3,
+      "name": "Ranger Archetype",
+      "options": [
+        {
+          "name": "Hunter",
+          "description": "Embrace the Hunter archetype to become a peerless tracker and slayer of fantastic monsters."
+        },
+        {
+          "name": "Beast Master",
+          "description": "The Beast Master archetype embodies a friendship between the civilized races and the beasts of the world."
+        }
+      ]
+    },
+    "features_by_level": {
+      "1": ["Favored Enemy", "Natural Explorer"],
+      "2": ["Fighting Style", "Spellcasting"],
+      "3": ["Primeval Awareness", "Ranger Archetype"],
+      "4": ["Ability Score Improvement"],
+      "5": ["Extra Attack"],
+      "6": ["Favored Enemy Improvement", "Natural Explorer Improvement"],
+      "7": ["Ranger Archetype Feature"],
+      "8": ["Land's Stride", "Ability Score Improvement"],
+      "9": [],
+      "10": ["Natural Explorer Improvement", "Hide in Plain Sight"],
+      "11": ["Ranger Archetype Feature"],
+      "12": ["Ability Score Improvement"],
+      "13": [],
+      "14": ["Favored Enemy Improvement", "Vanish"],
+      "15": ["Ranger Archetype Feature"],
+      "16": ["Ability Score Improvement"],
+      "17": [],
+      "18": ["Feral Senses"],
+      "19": ["Ability Score Improvement"],
+      "20": ["Foe Slayer"]
+    },
+    "spellcasting": {
+      "ability": "Wisdom",
+      "spell_slots_by_level": {
+        "1": [0, 0, 0, 0, 0],
+        "2": [2, 0, 0, 0, 0],
+        "3": [3, 0, 0, 0, 0],
+        "4": [3, 0, 0, 0, 0],
+        "5": [4, 2, 0, 0, 0],
+        "6": [4, 2, 0, 0, 0],
+        "7": [4, 3, 0, 0, 0],
+        "8": [4, 3, 0, 0, 0],
+        "9": [4, 3, 2, 0, 0],
+        "10": [4, 3, 2, 0, 0],
+        "11": [4, 3, 3, 0, 0],
+        "12": [4, 3, 3, 0, 0],
+        "13": [4, 3, 3, 1, 0],
+        "14": [4, 3, 3, 1, 0],
+        "15": [4, 3, 3, 2, 0],
+        "16": [4, 3, 3, 2, 0],
+        "17": [4, 3, 3, 3, 1],
+        "18": [4, 3, 3, 3, 1],
+        "19": [4, 3, 3, 3, 2],
+        "20": [4, 3, 3, 3, 2]
+      },
+      "spells_known_formula": "Ranger level + Wisdom modifier (minimum 1)"
+    },
+    "favored_enemy": {
+      "choices": 3,
+      "levels": [1, 6, 14],
+      "options": [
+        "Aberrations", "Beasts", "Celestials", "Constructs", "Dragons", "Elementals",
+        "Fey", "Fiends", "Giants", "Monstrosities", "Oozes", "Plants", "Undead"
+      ]
+    },
+    "natural_explorer": {
+      "choices": 3,
+      "levels": [1, 6, 10],
+      "options": [
+        "Arctic", "Coast", "Desert", "Forest", "Grassland", "Mountain", "Swamp"
+      ]
+    },
+    "fighting_styles": {
+      "options": [
+        {
+          "name": "Archery",
+          "description": "+2 bonus to attack rolls with ranged weapons"
+        },
+        {
+          "name": "Defense",
+          "description": "+1 bonus to AC while wearing armor"
+        },
+        {
+          "name": "Dueling",
+          "description": "+2 bonus to damage rolls with one-handed melee weapons when wielding only one weapon"
+        },
+        {
+          "name": "Two-Weapon Fighting",
+          "description": "Add ability modifier to damage of off-hand attack"
+        }
+      ]
+    },
+    "primeval_awareness": {
+      "duration_formula": "1 minute per spell slot level",
+      "range": "1 mile (6 miles in favored terrain)",
+      "detects": ["Aberrations", "Celestials", "Dragons", "Elementals", "Fey", "Fiends", "Undead"]
+    },
+    "archetype_features": {
+      "Hunter": {
+        "3": ["Hunter's Prey"],
+        "7": ["Defensive Tactics"],
+        "11": ["Multiattack"],
+        "15": ["Superior Hunter's Defense"]
+      }
+    }
+  },
+
+  "Rogue": {
+    "name": "Rogue",
+    "description": "A scoundrel who uses stealth and trickery to overcome obstacles and enemies",
+    "hit_die": "d8",
+    "primary_abilities": ["Dexterity"],
+    "saves": ["Dexterity", "Intelligence"],
+    "armor_proficiencies": ["Light armor"],
+    "weapon_proficiencies": ["Simple weapons", "Hand crossbows", "Longswords", "Rapiers", "Shortswords"],
+    "tool_proficiencies": ["Thieves' tools"],
+    "skills": {
+      "choose": 4,
+      "from": [
+        "Acrobatics",
+        "Athletics",
+        "Deception",
+        "Insight",
+        "Intimidation",
+        "Investigation",
+        "Perception",
+        "Performance",
+        "Persuasion",
+        "Sleight of Hand",
+        "Stealth"
+      ]
+    },
+    "starting_equipment": {
+      "choice_1": {
+        "desc": "Choose one",
+        "options": [
+          "Rapier",
+          "Shortsword"
+        ]
+      },
+      "choice_2": {
+        "desc": "Choose one",
+        "options": [
+          "Shortbow and quiver of 20 arrows",
+          "Shortsword"
+        ]
+      },
+      "choice_3": {
+        "desc": "Choose one",
+        "options": [
+          "Burglar's pack",
+          "Dungeoneer's pack",
+          "Explorer's pack"
+        ]
+      },
+      "default": [
+        "Leather armor",
+        "Two daggers",
+        "Thieves' tools"
+      ]
+    },
+    "subclasses": {
+      "level": 3,
+      "name": "Roguish Archetype",
+      "options": [
+        {
+          "name": "Thief",
+          "description": "The Thief archetype focuses on honing your skills in stealth and larceny."
+        },
+        {
+          "name": "Assassin",
+          "description": "The Assassin archetype focuses on the grim art of death and infiltration."
+        },
+        {
+          "name": "Arcane Trickster",
+          "description": "The Arcane Trickster combines the rogue's skill and stealth with the magic of wizards."
+        }
+      ]
+    },
+    "features_by_level": {
+      "1": ["Expertise", "Sneak Attack", "Thieves' Cant"],
+      "2": ["Cunning Action"],
+      "3": ["Roguish Archetype"],
+      "4": ["Ability Score Improvement"],
+      "5": ["Uncanny Dodge"],
+      "6": ["Expertise"],
+      "7": ["Evasion"],
+      "8": ["Ability Score Improvement"],
+      "9": ["Roguish Archetype Feature"],
+      "10": ["Ability Score Improvement"],
+      "11": ["Reliable Talent"],
+      "12": ["Ability Score Improvement"],
+      "13": ["Roguish Archetype Feature"],
+      "14": ["Blindsense"],
+      "15": ["Slippery Mind"],
+      "16": ["Ability Score Improvement"],
+      "17": ["Roguish Archetype Feature"],
+      "18": ["Elusive"],
+      "19": ["Ability Score Improvement"],
+      "20": ["Stroke of Luck"]
+    },
+    "sneak_attack": {
+      "dice_progression": {
+        "1": 1, "2": 1, "3": 2, "4": 2, "5": 3, "6": 3, "7": 4, "8": 4, "9": 5, "10": 5,
+        "11": 6, "12": 6, "13": 7, "14": 7, "15": 8, "16": 8, "17": 9, "18": 9, "19": 10, "20": 10
+      },
+      "conditions": [
+        "Advantage on attack roll",
+        "Ally within 5ft of target (no disadvantage)",
+        "Finesse or ranged weapon"
+      ]
+    },
+    "expertise": {
+      "choices": 4,
+      "levels": [1, 6],
+      "applies_to": ["Skills", "Thieves' tools"]
+    },
+    "cunning_action": {
+      "bonus_actions": ["Dash", "Disengage", "Hide"]
+    },
+    "archetype_features": {
+      "Thief": {
+        "3": ["Fast Hands", "Second-Story Work"],
+        "9": ["Supreme Sneak"],
+        "13": ["Use Magic Device"],
+        "17": ["Thief's Reflexes"]
+      }
+    }
   }
+  
 }

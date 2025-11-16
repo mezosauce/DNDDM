@@ -2,6 +2,10 @@
  * Barbarian Class Features UI
  * Handles Barbarian-specific displays: Rage, Unarmored Defense, Feature Tree
  */
+// API base used by frontend to reach the backend service.
+// If your frontend is served from a different origin than the API server,
+// set `window.API_BASE` (e.g. in a template) or let it default to localhost:5005
+const API_BASE = (typeof window !== 'undefined' && window.API_BASE) ? window.API_BASE : 'http://localhost:5005';
 
 class BarbarianFeatureManager extends ClassFeatureManager {
     constructor() {
@@ -16,7 +20,7 @@ class BarbarianFeatureManager extends ClassFeatureManager {
     initialize(level, stats, subclass = '') {
         this.level = level;
         this.stats = stats || this.stats;
-        this.   subclass = subclass;
+        this.subclass = subclass;
         this.updateRageProgression();
         this.render();
     }
@@ -183,9 +187,15 @@ class BarbarianFeatureManager extends ClassFeatureManager {
         this.currentlyRaging = true;
         this.ragesUsed++;
         this.render();
-        
-        // Show notification
+        // Optimistically update UI then notify backend
         this.showNotification('🔥 RAGE ACTIVATED! +' + this.rageDamage + ' damage, advantage on STR checks!');
+
+        // Send to backend if available
+        if (this.characterName) {
+            fetch(`${API_BASE}/api/barbarian/${encodeURIComponent(this.characterName)}/enter_rage`, {
+                method: 'POST', headers: {'Content-Type': 'application/json'}
+            }).catch(() => {});
+        }
     }
 
     endRage() {
@@ -193,16 +203,26 @@ class BarbarianFeatureManager extends ClassFeatureManager {
         
         this.currentlyRaging = false;
         this.render();
-        
         this.showNotification('Rage ended.');
+
+        if (this.characterName) {
+            fetch(`${API_BASE}/api/barbarian/${encodeURIComponent(this.characterName)}/end_rage`, {
+                method: 'POST', headers: {'Content-Type': 'application/json'}
+            }).catch(() => {});
+        }
     }
 
     longRest() {
         this.ragesUsed = 0;
         this.currentlyRaging = false;
         this.render();
-        
         this.showNotification('✨ Long rest completed. Rages restored!');
+
+        if (this.characterName) {
+            fetch(`${API_BASE}/api/barbarian/${encodeURIComponent(this.characterName)}/long_rest`, {
+                method: 'POST', headers: {'Content-Type': 'application/json'}
+            }).catch(() => {});
+        }
     }
 
     showNotification(message) {
@@ -227,17 +247,56 @@ class BarbarianFeatureManager extends ClassFeatureManager {
     updateStats(stats) {
         this.stats = stats;
         this.render();
+        if (this.characterName) {
+            fetch(`${API_BASE}/api/barbarian/${encodeURIComponent(this.characterName)}/update_stats`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({stats: stats})
+            }).catch(() => {});
+        }
     }
 
     setLevel(level) {
         this.level = parseInt(level) || 1;
         this.updateRageProgression();
         this.render();
+        if (this.characterName) {
+            fetch(`${API_BASE}/api/barbarian/${encodeURIComponent(this.characterName)}/set_level`, {
+                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({level: this.level})
+            }).catch(() => {});
+        }
     }
 
     setSubclass(subclass) {
         this.subclass = subclass;
         this.render();
+    }
+
+    setCharacterName(name) {
+        this.characterName = name;
+
+        // Ensure backend has this character - create minimal record if missing
+        (async () => {
+            try {
+                const res = await fetch(`${API_BASE}/api/barbarian/${encodeURIComponent(this.characterName)}`);
+                if (res.status === 404) {
+                    // Create minimal character on backend so subsequent calls succeed
+                    await fetch(`${API_BASE}/api/barbarian/${encodeURIComponent(this.characterName)}/create`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            level: this.level || 1,
+                            stats: this.stats || {strength:15,dexterity:13,constitution:14,intelligence:10,wisdom:12,charisma:8},
+                            race: 'Human',
+                            background: ''
+                        })
+                    });
+                }
+            } catch (e) {
+                // Ignore network errors; keep UI functional offline
+                console.warn('Could not verify/create backend character:', e);
+            }
+        })();
     }
 }
 

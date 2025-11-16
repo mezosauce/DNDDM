@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&D Class Features Test Suite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .test-controls {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .control-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .control-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .class-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .class-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+        }
+
+        .class-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .class-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .status-loaded {
+            background: #4caf50;
+            color: white;
+        }
+
+        .status-error {
+            background: #f44336;
+            color: white;
+        }
+
+        .status-not-loaded {
+            background: #ff9800;
+            color: white;
+        }
+
+        .class-info {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .test-output {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .error-log {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #c62828;
+        }
+
+        .success-log {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #2e7d32;
+        }
+
+        #render-output {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 300px;
+        }
+
+        /* Copy styles from actual class feature files */
+        .class-specific-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .class-section-header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .resource-tracker {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .resource-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .resource-bar {
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .resource-fill {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 0.3s ease;
+        }
+
+        .resource-buttons {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .calculation-display {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .ability-card-name {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .calculation-formula {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .calculation-result {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .feature-tree {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .feature-node {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 8px;
+            background: #f5f5f5;
+            transition: all 0.3s ease;
+        }
+
+        .feature-node.unlocked {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+        }
+
+        .feature-node.locked {
+            background: #e0e0e0;
+            color: #999;
+        }
+
+        .feature-level {
+            font-weight: bold;
+            margin-right: 15px;
+            min-width: 50px;
+        }
+
+        .feature-name {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .feature-desc {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .feature-unlock-notice {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎲 D&D 5e Class Features Test Suite</h1>
+        
+        <div class="test-controls">
+            <h2>Test Controls</h2>
+            <div class="control-group">
+                <div class="control-item">
+                    <label for="test-class">Select Class:</label>
+                    <select id="test-class">
+                        <option value="">-- Select Class --</option>
+                        <option value="Barbarian">Barbarian</option>
+                        <option value="Bard">Bard</option>
+                        <option value="Cleric">Cleric</option>
+                        <option value="Druid">Druid</option>
+                        <option value="Fighter">Fighter</option>
+                        <option value="Monk">Monk</option>
+                        <option value="Paladin">Paladin</option>
+                        <option value="Ranger">Ranger</option>
+                        <option value="Rogue">Rogue</option>
+                        <option value="Sorcerer">Sorcerer</option>
+                        <option value="Warlock">Warlock</option>
+                        <option value="Wizard">Wizard</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <label for="test-level">Character Level:</label>
+                    <input type="number" id="test-level" min="1" max="20" value="5">
+                </div>
+                <div class="control-item">
+                    <label for="test-subclass">Subclass:</label>
+                    <input type="text" id="test-subclass" placeholder="e.g., Champion, Circle of the Moon">
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <div class="control-item">
+                    <label>Ability Scores:</label>
+                    <div style="display: flex; gap: 5px;">
+                        <input type="number" id="str" min="1" max="20" value="14" placeholder="STR">
+                        <input type="number" id="dex" min="1" max="20" value="12" placeholder="DEX">
+                        <input type="number" id="con" min="1" max="20" value="13" placeholder="CON">
+                        <input type="number" id="int" min="1" max="20" value="10" placeholder="INT">
+                        <input type="number" id="wis" min="1" max="20" value="15" placeholder="WIS">
+                        <input type="number" id="cha" min="1" max="20" value="8" placeholder="CHA">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <button onclick="testClass()">Test Selected Class</button>
+                <button onclick="testAllClasses()">Test All Classes</button>
+                <button onclick="clearOutput()">Clear Output</button>
+            </div>
+        </div>
+
+        <div class="class-grid" id="class-grid">
+            <!-- Class cards will be populated here -->
+        </div>
+
+        <div class="test-output">
+            <h2>Test Output</h2>
+            <div id="test-log"></div>
+        </div>
+
+        <div id="render-output">
+            <h2>Rendered Class Features</h2>
+            <div id="barbarian-features"></div>
+            <div id="bard-features"></div>
+            <div id="cleric-features"></div>
+            <div id="druid-features"></div>
+            <div id="fighter-features"></div>
+            <div id="monk-features"></div>
+            <div id="paladin-features"></div>
+            <div id="ranger-features"></div>
+            <div id="rogue-features"></div>
+            <div id="sorcerer-features"></div>
+            <div id="warlock-features"></div>
+            <div id="wizard-features"></div>
+        </div>
+    </div>
+
+    <!-- Load the base class first -->
+    <script src="static/js/class_features/base.js"></script>
+    
+    <!-- Load all class feature managers -->
+    <script src="static/js/class_features/barbarian.js"></script>
+    <script src="static/js/class_features/bard.js"></script>
+    <script src="static/js/class_features/cleric.js"></script>
+    <script src="static/js/class_features/druid.js"></script>
+    <script src="static/js/class_features/fighter.js"></script>
+    <script src="static/js/class_features/monk.js"></script>
+    <script src="static/js/class_features/paladin.js"></script>
+    <!-- Note: Ranger.js has different structure, may need separate handling -->
+    <!-- <script src="static/js/class_features/ranger.js"></script> -->
+    <script src="static/js/class_features/rogue.js"></script>
+    <script src="static/js/class_features/sorcerer.js"></script>
+    <script src="static/js/class_features/warlock.js"></script>
+    <script src="static/js/class_features/wizard.js"></script>
+
+    <script>
+        // Test data
+        const classManagers = {
+            'Barbarian': window.BarbarianFeatureManager,
+            'Bard': window.BardFeatureManager,
+            'Cleric': window.ClericFeatureManager,
+            'Druid': window.DruidFeatureManager,
+            'Fighter': window.FighterFeatureManager,
+            'Monk': window.MonkFeatureManager,
+            'Paladin': window.PaladinFeatureManager,
+            'Rogue': window.RogueFeatureManager,
+            'Sorcerer': window.SorcererFeatureManager,
+            'Warlock': window.WarlockFeatureManager,
+            'Wizard': window.WizardFeatureManager
+        };
+
+        const subclassExamples = {
+            'Barbarian': ['Path of the Berserker', 'Path of the Totem Warrior'],
+            'Bard': ['College of Lore', 'College of Valor'],
+            'Cleric': ['Life', 'Light', 'War'],
+            'Druid': ['Circle of the Land', 'Circle of the Moon'],
+            'Fighter': ['Champion', 'Battle Master', 'Eldritch Knight'],
+            'Monk': ['Way of the Open Hand', 'Way of Shadow'],
+            'Paladin': ['Oath of Devotion', 'Oath of Vengeance'],
+            'Rogue': ['Thief', 'Assassin', 'Arcane Trickster'],
+            'Sorcerer': ['Draconic Bloodline', 'Wild Magic'],
+            'Warlock': ['The Fiend', 'The Archfey', 'The Great Old One'],
+            'Wizard': ['School of Evocation', 'School of Divination']
+        };
+
+        // Initialize class status display
+        function initializeClassGrid() {
+            const grid = document.getElementById('class-grid');
+            grid.innerHTML = '';
+            
+            for (const [className, Manager] of Object.entries(classManagers)) {
+                const card = document.createElement('div');
+                card.className = 'class-card';
+                
+                const status = Manager ? 'loaded' : 'not-loaded';
+                const statusText = Manager ? 'Loaded' : 'Not Loaded';
+                
+                card.innerHTML = `
+                    <div class="class-name">${className}</div>
+                    <div class="class-status status-${status}">${statusText}</div>
+                    <div class="class-info">
+                        Manager: ${Manager ? '✓' : '✗'}<br>
+                        Subclasses: ${subclassExamples[className]?.join(', ') || 'None defined'}
+                    </div>
+                    <button onclick="quickTest('${className}')">Quick Test</button>
+                `;
+                
+                grid.appendChild(card);
+            }
+        }
+
+        // Test a specific class
+        function testClass() {
+            const className = document.getElementById('test-class').value;
+            const level = parseInt(document.getElementById('test-level').value) || 1;
+            const subclass = document.getElementById('test-subclass').value;
+            
+            const stats = {
+                strength: parseInt(document.getElementById('str').value) || 10,
+                dexterity: parseInt(document.getElementById('dex').value) || 10,
+                constitution: parseInt(document.getElementById('con').value) || 10,
+                intelligence: parseInt(document.getElementById('int').value) || 10,
+                wisdom: parseInt(document.getElementById('wis').value) || 10,
+                charisma: parseInt(document.getElementById('cha').value) || 10
+            };
+            
+            if (!className) {
+                logError('Please select a class to test');
+                return;
+            }
+            
+            const Manager = classManagers[className];
+            if (!Manager) {
+                logError(`Manager for ${className} not found`);
+                return;
+            }
+            
+            try {
+                logSuccess(`Testing ${className} at level ${level}...`);
+                
+                // Create instance
+                const manager = new Manager();
+                logSuccess(`✓ ${className} manager created`);
+                
+                // Initialize
+                manager.initialize(level, stats, subclass);
+                logSuccess(`✓ ${className} initialized with level ${level}${subclass ? ' and subclass ' + subclass : ''}`);
+                
+                // Test specific methods
+                testManagerMethods(manager, className);
+                
+                // Render
+                manager.render();
+                logSuccess(`✓ ${className} rendered successfully`);
+                
+            } catch (error) {
+                logError(`Error testing ${className}: ${error.message}\n${error.stack}`);
+            }
+        }
+
+        // Quick test for a class
+        function quickTest(className) {
+            document.getElementById('test-class').value = className;
+            document.getElementById('test-level').value = 5;
+            document.getElementById('test-subclass').value = subclassExamples[className]?.[0] || '';
+            testClass();
+        }
+
+        // Test all classes
+        function testAllClasses() {
+            clearOutput();
+            logSuccess('Starting comprehensive test of all classes...\n');
+            
+            let passed = 0;
+            let failed = 0;
+            
+            for (const [className, Manager] of Object.entries(classManagers)) {
+                try {
+                    if (!Manager) {
+                        logError(`${className}: Manager not loaded`);
+                        failed++;
+                        continue;
+                    }
+                    
+                    const manager = new Manager();
+                    const stats = {
+                        strength: 14,
+                        dexterity: 12,
+                        constitution: 13,
+                        intelligence: 10,
+                        wisdom: 15,
+                        charisma: 8
+                    };
+                    
+                    // Test at different levels
+                    for (const level of [1, 5, 10, 15, 20]) {
+                        manager.initialize(level, stats, subclassExamples[className]?.[0]);
+                        manager.render();
+                    }
+                    
+                    logSuccess(`${className}: All tests passed ✓`);
+                    passed++;
+                    
+                } catch (error) {
+                    logError(`${className}: ${error.message}`);
+                    failed++;
+                }
+            }
+            
+            logSuccess(`\nTest Summary: ${passed} passed, ${failed} failed`);
+        }
+
+        // Test specific manager methods
+        function testManagerMethods(manager, className) {
+            // Test common methods
+            if (typeof manager.setLevel === 'function') {
+                manager.setLevel(10);
+                logSuccess(`✓ ${className}.setLevel() works`);
+            }
+            
+            if (typeof manager.updateStats === 'function') {
+                manager.updateStats({ strength: 16, dexterity: 14, constitution: 14, intelligence: 10, wisdom: 12, charisma: 8 });
+                logSuccess(`✓ ${className}.updateStats() works`);
+            }
+            
+            // Test class-specific features
+            switch(className) {
+                case 'Barbarian':
+                    if (manager.enterRage) manager.enterRage();
+                    if (manager.endRage) manager.endRage();
+                    break;
+                case 'Bard':
+                    if (manager.useBardicInspiration) manager.useBardicInspiration();
+                    break;
+                case 'Wizard':
+                    if (manager.castSpell) manager.castSpell(1);
+                    break;
+                // Add more specific tests as needed
+            }
+        }
+
+        // Logging functions
+        function logSuccess(message) {
+            const log = document.getElementById('test-log');
+            const entry = document.createElement('div');
+            entry.className = 'success-log';
+            entry.textContent = message;
+            log.appendChild(entry);
+        }
+
+        function logError(message) {
+            const log = document.getElementById('test-log');
+            const entry = document.createElement('div');
+            entry.className = 'error-log';
+            entry.textContent = message;
+            log.appendChild(entry);
+        }
+
+        function clearOutput() {
+            document.getElementById('test-log').innerHTML = '';
+            // Also clear rendered features
+            const features = document.querySelectorAll('[id$="-features"]');
+            features.forEach(f => f.innerHTML = '');
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeClassGrid();
+            logSuccess('Test suite loaded. Select a class to begin testing.');
+        });
+
+        // Override console.error to catch any errors
+        const originalError = console.error;
+        console.error = function(...args) {
+            logError(`Console Error: ${args.join(' ')}`);
+            originalError.apply(console, args);
+        };
+    </script>
+</body>
+</html>

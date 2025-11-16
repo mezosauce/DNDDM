@@ -356,6 +356,15 @@ if __name__ == "__main__":
         background="Outlander",
         level=5
     )
+    bard = create_character(
+        class_type="Bard",
+        name="Jester Lavorre",
+        race="Tiefling",
+        char_class="Bard",
+        background="Entertainer",
+        level=5
+    )
+    
     
     print(f"Created: {barbarian}")
     print(f"Type: {type(barbarian).__name__}")
