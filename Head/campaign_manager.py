@@ -31,7 +31,8 @@ class Character:
     stats: Dict[str, int] = None
     inventory: List[str] = None
     notes: str = ""
-    
+    armor_worn: str = ""
+
     background_feature: str = ""  # Description of background feature
     background_equipment: List[str] = field(default_factory=list)  # Equipment from background
     
@@ -50,6 +51,8 @@ class Character:
     
     has_inspiration: bool = False
 
+    
+    
     skill_proficiencies: list = field(default_factory=list)
     saving_throw_proficiencies: list = field(default_factory=list)
     languages_known: list = field(default_factory=list)
@@ -62,7 +65,7 @@ class Character:
     
     def __post_init__(self):
         if self.stats is None:
-            self.stats = {
+            self.statsx = {
                 "strength": 10,
                 "dexterity": 10,
                 "constitution": 10,
