@@ -1,0 +1,163 @@
+{
+  "name": "Phase 3 Test Campaign",
+  "created_date": "2025-11-15T22:33:23.198325",
+  "current_phase": "setup",
+  "party_size": 2,
+  "characters": [
+    {
+      "name": "Test Grog",
+      "race": "Goliath",
+      "char_class": "Barbarian",
+      "background": "Outlander",
+      "level": 5,
+      "hp": 10,
+      "max_hp": 10,
+      "ac": 15,
+      "stats": {
+        "strength": 18,
+        "dexterity": 14,
+        "constitution": 16,
+        "intelligence": 8,
+        "wisdom": 10,
+        "charisma": 12
+      },
+      "inventory": [
+        "Greataxe",
+        "Handaxe",
+        "Javelin x4"
+      ],
+      "notes": "",
+      "background_feature": "",
+      "background_equipment": [],
+      "skill_proficiencies": [
+        "Athletics",
+        "Perception"
+      ],
+      "tool_proficiencies": [],
+      "languages_known": [
+        "Common"
+      ],
+      "personality_traits": [
+        "I'm driven by wanderlust"
+      ],
+      "ideal": "Freedom",
+      "bond": "My clan is everything",
+      "flaw": "I love ale too much",
+      "alignment": "Chaotic Neutral",
+      "has_inspiration": false,
+      "currency": {
+        "cp": 0,
+        "sp": 50,
+        "ep": 0,
+        "gp": 25,
+        "pp": 0
+      },
+      "primal_path": "",
+      "rages_per_day": 3,
+      "rages_used": 1,
+      "rage_damage": 2,
+      "currently_raging": false,
+      "unarmored_defense_active": true,
+      "danger_sense_active": true,
+      "reckless_attack_available": true,
+      "fast_movement": 10,
+      "feral_instinct": false,
+      "brutal_critical_dice": 0,
+      "relentless_rage_active": false,
+      "relentless_rage_dc": 10,
+      "persistent_rage": false,
+      "indomitable_might": false,
+      "primal_champion": false,
+      "frenzy_active": false,
+      "exhaustion_level": 0,
+      "mindless_rage": false,
+      "intimidating_presence_available": false,
+      "retaliation_available": false,
+      "path_feature_3": true,
+      "path_feature_6": false,
+      "path_feature_10": false,
+      "path_feature_14": false,
+      "class_type": "Barbarian"
+    },
+    {
+      "name": "Test Grog",
+      "race": "Goliath",
+      "char_class": "Barbarian",
+      "background": "Outlander",
+      "level": 5,
+      "hp": 10,
+      "max_hp": 10,
+      "ac": 15,
+      "stats": {
+        "strength": 18,
+        "dexterity": 14,
+        "constitution": 16,
+        "intelligence": 8,
+        "wisdom": 10,
+        "charisma": 12
+      },
+      "inventory": [
+        "Greataxe",
+        "Handaxe",
+        "Javelin x4"
+      ],
+      "notes": "",
+      "background_feature": "",
+      "background_equipment": [],
+      "skill_proficiencies": [
+        "Athletics",
+        "Perception"
+      ],
+      "tool_proficiencies": [],
+      "languages_known": [
+        "Common"
+      ],
+      "personality_traits": [
+        "I'm driven by wanderlust"
+      ],
+      "ideal": "Freedom",
+      "bond": "My clan is everything",
+      "flaw": "I love ale too much",
+      "alignment": "Chaotic Neutral",
+      "has_inspiration": false,
+      "currency": {
+        "cp": 0,
+        "sp": 50,
+        "ep": 0,
+        "gp": 25,
+        "pp": 0
+      },
+      "primal_path": "",
+      "rages_per_day": 3,
+      "rages_used": 1,
+      "rage_damage": 2,
+      "currently_raging": false,
+      "unarmored_defense_active": true,
+      "danger_sense_active": true,
+      "reckless_attack_available": true,
+      "fast_movement": 10,
+      "feral_instinct": false,
+      "brutal_critical_dice": 0,
+      "relentless_rage_active": false,
+      "relentless_rage_dc": 10,
+      "persistent_rage": false,
+      "indomitable_might": false,
+      "primal_champion": false,
+      "frenzy_active": false,
+      "exhaustion_level": 0,
+      "mindless_rage": false,
+      "intimidating_presence_available": false,
+      "retaliation_available": false,
+      "path_feature_3": true,
+      "path_feature_6": false,
+      "path_feature_10": false,
+      "path_feature_14": false,
+      "class_type": "Barbarian"
+    }
+  ],
+  "setup_complete": true,
+  "adventure_complete": false,
+  "preparation_complete": false,
+  "session_number": 0,
+  "description": "Testing Barbarian class implementation"
+}

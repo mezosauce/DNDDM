@@ -488,7 +488,7 @@ Add your campaign notes, world-building, and story hooks here.
         party_content = "\n## Party Composition\n\n"
         
         for char_data in campaign.characters:
-            char = Character(**char_data)
+            char = character_from_dict(char_data)
             
             party_content += f"""### {char.name}
 - **Race:** {char.race}

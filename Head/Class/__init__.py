@@ -7,15 +7,16 @@ Handles creation and serialization of class-specific Character objects
 from typing import Dict, Type, Any
 from dataclasses import asdict
 
-# Import all class implementations
-from Head.Class.barbarian import Barbarian
+Barbarian = None
+Bard = None
 
-# Try to import other classes (they may not exist yet)
-try:
-    from Head.Class.bard import Bard
-except ImportError:
-    Bard = None
-
+def _import_barbarian():
+    """Lazy import Barbarian to avoid circular dependency"""
+    global Barbarian
+    if Barbarian is None:
+        from Head.Class.barbarian import Barbarian as BarbarianClass
+        Barbarian = BarbarianClass
+    return Barbarian
 
 # ============================================================================
 # CLASS REGISTRY
@@ -23,9 +24,21 @@ except ImportError:
 
 # Registry mapping class names to class types
 # Character base class added lazily to avoid circular import
-CLASS_REGISTRY: Dict[str, Type] = {
-    "Barbarian": Barbarian,
-}
+
+CLASS_REGISTRY: Dict[str, Type] = {}
+
+def _initialize_registry():
+    """Initialize the registry with all available classes"""
+    if not CLASS_REGISTRY:
+        _import_barbarian()
+        #_import_bard()
+        
+        if Barbarian:
+            CLASS_REGISTRY["Barbarian"] = Barbarian
+        if Bard:
+            CLASS_REGISTRY["Bard"] = Bard
+
+
 
 # Add other classes if they exist
 if Bard:
@@ -40,6 +53,7 @@ def _get_base_character_class():
 
 def _ensure_character_in_registry():
     """Add Character to registry if not already present"""
+    _initialize_registry()
     if "Character" not in CLASS_REGISTRY:
         CLASS_REGISTRY["Character"] = _get_base_character_class()
 
@@ -128,9 +142,10 @@ def character_from_dict(data: Dict[str, Any]):
     # Backward compatibility: If no class_type, try to infer from char_class
     if not class_type:
         class_type = data.get('char_class', 'Character')
+    data_copy = data.copy()
+    data_copy.pop('class_type', None)
     
-    # Create character using factory
-    return create_character(class_type, **data)
+    return create_character(class_type, **data_copy)
 
 
 def get_available_classes() -> list:
