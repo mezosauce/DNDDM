@@ -9,6 +9,10 @@ from dataclasses import asdict
 
 Barbarian = None
 Bard = None
+Cleric = None
+Druid = None
+Fighter = None
+
 
 # ============================================================================
 # LAZY IMPORT HELPERS
@@ -38,6 +42,30 @@ def _import_cleric():
         Cleric = ClericClass
     return Cleric
 
+def _import_druid():
+    """Lazy import Druid to avoid circular dependency"""
+    global Druid
+    if Druid is None:
+        from Head.Class.druid import Druid as DruidClass
+        Druid = DruidClass
+    return Druid
+
+def _import_fighter():
+    """Lazy import Fighter to avoid circular dependency"""
+    global Fighter
+    if Fighter is None:
+        from Head.Class.fighter import Fighter as FighterClass
+        Fighter = FighterClass
+    return Fighter
+def _import_monk():
+    """Lazy import Monk to avoid circular dependency"""
+    global Monk
+    if Monk is None:
+        from Head.Class.monk import Monk as MonkClass
+        Monk = MonkClass
+    return Monk
+
+
 
 # ============================================================================
 # CLASS REGISTRY
@@ -54,6 +82,8 @@ def _initialize_registry():
         _import_barbarian()
         _import_bard()
         _import_cleric()
+        _import_druid()
+        _import_fighter()
 
         if Barbarian:
             CLASS_REGISTRY["Barbarian"] = Barbarian
@@ -61,6 +91,10 @@ def _initialize_registry():
             CLASS_REGISTRY["Bard"] = Bard
         if Cleric:
             CLASS_REGISTRY["Cleric"] = Cleric
+        if Druid:
+            CLASS_REGISTRY["Druid"] = Druid
+        if Fighter:
+            CLASS_REGISTRY["Fighter"] = Fighter
 
 
 def _get_base_character_class():
@@ -217,6 +251,9 @@ __all__ = [
     'Barbarian',
     'Bard',
     'Cleric',
+    'Druid',
+    'Fighter',
+    'Monk',
 ]
 
 

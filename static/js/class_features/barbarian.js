@@ -16,7 +16,7 @@ class BarbarianFeatureManager extends ClassFeatureManager {
     initialize(level, stats, subclass = '') {
         this.level = level;
         this.stats = stats || this.stats;
-        this.subclass = subclass;
+        this.   subclass = subclass;
         this.updateRageProgression();
         this.render();
     }
