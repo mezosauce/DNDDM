@@ -75,5 +75,194 @@
       "19": ["Ability Score Improvement"],
       "20": ["Primal Champion"]
     }
+  },
+  "Bard": {
+    "name": "Bard",
+    "description": "An inspiring magician whose power echoes the music of creation",
+    "hit_die": "d8",
+    "primary_abilities": ["Charisma"],
+    "saves": ["Dexterity", "Charisma"],
+    "armor_proficiencies": ["Light armor"],
+    "weapon_proficiencies": ["Simple weapons", "Hand crossbows", "Longswords", "Rapiers", "Shortswords"],
+    "tool_proficiencies": ["Three musical instruments of your choice"],
+    "skills": {
+      "choose": 3,
+      "from": "Any"
+    },
+    "starting_equipment": {
+      "choice_1": {
+        "desc": "Choose one",
+        "options": [
+          "Rapier",
+          "Longsword",
+          "Any simple weapon"
+        ]
+      },
+      "choice_2": {
+        "desc": "Choose one",
+        "options": [
+          "Diplomat's pack",
+          "Entertainer's pack"
+        ]
+      },
+      "choice_3": {
+        "desc": "Choose one",
+        "options": [
+          "Lute",
+          "Any other musical instrument"
+        ]
+      },
+      "default": [
+        "Leather armor",
+        "Dagger"
+      ]
+    },
+    "subclasses": {
+      "level": 3,
+      "name": "Bard College",
+      "options": [
+        {
+          "name": "College of Lore",
+          "description": "Bards of the College of Lore know something about most things, collecting bits of knowledge from sources as diverse as scholarly tomes and peasant tales."
+        },
+        {
+          "name": "College of Valor",
+          "description": "Bards of the College of Valor are daring skalds whose tales keep alive the memory of the great heroes of the past."
+        }
+      ]
+    },
+    "features_by_level": {
+      "1": ["Spellcasting", "Bardic Inspiration (d6)"],
+      "2": ["Jack of All Trades", "Song of Rest (d6)"],
+      "3": ["Bard College", "Expertise"],
+      "4": ["Ability Score Improvement"],
+      "5": ["Bardic Inspiration (d8)", "Font of Inspiration"],
+      "6": ["Countercharm", "Bard College Feature"],
+      "7": [],
+      "8": ["Ability Score Improvement"],
+      "9": ["Song of Rest (d8)"],
+      "10": ["Bardic Inspiration (d10)", "Expertise", "Magical Secrets"],
+      "11": [],
+      "12": ["Ability Score Improvement"],
+      "13": ["Song of Rest (d10)"],
+      "14": ["Magical Secrets", "Bard College Feature"],
+      "15": ["Bardic Inspiration (d12)"],
+      "16": ["Ability Score Improvement"],
+      "17": ["Song of Rest (d12)"],
+      "18": ["Magical Secrets"],
+      "19": ["Ability Score Improvement"],
+      "20": ["Superior Inspiration"]
+    }
+  },
+  "Cleric": {
+    "name": "Cleric",
+    "description": "A priestly champion who wields divine magic in service of a higher power",
+    "hit_die": "d8",
+    "primary_abilities": ["Wisdom"],
+    "saves": ["Wisdom", "Charisma"],
+    "armor_proficiencies": ["Light armor", "Medium armor", "Shields"],
+    "weapon_proficiencies": ["Simple weapons"],
+    "tool_proficiencies": [],
+    "skills": {
+      "choose": 2,
+      "from": [
+        "History",
+        "Insight",
+        "Medicine",
+        "Persuasion",
+        "Religion"
+      ]
+    },
+    "starting_equipment": {
+      "choice_1": {
+        "desc": "Choose one",
+        "options": [
+          "Mace",
+          "Warhammer (if proficient)"
+        ]
+      },
+      "choice_2": {
+        "desc": "Choose one",
+        "options": [
+          "Scale mail",
+          "Leather armor",
+          "Chain mail (if proficient)"
+        ]
+      },
+      "choice_3": {
+        "desc": "Choose one",
+        "options": [
+          "Light crossbow and 20 bolts",
+          "Any simple weapon"
+        ]
+      },
+      "choice_4": {
+        "desc": "Choose one",
+        "options": [
+          "Priest's pack",
+          "Explorer's pack"
+        ]
+      },
+      "default": [
+        "Shield",
+        "Holy symbol"
+      ]
+    },
+    "subclasses": {
+      "level": 1,
+      "name": "Divine Domain",
+      "options": [
+        {
+          "name": "Life Domain",
+          "description": "The Life domain focuses on the vibrant positive energy that sustains all life."
+        },
+        {
+          "name": "Knowledge Domain",
+          "description": "The gods of knowledge value learning and understanding above all."
+        },
+        {
+          "name": "Light Domain",
+          "description": "Gods of light promote the ideals of rebirth and renewal, truth, vigilance, and beauty."
+        },
+        {
+          "name": "Nature Domain",
+          "description": "Gods of nature are as varied as the natural world itself."
+        },
+        {
+          "name": "Tempest Domain",
+          "description": "Gods whose portfolios include the Tempest domain govern storms, sea, and sky."
+        },
+        {
+          "name": "Trickery Domain",
+          "description": "Gods of trickery are mischief-makers and instigators who stand as a constant challenge to the accepted order."
+        },
+        {
+          "name": "War Domain",
+          "description": "War has many manifestations, and the gods of war watch over warriors and reward them for their great deeds."
+        }
+      ]
+    },
+    "features_by_level": {
+      "1": ["Spellcasting", "Divine Domain"],
+      "2": ["Channel Divinity (1/rest)", "Divine Domain Feature"],
+      "3": [],
+      "4": ["Ability Score Improvement"],
+      "5": ["Destroy Undead (CR 1/2)"],
+      "6": ["Channel Divinity (2/rest)", "Divine Domain Feature"],
+      "7": [],
+      "8": ["Ability Score Improvement", "Destroy Undead (CR 1)", "Divine Domain Feature"],
+      "9": [],
+      "10": ["Divine Intervention"],
+      "11": ["Destroy Undead (CR 2)"],
+      "12": ["Ability Score Improvement"],
+      "13": [],
+      "14": ["Destroy Undead (CR 3)"],
+      "15": [],
+      "16": ["Ability Score Improvement"],
+      "17": ["Destroy Undead (CR 4)", "Divine Domain Feature"],
+      "18": ["Channel Divinity (3/rest)"],
+      "19": ["Ability Score Improvement"],
+      "20": ["Divine Intervention Improvement"]
+    }
   }
 }

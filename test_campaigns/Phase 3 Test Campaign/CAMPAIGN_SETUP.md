@@ -9,6 +9,11 @@
 
 
 
+
+
+
+
+
 ## Party Composition
 
 ### Test Grog
@@ -43,6 +48,191 @@
 **Background Feature:** None
 
 **Notes:** None
+
+---
+
+### Test Grog
+- **Race:** Goliath
+- **Class:** Barbarian
+- **Background:** Outlander
+- **Alignment:** Chaotic Neutral
+- **Level:** 5
+- **HP:** 10/10
+- **AC:** 15
+
+**Ability Scores:**
+- STR: 18 | DEX: 14 | CON: 16
+- INT: 8 | WIS: 10 | CHA: 12
+
+**Proficiencies:**
+- Skills: Athletics, Perception
+- Tools: None
+
+**Languages:** Common
+
+**Personality:**
+- Traits: I'm driven by wanderlust
+- Ideal: Freedom
+- Bond: My clan is everything
+- Flaw: I love ale too much
+
+**Currency:** 0pp, 25gp, 0ep, 50sp, 0cp (Total: 30.00 gp)
+
+**Inventory:** Greataxe, Handaxe, Javelin x4
+
+**Background Feature:** None
+
+**Notes:** None
+
+---
+
+---
+
+### Test Grog
+- **Race:** Goliath
+- **Class:** Barbarian
+- **Background:** Outlander
+- **Alignment:** Chaotic Neutral
+- **Level:** 5
+- **HP:** 10/10
+- **AC:** 15
+
+**Ability Scores:**
+- STR: 18 | DEX: 14 | CON: 16
+- INT: 8 | WIS: 10 | CHA: 12
+
+**Proficiencies:**
+- Skills: Athletics, Perception
+- Tools: None
+
+**Languages:** Common
+
+**Personality:**
+- Traits: I'm driven by wanderlust
+- Ideal: Freedom
+- Bond: My clan is everything
+- Flaw: I love ale too much
+
+**Currency:** 0pp, 25gp, 0ep, 50sp, 0cp (Total: 30.00 gp)
+
+**Inventory:** Greataxe, Handaxe, Javelin x4
+
+**Background Feature:** None
+
+**Notes:** None
+
+---
+
+---
+
+### Test Grog
+- **Race:** Goliath
+- **Class:** Barbarian
+- **Background:** Outlander
+- **Alignment:** Chaotic Neutral
+- **Level:** 5
+- **HP:** 10/10
+- **AC:** 15
+
+**Ability Scores:**
+- STR: 18 | DEX: 14 | CON: 16
+- INT: 8 | WIS: 10 | CHA: 12
+
+**Proficiencies:**
+- Skills: Athletics, Perception
+- Tools: None
+
+**Languages:** Common
+
+**Personality:**
+- Traits: I'm driven by wanderlust
+- Ideal: Freedom
+- Bond: My clan is everything
+- Flaw: I love ale too much
+
+**Currency:** 0pp, 25gp, 0ep, 50sp, 0cp (Total: 30.00 gp)
+
+**Inventory:** Greataxe, Handaxe, Javelin x4
+
+**Background Feature:** None
+
+**Notes:** None
+
+---
+
+---
+
+### Test Grog
+- **Race:** Goliath
+- **Class:** Barbarian
+- **Background:** Outlander
+- **Alignment:** Chaotic Neutral
+- **Level:** 5
+- **HP:** 10/10
+- **AC:** 15
+
+**Ability Scores:**
+- STR: 18 | DEX: 14 | CON: 16
+- INT: 8 | WIS: 10 | CHA: 12
+
+**Proficiencies:**
+- Skills: Athletics, Perception
+- Tools: None
+
+**Languages:** Common
+
+**Personality:**
+- Traits: I'm driven by wanderlust
+- Ideal: Freedom
+- Bond: My clan is everything
+- Flaw: I love ale too much
+
+**Currency:** 0pp, 25gp, 0ep, 50sp, 0cp (Total: 30.00 gp)
+
+**Inventory:** Greataxe, Handaxe, Javelin x4
+
+**Background Feature:** None
+
+**Notes:** None
+
+---
+
+---
+
+### Test Grog
+- **Race:** Goliath
+- **Class:** Barbarian
+- **Background:** Outlander
+- **Alignment:** Chaotic Neutral
+- **Level:** 5
+- **HP:** 10/10
+- **AC:** 15
+
+**Ability Scores:**
+- STR: 18 | DEX: 14 | CON: 16
+- INT: 8 | WIS: 10 | CHA: 12
+
+**Proficiencies:**
+- Skills: Athletics, Perception
+- Tools: None
+
+**Languages:** Common
+
+**Personality:**
+- Traits: I'm driven by wanderlust
+- Ideal: Freedom
+- Bond: My clan is everything
+- Flaw: I love ale too much
+
+**Currency:** 0pp, 25gp, 0ep, 50sp, 0cp (Total: 30.00 gp)
+
+**Inventory:** Greataxe, Handaxe, Javelin x4
+
+**Background Feature:** None
+
+**Notes:** None
+
+---
 
 ---
 

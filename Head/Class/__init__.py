@@ -10,6 +10,10 @@ from dataclasses import asdict
 Barbarian = None
 Bard = None
 
+# ============================================================================
+# LAZY IMPORT HELPERS
+# ===========================================================================
+
 def _import_barbarian():
     """Lazy import Barbarian to avoid circular dependency"""
     global Barbarian
@@ -17,6 +21,23 @@ def _import_barbarian():
         from Head.Class.barbarian import Barbarian as BarbarianClass
         Barbarian = BarbarianClass
     return Barbarian
+
+def _import_bard():
+    """Lazy import Bard to avoid circular dependency"""
+    global Bard
+    if Bard is None:
+        from Head.Class.bard import Bard as BardClass
+        Bard = BardClass
+    return Bard
+
+def _import_cleric():
+    """Lazy import Cleric to avoid circular dependency"""
+    global Cleric
+    if Cleric is None:
+        from Head.Class.cleric import Cleric as ClericClass
+        Cleric = ClericClass
+    return Cleric
+
 
 # ============================================================================
 # CLASS REGISTRY
@@ -31,18 +52,15 @@ def _initialize_registry():
     """Initialize the registry with all available classes"""
     if not CLASS_REGISTRY:
         _import_barbarian()
-        #_import_bard()
-        
+        _import_bard()
+        _import_cleric()
+
         if Barbarian:
             CLASS_REGISTRY["Barbarian"] = Barbarian
         if Bard:
             CLASS_REGISTRY["Bard"] = Bard
-
-
-
-# Add other classes if they exist
-if Bard:
-    CLASS_REGISTRY["Bard"] = Bard
+        if Cleric:
+            CLASS_REGISTRY["Cleric"] = Cleric
 
 
 def _get_base_character_class():
@@ -195,7 +213,10 @@ __all__ = [
     'character_from_dict',
     'get_available_classes',
     'is_class_available',
+    
     'Barbarian',
+    'Bard',
+    'Cleric',
 ]
 
 
