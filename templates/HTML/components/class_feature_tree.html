@@ -1,0 +1,144 @@
+<!-- 
+    Class Feature Tree Component
+    Reusable component for displaying class features by level
+    Can be included in character sheets and creation forms
+-->
+
+<div class="feature-tree-component">
+    <div class="feature-tree-header">
+        <h3 style="color: #51cf66; margin: 0;">📊 Feature Progression</h3>
+        <div class="feature-tree-legend">
+            <span class="legend-item">
+                <span class="legend-dot unlocked"></span> Unlocked
+            </span>
+            <span class="legend-item">
+                <span class="legend-dot locked"></span> Locked
+            </span>
+        </div>
+    </div>
+
+    <div id="feature-tree-container" class="feature-tree">
+        <!-- Features will be dynamically inserted here by JavaScript -->
+    </div>
+</div>
+
+<style>
+/* Feature Tree Component Styles */
+.feature-tree-component {
+    background: rgba(0, 0, 0, 0.2);
+    border: 2px solid #4a4a6a;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.feature-tree-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #4a4a6a;
+}
+
+.feature-tree-legend {
+    display: flex;
+    gap: 15px;
+    font-size: 0.85em;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #b0b0b0;
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.legend-dot.unlocked {
+    background: #51cf66;
+    box-shadow: 0 0 5px rgba(81, 207, 102, 0.5);
+}
+
+.legend-dot.locked {
+    background: #666;
+}
+
+/* Animation for newly unlocked features */
+@keyframes featureUnlock {
+    0% {
+        transform: scale(0.95);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.feature-node.newly-unlocked {
+    animation: featureUnlock 0.6s ease-out;
+}
+</style>
+
+<script>
+/**
+ * Populate feature tree with class features
+ * @param {Array} features - Array of feature objects with {level, name, desc}
+ * @param {number} currentLevel - Current character level
+ */
+function populateFeatureTree(features, currentLevel) {
+    const container = document.getElementById('feature-tree-container');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    features.forEach(feature => {
+        const unlocked = currentLevel >= feature.level;
+        const node = document.createElement('div');
+        node.className = `feature-node ${unlocked ? 'unlocked' : 'locked'}`;
+        
+        node.innerHTML = `
+            <div class="feature-level">Lv ${feature.level}</div>
+            <div style="flex: 1;">
+                <div class="feature-name">${feature.name}</div>
+                <div class="feature-desc">${feature.desc}</div>
+            </div>
+        `;
+
+        container.appendChild(node);
+    });
+}
+
+/**
+ * Update feature tree when level changes
+ */
+function updateFeatureTreeLevel(newLevel) {
+    const nodes = document.querySelectorAll('.feature-node');
+    nodes.forEach(node => {
+        const levelText = node.querySelector('.feature-level').textContent;
+        const requiredLevel = parseInt(levelText.replace('Lv ', ''));
+        
+        const wasLocked = node.classList.contains('locked');
+        const shouldBeUnlocked = newLevel >= requiredLevel;
+        
+        if (wasLocked && shouldBeUnlocked) {
+            node.classList.remove('locked');
+            node.classList.add('unlocked', 'newly-unlocked');
+            setTimeout(() => node.classList.remove('newly-unlocked'), 600);
+        } else if (!wasLocked && !shouldBeUnlocked) {
+            node.classList.remove('unlocked');
+            node.classList.add('locked');
+        }
+    });
+}
+</script>

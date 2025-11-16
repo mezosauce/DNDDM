@@ -125,7 +125,7 @@ def register_phase1_routes(app, campaign_mgr, Character):
             
             # Use factory to create the correct class instance
             character = create_character(
-                class_type=class_type,
+                class_type=data.get('class', 'Character'),
                 name=data['name'],
                 race=data['race'],
                 char_class=data['class'],
