@@ -89,6 +89,29 @@ def _import_rogue():
         from Head.Class.rogue import Rogue as RogueClass
         Rogue = RogueClass
     return Rogue
+def _import_sorcerer():
+    """Lazy import Sorcerer to avoid circular dependency"""
+    global Sorcerer
+    if Sorcerer is None:
+        from Head.Class.sorcerer import Sorcerer as SorcererClass
+        Sorcerer = SorcererClass
+    return Sorcerer
+
+def _import_warlock():
+    """Lazy import Warlock to avoid circular dependency"""
+    global Warlock
+    if Warlock is None:
+        from Head.Class.warlock import Warlock as WarlockClass
+        Warlock = WarlockClass
+    return Warlock
+def _import_wizard():
+    """Lazy import Wizard to avoid circular dependency"""
+    global Wizard
+    if Wizard is None:
+        from Head.Class.wizard import Wizard as WizardClass
+        Wizard = WizardClass
+    return Wizard
+
 
 
 # ============================================================================
@@ -112,6 +135,9 @@ def _initialize_registry():
         _import_paladin()
         _import_ranger()
         _import_rogue()
+        _import_sorcerer()
+        _import_warlock()
+        _import_wizard()
 
         if Barbarian:
             CLASS_REGISTRY["Barbarian"] = Barbarian
@@ -131,6 +157,13 @@ def _initialize_registry():
             CLASS_REGISTRY["Ranger"] = Ranger
         if Rogue:
             CLASS_REGISTRY["Rogue"] = Rogue
+        if Sorcerer:
+            CLASS_REGISTRY["Sorcerer"] = Sorcerer
+        if Warlock:
+            CLASS_REGISTRY["Warlock"] = Warlock
+        if Wizard:
+            CLASS_REGISTRY["Wizard"] = Wizard
+
 
 
 def _get_base_character_class():
@@ -290,6 +323,12 @@ __all__ = [
     'Druid',
     'Fighter',
     'Monk',
+    'Paladin',
+    'Ranger',
+    'Rogue',
+    'Sorcerer',
+    'Warlock',
+    'Wizard',
 ]
 
 
