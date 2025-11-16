@@ -49,8 +49,15 @@ class Character:
     alignment: str = "True Neutral"  # Default alignment
     
     has_inspiration: bool = False
+
+    skill_proficiencies: list = field(default_factory=list)
+    saving_throw_proficiencies: list = field(default_factory=list)
+    languages_known: list = field(default_factory=list)
+
+    inventory: list = field(default_factory=list)
+    currency: dict = field(default_factory=lambda: {"gp": 0, "sp": 0, "cp": 0})
+
     
-    # NEW: Currency (D&D 5e standard denominations)
     currency: Dict[str, int] = None  # {'cp': 0, 'sp': 0, 'ep': 0, 'gp': 0, 'pp': 0}
     
     def __post_init__(self):

@@ -57,6 +57,7 @@ def _import_fighter():
         from Head.Class.fighter import Fighter as FighterClass
         Fighter = FighterClass
     return Fighter
+
 def _import_monk():
     """Lazy import Monk to avoid circular dependency"""
     global Monk
@@ -65,6 +66,29 @@ def _import_monk():
         Monk = MonkClass
     return Monk
 
+def _import_paladin():
+    """Lazy import Paladin to avoid circular dependency"""
+    global Paladin
+    if Paladin is None:
+        from Head.Class.paladin import Paladin as PaladinClass
+        Paladin = PaladinClass
+    return Paladin
+
+def _import_ranger():
+    """Lazy import Ranger to avoid circular dependency"""
+    global Ranger
+    if Ranger is None:
+        from Head.Class.ranger import Ranger as RangerClass
+        Ranger = RangerClass
+    return Ranger
+
+def _import_rogue():
+    """Lazy import Rogue to avoid circular dependency"""
+    global Rogue
+    if Rogue is None:
+        from Head.Class.rogue import Rogue as RogueClass
+        Rogue = RogueClass
+    return Rogue
 
 
 # ============================================================================
@@ -84,6 +108,10 @@ def _initialize_registry():
         _import_cleric()
         _import_druid()
         _import_fighter()
+        _import_monk()
+        _import_paladin()
+        _import_ranger()
+        _import_rogue()
 
         if Barbarian:
             CLASS_REGISTRY["Barbarian"] = Barbarian
@@ -95,6 +123,14 @@ def _initialize_registry():
             CLASS_REGISTRY["Druid"] = Druid
         if Fighter:
             CLASS_REGISTRY["Fighter"] = Fighter
+        if Monk:
+            CLASS_REGISTRY["Monk"] = Monk
+        if Paladin:
+            CLASS_REGISTRY["Paladin"] = Paladin
+        if Ranger:
+            CLASS_REGISTRY["Ranger"] = Ranger
+        if Rogue:
+            CLASS_REGISTRY["Rogue"] = Rogue
 
 
 def _get_base_character_class():
