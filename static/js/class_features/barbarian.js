@@ -3,9 +3,9 @@
  * Handles Barbarian-specific displays: Rage, Unarmored Defense, Feature Tree
  */
 // API base used by frontend to reach the backend service.
-// If your frontend is served from a different origin than the API server,
-// set `window.API_BASE` (e.g. in a template) or let it default to localhost:5005
-const API_BASE = (typeof window !== 'undefined' && window.API_BASE) ? window.API_BASE : 'http://localhost:5005';
+// Defaults to "/" (same origin) so it works when served from the same Flask app.
+// Override with window.API_BASE if needed for cross-origin use.
+const API_BASE = (typeof window !== 'undefined' && window.API_BASE) ? window.API_BASE : '';
 
 class BarbarianFeatureManager extends ClassFeatureManager {
     constructor() {

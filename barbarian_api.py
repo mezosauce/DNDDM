@@ -1,143 +1,160 @@
-#!/usr/bin/env python3
-"""
-Minimal Flask API to expose Barbarian actions for the frontend.
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from barbarian import Barbarian
 
-Run with: `python barbarian_api.py` and visit the frontend pages that use the JS.
-This keeps state in-memory for simple integration/testing.
-"""
-from flask import Flask, jsonify, request
-from Head.Class.barbarian import Barbarian
-from typing import Dict
+app = FastAPI(title="Barbarian API")
 
-app = Flask(__name__)
+# ---------------------------
+# CORS (allow frontend access)
+# ---------------------------
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# In-memory store of characters by name
-_CHARACTERS: Dict[str, Barbarian] = {}
-
-
-def serialize_barbarian(b: Barbarian):
-    return b.get_character_sheet()
-
-
-# Add simple CORS headers so browser pages served from other origins can call this API
-@app.after_request
-def _add_cors(response):
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-    return response
+# ---------------------------
+# In-memory database
+# ---------------------------
+BARBARIANS = {}
 
 
-@app.route('/api/barbarians', methods=['GET'])
-def list_barbarians():
-    print(f"[API] GET /api/barbarians -> {list(_CHARACTERS.keys())}")
-    return jsonify({'barbarians': list(_CHARACTERS.keys())})
+# ---------------------------
+# Pydantic Models
+# ---------------------------
+class CreateBarbarianRequest(BaseModel):
+    level: int = 1
+    stats: dict = None
+    race: str = "Human"
+    background: str = ""
 
 
-@app.route('/api/barbarian/<name>', methods=['GET'])
-def get_barbarian(name):
-    print(f"[API] GET /api/barbarian/{name}")
-    b = _CHARACTERS.get(name)
-    if not b:
-        print(f"[API] -> 404 not found: {name}")
-        return jsonify({'error': 'Not found'}), 404
-    return jsonify(serialize_barbarian(b))
+class UpdateStatsRequest(BaseModel):
+    stats: dict
 
 
-@app.route('/api/barbarian/<name>/create', methods=['POST'])
-def create_barbarian(name):
-    data = request.json or {}
-    print(f"[API] POST /api/barbarian/{name}/create payload={data}")
-    if name in _CHARACTERS:
-        print(f"[API] -> already exists: {name}")
-        return jsonify({'error': 'Already exists'}), 400
+class SetLevelRequest(BaseModel):
+    level: int
 
-    stats = data.get('stats', {
-        'strength': 15,
-        'dexterity': 13,
-        'constitution': 14,
-        'intelligence': 10,
-        'wisdom': 12,
-        'charisma': 8
-    })
 
-    b = Barbarian(
+# ---------------------------
+# ROUTES
+# ---------------------------
+
+@app.get("/")
+def root():
+    return {
+        "status": "online",
+        "message": "Barbarian FastAPI running",
+        "endpoints": [
+            "/api/barbarian/{name}",
+            "/api/barbarian/{name}/create",
+            "/api/barbarian/{name}/enter_rage",
+            "/api/barbarian/{name}/end_rage",
+            "/api/barbarian/{name}/long_rest",
+            "/api/barbarian/{name}/update_stats",
+            "/api/barbarian/{name}/set_level",
+        ],
+    }
+
+
+@app.get("/api/barbarian/{name}")
+def get_barbarian(name: str):
+    name = name.lower()
+    if name not in BARBARIANS:
+        raise HTTPException(status_code=404, detail="Character not found")
+
+    return BARBARIANS[name].get_character_sheet()
+
+
+@app.post("/api/barbarian/{name}/create")
+def create_barbarian(name: str, request: CreateBarbarianRequest):
+    name = name.lower()
+
+    stats = request.stats or {
+        "strength": 15,
+        "dexterity": 13,
+        "constitution": 14,
+        "intelligence": 10,
+        "wisdom": 12,
+        "charisma": 8
+    }
+
+    bar = Barbarian(
         name=name,
-        race=data.get('race', 'Human'),
-        char_class='Barbarian',
-        background=data.get('background', ''),
-        level=int(data.get('level', 1)),
-        stats=stats,
-        alignment=data.get('alignment', 'True Neutral')
+        race=request.race,
+        background=request.background,
+        level=request.level,
+        stats=stats
     )
 
-    _CHARACTERS[name] = b
-    return jsonify({'success': True, 'character': serialize_barbarian(b)})
+    BARBARIANS[name] = bar
+
+    return {"status": "created", "sheet": bar.get_character_sheet()}
 
 
-@app.route('/api/barbarian/<name>/enter_rage', methods=['POST'])
-def api_enter_rage(name):
-    print(f"[API] POST /api/barbarian/{name}/enter_rage")
-    b = _CHARACTERS.get(name)
-    if not b:
-        print(f"[API] -> 404 not found: {name}")
-        return jsonify({'error': 'Not found'}), 404
-    ok = b.enter_rage()
-    return jsonify({'success': bool(ok), 'rages_used': b.rages_used, 'currently_raging': b.currently_raging})
+@app.post("/api/barbarian/{name}/enter_rage")
+def enter_rage(name: str):
+    name = name.lower()
+
+    if name not in BARBARIANS:
+        raise HTTPException(status_code=404, detail="Character not found")
+
+    success = BARBARIANS[name].enter_rage()
+
+    return {"success": success, "sheet": BARBARIANS[name].get_character_sheet()}
 
 
-@app.route('/api/barbarian/<name>/end_rage', methods=['POST'])
-def api_end_rage(name):
-    print(f"[API] POST /api/barbarian/{name}/end_rage")
-    b = _CHARACTERS.get(name)
-    if not b:
-        print(f"[API] -> 404 not found: {name}")
-        return jsonify({'error': 'Not found'}), 404
-    b.end_rage()
-    return jsonify({'success': True, 'currently_raging': b.currently_raging})
+@app.post("/api/barbarian/{name}/end_rage")
+def end_rage(name: str):
+    name = name.lower()
+
+    if name not in BARBARIANS:
+        raise HTTPException(status_code=404, detail="Character not found")
+
+    BARBARIANS[name].end_rage()
+
+    return {"status": "rage_ended", "sheet": BARBARIANS[name].get_character_sheet()}
 
 
-@app.route('/api/barbarian/<name>/long_rest', methods=['POST'])
-def api_long_rest(name):
-    print(f"[API] POST /api/barbarian/{name}/long_rest")
-    b = _CHARACTERS.get(name)
-    if not b:
-        print(f"[API] -> 404 not found: {name}")
-        return jsonify({'error': 'Not found'}), 404
-    b.long_rest()
-    return jsonify({'success': True, 'rages_used': b.rages_used, 'hp': b.hp})
+@app.post("/api/barbarian/{name}/long_rest")
+def long_rest(name: str):
+    name = name.lower()
+
+    if name not in BARBARIANS:
+        raise HTTPException(status_code=404, detail="Character not found")
+
+    BARBARIANS[name].long_rest()
+
+    return {"status": "long_rest", "sheet": BARBARIANS[name].get_character_sheet()}
 
 
-@app.route('/api/barbarian/<name>/set_level', methods=['POST'])
-def api_set_level(name):
-    data = request.json or {}
-    print(f"[API] POST /api/barbarian/{name}/set_level payload={data}")
-    level = int(data.get('level', 1))
-    b = _CHARACTERS.get(name)
-    if not b:
-        print(f"[API] -> 404 not found: {name}")
-        return jsonify({'error': 'Not found'}), 404
-    b.level = level
-    b.apply_level_features()
-    return jsonify({'success': True, 'level': b.level, 'rages_per_day': b.rages_per_day})
+@app.post("/api/barbarian/{name}/update_stats")
+def update_stats(name: str, request: UpdateStatsRequest):
+    name = name.lower()
+
+    if name not in BARBARIANS:
+        raise HTTPException(status_code=404, detail="Character not found")
+
+    BARBARIANS[name].stats.update(request.stats)
+    BARBARIANS[name].calculate_unarmored_defense()
+
+    return {"status": "stats_updated", "sheet": BARBARIANS[name].get_character_sheet()}
 
 
-@app.route('/api/barbarian/<name>/update_stats', methods=['POST'])
-def api_update_stats(name):
-    data = request.json or {}
-    stats = data.get('stats')
-    print(f"[API] POST /api/barbarian/{name}/update_stats payload={data}")
-    b = _CHARACTERS.get(name)
-    if not b:
-        print(f"[API] -> 404 not found: {name}")
-        return jsonify({'error': 'Not found'}), 404
-    if not isinstance(stats, dict):
-        return jsonify({'error': 'Invalid stats payload'}), 400
-    b.stats.update(stats)
-    if b.unarmored_defense_active:
-        b.calculate_unarmored_defense()
-    return jsonify({'success': True, 'stats': b.stats, 'ac': b.ac})
+@app.post("/api/barbarian/{name}/set_level")
+def set_level(name: str, request: SetLevelRequest):
+    name = name.lower()
 
+    if name not in BARBARIANS:
+        raise HTTPException(status_code=404, detail="Character not found")
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5005, debug=True)
+    target = request.level
+
+    while BARBARIANS[name].level < target:
+        BARBARIANS[name].level_up()
+
+    return {"status": "level_updated", "sheet": BARBARIANS[name].get_character_sheet()}
