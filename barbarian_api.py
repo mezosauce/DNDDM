@@ -1,8 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from barbarian import Barbarian
-
+from Head.Class.barbarian import Barbarian
+rffffffffffffffffffdtgfrrrrrrrrrrrrrrrrrr
 app = FastAPI(title="Barbarian API")
 
 # ---------------------------
@@ -44,7 +44,7 @@ class SetLevelRequest(BaseModel):
 # ROUTES
 # ---------------------------
 
-@app.get("/")
+@app.get("/docs")
 def root():
     return {
         "status": "online",
