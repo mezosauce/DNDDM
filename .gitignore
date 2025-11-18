@@ -78,3 +78,7 @@ _trash/
 .vs/DNDDM/CopilotIndices/17.14.1368.60722/CodeChunks.db-wal
 .vs/DNDDM/CopilotIndices/17.14.1368.60722/CodeChunks.db-shm
 .vs/DNDDM/FileContentIndex/d8a1857a-c2e1-407d-a10f-32b0333c73e8.vsidx
+*.vsidx
+*.config
+.vs/DNDDM/FileContentIndex/c13510e8-8e4f-4695-afd6-cc2d1fc70d82.vsidx
+.vs/DNDDM/FileContentIndex/437a55c0-2cc8-4997-a55d-9435deb41bd2.vsidx

@@ -1,0 +1,814 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barbarian API Test Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3a52 0%, #2d5a7a 100%);
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+            .test-section h2 {
+                color: #ffa500;
+                margin-bottom: 15px;
+                border-bottom: 2px solid #ffa500;
+                padding-bottom: 5px;
+            }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+            button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            }
+
+            button:disabled {
+                background: #666;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+            button.success {
+                background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
+            }
+
+            button.info {
+                background: linear-gradient(135deg, #339af0 0%, #1c7ed6 100%);
+            }
+
+        input, select {
+            padding: 10px;
+            border: 2px solid #ffa500;
+            border-radius: 5px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.9);
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .response-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #ffa500;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+            .response-box.success {
+                border-left-color: #51cf66;
+            }
+
+            .response-box.error {
+                border-left-color: #ff6b6b;
+            }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+            .status-indicator.online {
+                background: #51cf66;
+                box-shadow: 0 0 10px #51cf66;
+            }
+
+            .status-indicator.offline {
+                background: #ff6b6b;
+                box-shadow: 0 0 10px #ff6b6b;
+            }
+
+        #character-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+        }
+
+            .stat-card h3 {
+                color: #ffa500;
+                margin-bottom: 10px;
+                font-size: 1.2em;
+            }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        #barbarian-features {
+            margin-top: 20px;
+        }
+
+        .resource-tracker {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .resource-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffa500;
+        }
+
+        .resource-bar {
+            background: rgba(0, 0, 0, 0.3);
+            height: 40px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .resource-fill {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: width 0.3s;
+        }
+
+        .calculation-display {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .calculation-formula {
+            font-family: 'Courier New', monospace;
+            color: #aaa;
+            margin: 10px 0;
+        }
+
+        .calculation-result {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #51cf66;
+        }
+
+        .feature-tree {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .feature-node {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 4px solid #666;
+        }
+
+            .feature-node.unlocked {
+                border-left-color: #51cf66;
+                background: rgba(81, 207, 102, 0.1);
+            }
+
+        .feature-level {
+            background: rgba(255, 165, 0, 0.3);
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        .feature-name {
+            font-weight: bold;
+            color: #ffa500;
+        }
+
+        .feature-desc {
+            color: #aaa;
+            font-size: 0.9em;
+            margin-top: 3px;
+        }
+
+        .ability-card-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffa500;
+        }
+
+        .log-entry {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 3px solid #339af0;
+        }
+
+            .log-entry.success {
+                border-left-color: #51cf66;
+            }
+
+            .log-entry.error {
+                border-left-color: #ff6b6b;
+            }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚔️ Barbarian API Test Suite ⚔️</h1>
+
+        <!-- API Status -->
+        <div class="test-section">
+            <h2>API Status</h2>
+            <div>
+                <span class="status-indicator" id="api-status"></span>
+                <span id="api-status-text">Checking connection...</span>
+                <button onclick="checkApiStatus()" class="info">Check Connection</button>
+            </div>
+            <div style="margin-top: 10px;">
+                <label>API URL: </label>
+                <input type="text" id="api-url" value="http://localhost:5000" style="width: 300px;">
+            </div>
+        </div>
+
+        <!-- Character Creation -->
+        <div class="test-section">
+            <h2>1. Character Creation</h2>
+            <div>
+                <input type="text" id="char-name" placeholder="Character Name" value="Grog">
+                <input type="text" id="char-race" placeholder="Race" value="Goliath">
+                <input type="number" id="char-level" placeholder="Level" value="1" min="1" max="20">
+            </div>
+            <div class="button-group">
+                <button onclick="createCharacter()">Create Character</button>
+                <button onclick="getCharacter()" class="info">Get Character</button>
+                <button onclick="deleteCharacter()" class="error">Delete Character</button>
+            </div>
+            <div id="create-response" class="response-box"></div>
+        </div>
+
+        <!-- Character Display -->
+        <div class="test-section">
+            <h2>Character Information</h2>
+            <div id="character-display">
+                <div class="stat-card">
+                    <h3>Name</h3>
+                    <div class="stat-value" id="display-name">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Level</h3>
+                    <div class="stat-value" id="display-level">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>HP</h3>
+                    <div class="stat-value" id="display-hp">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>AC</h3>
+                    <div class="stat-value" id="display-ac">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rage Mechanics -->
+        <div class="test-section">
+            <h2>2. Rage Mechanics</h2>
+            <div class="button-group">
+                <button onclick="enterRage()">🔥 Enter Rage</button>
+                <button onclick="endRage()">End Rage</button>
+                <button onclick="getRageBenefits()" class="info">Get Rage Benefits</button>
+            </div>
+            <div id="rage-response" class="response-box"></div>
+        </div>
+
+        <!-- Barbarian Features UI -->
+        <div class="test-section">
+            <h2>3. Barbarian Features (Live UI)</h2>
+            <div id="barbarian-features">
+                <p>Initialize character to see features...</p>
+            </div>
+        </div>
+
+        <!-- Stats & Level -->
+        <div class="test-section">
+            <h2>4. Stats & Level Management</h2>
+            <div>
+                <label>STR:</label>
+                <input type="number" id="stat-str" value="17" min="1" max="30">
+                <label>DEX:</label>
+                <input type="number" id="stat-dex" value="14" min="1" max="30">
+                <label>CON:</label>
+                <input type="number" id="stat-con" value="16" min="1" max="30">
+            </div>
+            <div>
+                <label>INT:</label>
+                <input type="number" id="stat-int" value="8" min="1" max="30">
+                <label>WIS:</label>
+                <input type="number" id="stat-wis" value="10" min="1" max="30">
+                <label>CHA:</label>
+                <input type="number" id="stat-cha" value="12" min="1" max="30">
+            </div>
+            <div class="button-group" style="margin-top: 10px;">
+                <button onclick="updateStats()">Update Stats</button>
+                <button onclick="setLevel()" class="success">Set Level</button>
+            </div>
+            <div id="stats-response" class="response-box"></div>
+        </div>
+
+        <!-- Rest & Recovery -->
+        <div class="test-section">
+            <h2>5. Rest & Recovery</h2>
+            <div class="button-group">
+                <button onclick="longRest()" class="success">✨ Long Rest</button>
+            </div>
+            <div id="rest-response" class="response-box"></div>
+        </div>
+
+        <!-- Advanced Operations -->
+        <div class="test-section">
+            <h2>6. Advanced Operations</h2>
+            <div>
+                <select id="primal-path">
+                    <option value="">Choose Primal Path...</option>
+                    <option value="Path of the Berserker">Path of the Berserker</option>
+                    <option value="Path of the Totem Warrior">Path of the Totem Warrior</option>
+                </select>
+            </div>
+            <div class="button-group">
+                <button onclick="setPrimalPath()">Set Primal Path</button>
+                <button onclick="getCharacterSheet()" class="info">Get Character Sheet</button>
+                <button onclick="listAllCharacters()" class="info">List All Characters</button>
+            </div>
+            <div id="advanced-response" class="response-box"></div>
+        </div>
+
+        <!-- Activity Log -->
+        <div class="test-section">
+            <h2>Activity Log</h2>
+            <div id="activity-log"></div>
+            <button onclick="clearLog()" class="info" style="margin-top: 10px;">Clear Log</button>
+        </div>
+    </div>
+
+    <!-- Include the Barbarian JavaScript -->
+    <script>
+        // Helper functions (mimics what would be in a shared utils file)
+        function calculateModifier(score) {
+            return Math.floor((score - 10) / 2);
+        }
+
+        function formatModifier(mod) {
+            return mod >= 0 ? `+${mod}` : `${mod}`;
+        }
+
+        // Base ClassFeatureManager (simplified)
+        class ClassFeatureManager {
+            constructor(className) {
+                this.className = className;
+                this.level = 1;
+            }
+
+            isFeatureUnlocked(level) {
+                return this.level >= level;
+            }
+        }
+    </script>
+
+    <!-- Copy the barbarian.js content here or include it -->
+    <script src="/static/js/class_features/barbarian.js"></script>
+
+    <!-- Test page functionality -->
+    <script>
+        const API_BASE = () => document.getElementById('api-url').value;
+
+        let barbarianManager = null;
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            checkApiStatus();
+        });
+
+        // Logging
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('activity-log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.insertBefore(entry, logDiv.firstChild);
+        }
+
+        function clearLog() {
+            document.getElementById('activity-log').innerHTML = '';
+        }
+
+        // API Status
+        async function checkApiStatus() {
+            const indicator = document.getElementById('api-status');
+            const text = document.getElementById('api-status-text');
+
+            try {
+                const response = await fetch(`${API_BASE()}/`);
+                if (response.ok) {
+                    indicator.className = 'status-indicator online';
+                    text.textContent = 'API Online';
+                    log('API connection successful', 'success');
+                } else {
+                    throw new Error('API returned error');
+                }
+            } catch (error) {
+                indicator.className = 'status-indicator offline';
+                text.textContent = 'API Offline - Make sure Flask server is running';
+                log('API connection failed: ' + error.message, 'error');
+            }
+        }
+
+        // Character Creation
+        async function createCharacter() {
+            const name = document.getElementById('char-name').value;
+            const race = document.getElementById('char-race').value;
+            const level = parseInt(document.getElementById('char-level').value);
+
+            const stats = {
+                strength: parseInt(document.getElementById('stat-str').value),
+                dexterity: parseInt(document.getElementById('stat-dex').value),
+                constitution: parseInt(document.getElementById('stat-con').value),
+                intelligence: parseInt(document.getElementById('stat-int').value),
+                wisdom: parseInt(document.getElementById('stat-wis').value),
+                charisma: parseInt(document.getElementById('stat-cha').value)
+            };
+
+            try {
+                const response = await fetch(`${API_BASE()}/api/barbarian/${encodeURIComponent(name)}/create`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({race, level, stats})
+                });
+
+                const data = await response.json();
+                document.getElementById('create-response').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('create-response').className = `response-box ${response.ok ? 'success' : 'error'}`;
+
+                if (response.ok) {
+                    log(`Character created: ${name}`, 'success');
+                    updateDisplay(data);
+                    initializeBarbarianUI(name, level, stats);
+                } else {
+                    log(`Failed to create character: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function getCharacter() {
+            const name = document.getElementById('char-name').value;
+
+            try {
+                const response = await fetch(`${API_BASE()}/api/barbarian/${encodeURIComponent(name)}`);
+                const data = await response.json();
+
+                document.getElementById('create-response').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('create-response').className = `response-box ${response.ok ? 'success' : 'error'}`;
+
+                if (response.ok) {
+                    log(`Character loaded: ${name}`, 'success');
+                    updateDisplay(data);
+                    initializeBarbarianUI(name, data.level, data.stats, data.primal_path);
+                } else {
+                    log(`Failed to get character: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteCharacter() {
+            const name = document.getElementById('char-name').value;
+
+            if (!confirm(`Delete character "${name}"?`)) return;
+
+            try {
+                const response = await fetch(`${API_BASE()}/api/barbarian/${encodeURIComponent(name)}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+
+                document.getElementById('create-response').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('create-response').className = `response-box ${response.ok ? 'success' : 'error'}`;
+
+                if (response.ok) {
+                    log(`Character deleted: ${name}`, 'success');
+                } else {
+                    log(`Failed to delete character: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Rage Mechanics
+        async function enterRage() {
+            const name = document.getElementById('char-name').value;
+
+            try {
+                const response = await fetch(`${API_BASE()}/api/barbarian/${encodeURIComponent(name)}/enter_rage`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                document.getElementById('rage-response').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('rage-response').className = `response-box ${response.ok ? 'success' : 'error'}`;
+
+                if (response.ok) {
+                    log('🔥 RAGE ACTIVATED!', 'success');
+                } else {
+                    log(`Failed to enter rage: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function endRage() {
+            const name = document.getElementById('char-name').value;
+
+            try {
+                const response = await fetch(`${API_BASE()}/api/barbarian/${encodeURIComponent(name)}/end_rage`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                document.getElementById('rage-response').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('rage-response').className = `response-box ${response.ok ? 'success' : 'error'}`;
+
+                if (response.ok) {
+                    log('Rage ended', 'success');
+                } else {
+                    log(`Failed to end rage: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function getRageBenefits() {
+            const name = document.getElementById('char-name').value;
+
+            try {
+                const response = await fetch(`${API_BASE()}/api/barbarian/${encodeURIComponent(name)}/rage_benefits`);
+                const data = await response.json();
+
+                document.getElementById('rage-response').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('rage-response').className = 'response-box success';
+
+                log('Rage benefits retrieved', 'success');
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Stats & Level
+        async function updateStats() {
+            const name = document.getElementById('char-name').value;
+            const stats = {
+                strength: parseInt(document.getElementById('stat-str').value),
+                dexterity: parseInt(document.getElementById('stat-dex').value),
+                constitution: parseInt(document.getElementById('stat-con').value),
+                intelligence: parseInt(document.getElementById('stat-int').value),
+                wisdom: parseInt(document.getElementById('stat-wis').value),
+                charisma: parseInt(document.getElementById('stat-cha').value)
+            };
+
+            try {
+                const response = await fetch(`${API_BASE()}/api/barbarian/${encodeURIComponent(name)}/update_stats`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({stats})
+                });
+                const data = await response.json();
+
+                document.getElementById('stats-response').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('stats-response').className = `response-box ${response.ok ? 'success' : 'error'}`;
+
+                if (response.ok) {
+                    log('Stats updated', 'success');
+                    if (barbarianManager) {
+                        barbarianManager.updateStats(stats);
+                    }
+                } else {
+                    log(`Failed to update stats: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function setLevel() {
+            const name = document.getElementById('char-name').value;
+            const level = parseInt(document.getElementById('char-level').value);
+
+            try {
+                const response = await fetch(`${API_BASE()}/api/barbarian/${encodeURIComponent(name)}/set_level`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({level})
+                });
+                const data = await response.json();
+
+                document.getElementById('stats-response').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('stats-response').className = `response-box ${response.ok ? 'success' : 'error'}`;
+
+                if (response.ok) {
+                    log(`Level set to ${level}`, 'success');
+                    if (barbarianManager) {
+                        barbarianManager.setLevel(level);
+                    }
+                } else {
+                    log(`Failed to set level: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Rest & Recovery
+        async function longRest() {
+            const name = document.getElementById('char-name').value;
+
+            try {
+                const response = await fetch(`${API_BASE()}/api/barbarian/${encodeURIComponent(name)}/long_rest`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                document.getElementById('rest-response').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('rest-response').className = `response-box ${response.ok ? 'success' : 'error'}`;
+
+                if (response.ok) {
+                    log('✨ Long rest completed!', 'success');
+                    if (barbarianManager) {
+                        barbarianManager.longRest();
+                    }
+                } else {
+                    log(`Failed to long rest: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Advanced Operations
+        async function setPrimalPath() {
+            const name = document.getElementById('char-name').value;
+            const primal_path = document.getElementById('primal-path').value;
+
+            if (!primal_path) {
+                alert('Please select a primal path');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE()}/api/barbarian/${encodeURIComponent(name)}/set_primal_path`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({primal_path})
+                });
+                const data = await response.json();
+
+                document.getElementById('advanced-response').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('advanced-response').className = `response-box ${response.ok ? 'success' : 'error'}`;
+
+                if (response.ok) {
+                    log(`Primal path set: ${primal_path}`, 'success');
+                    if (barbarianManager) {
+                        barbarianManager.setSubclass(primal_path);
+                    }
+                } else {
+                    log(`Failed to set primal path: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function getCharacterSheet() {
+            const name = document.getElementById('char-name').value;
+
+            try {
+                const response = await fetch(`${API_BASE()}/api/barbarian/${encodeURIComponent(name)}/character_sheet`);
+                const data = await response.json();
+
+                document.getElementById('advanced-response').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('advanced-response').className = 'response-box success';
+
+                log('Character sheet retrieved', 'success');
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function listAllCharacters() {
+            try {
+                const response = await fetch(`${API_BASE()}/api/barbarian/list`);
+                const data = await response.json();
+
+                document.getElementById('advanced-response').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('advanced-response').className = 'response-box success';
+
+                log(`${data.count} character(s) found`, 'success');
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Display Updates
+        function updateDisplay(data) {
+            document.getElementById('display-name').textContent = data.name || '-';
+            document.getElementById('display-level').textContent = data.level || '-';
+            document.getElementById('display-hp').textContent = data.hp && data.max_hp ? `${data.hp}/${data.max_hp}` : '-';
+            document.getElementById('display-ac').textContent = data.ac || '-';
+        }
+
+        // Initialize Barbarian UI
+        function initializeBarbarianUI(name, level, stats, subclass = '') {
+            if (!window.BarbarianFeatureManager) {
+                log('BarbarianFeatureManager not loaded', 'error');
+                return;
+            }
+
+            barbarianManager = new BarbarianFeatureManager();
+            barbarianManager.setCharacterName(name);
+            barbarianManager.initialize(level, stats, subclass);
+            log('Barbarian UI initialized', 'success');
+        }
+    </script>
+</body>
+</html>

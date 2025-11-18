@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Head",
+    "\\Head\\Class"
   ],
-  "SelectedNode": "\\barbarian_api.py",
+  "SelectedNode": "\\router_tester.py",
   "PreviewInSolutionExplorer": false
 }
