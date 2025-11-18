@@ -133,6 +133,8 @@ def new_campaign():
     """Create new campaign"""
     if request.method == 'POST':
         data = request.json
+        if not data:
+            return jsonify({'error': 'Invalid JSON data'}), 400
         try:
             campaign = campaign_mgr.create_campaign(
                 name=data['name'],

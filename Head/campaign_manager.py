@@ -16,6 +16,16 @@ import shutil
 from Head.Class import character_to_dict, character_from_dict
 
 
+def default_stats() -> Dict[str, int]:
+    return {
+        "strength": 10,
+        "dexterity": 10,
+        "constitution": 10,
+        "intelligence": 10,
+        "wisdom": 10,
+        "charisma": 10
+    } # type: ignore
+
 @dataclass
 class Character:
     """Player character data - ENHANCED with full D&D 5e character sheet"""
@@ -28,14 +38,8 @@ class Character:
     hp: int = 10
     max_hp: int = 10
     ac: int = 10
-    stats: Dict[str, int] = field(default_factory=lambda: {
-        "strength": 10,
-        "dexterity": 10,
-        "constitution": 10,
-        "intelligence": 10,
-        "wisdom": 10,
-        "charisma": 10
-    })
+    stats: Dict[str, int] = field(default_factory=default_stats)
+
     inventory: List[str] = field(default_factory=list)  # type: ignore
     notes: str = ""
     armor_worn: str = ""
@@ -335,7 +339,7 @@ class CampaignManager:
         # Use character_to_dict to include class_type metadata
         char_dict = character_to_dict(character)
         
-        with open(char_file, 'w', encoding='utf-8') as f:
+        with open(str(char_file), 'w', encoding='utf-8') as f:
             json.dump(char_dict, f, indent=2)
         
         # Add to campaign
