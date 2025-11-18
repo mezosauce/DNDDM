@@ -28,21 +28,28 @@ class Character:
     hp: int = 10
     max_hp: int = 10
     ac: int = 10
-    stats: Dict[str, int] = None
-    inventory: List[str] = None
+    stats: Dict[str, int] = field(default_factory=lambda: {
+        "strength": 10,
+        "dexterity": 10,
+        "constitution": 10,
+        "intelligence": 10,
+        "wisdom": 10,
+        "charisma": 10
+    })
+    inventory: List[str] = field(default_factory=list)  # type: ignore
     notes: str = ""
     armor_worn: str = ""
 
     background_feature: str = ""  # Description of background feature
-    background_equipment: List[str] = field(default_factory=list)  # Equipment from background
+    background_equipment: List[str] = field(default_factory=list)  # Equipment from background  # type: ignore
     
-    skill_proficiencies: List[str] = field(default_factory=list)  # All skills (class + background)
-    tool_proficiencies: List[str] = field(default_factory=list)  # Tools from background
-    
-    languages_known: List[str] = field(default_factory=list)  # Combines racial + background languages
+    skill_proficiencies: List[str] = field(default_factory=list)  # All skills (class + background)  # type: ignore
+    tool_proficiencies: List[str] = field(default_factory=list)  # Tools from background  # type: ignore
+
+    languages_known: List[str] = field(default_factory=list)  # Combines racial + background languages  # type: ignore
     
     # Personality (from background tables)
-    personality_traits: List[str] = field(default_factory=list)  # 2 traits
+    personality_traits: List[str] = field(default_factory=list)  # 2 traits  # type: ignore
     ideal: str = ""  # 1 ideal
     bond: str = ""  # 1 bond
     flaw: str = ""  # 1 flaw
@@ -53,35 +60,27 @@ class Character:
 
     
     
-    skill_proficiencies: list = field(default_factory=list)
-    saving_throw_proficiencies: list = field(default_factory=list)
-    languages_known: list = field(default_factory=list)
-
-    inventory: list = field(default_factory=list)
-    currency: dict = field(default_factory=lambda: {"gp": 0, "sp": 0, "cp": 0})
-
-    
-    currency: Dict[str, int] = None  # {'cp': 0, 'sp': 0, 'ep': 0, 'gp': 0, 'pp': 0}
+    saving_throw_proficiencies: List[str] = field(default_factory=list)  # type: ignore
+    # currency: full denominations, default to zero for each type
+    currency: Dict[str, int] = field(default_factory=lambda: {
+        'cp': 0,
+        'sp': 0,
+        'ep': 0,
+        'gp': 0,
+        'pp': 0
+    })
+    # type: ignore
     
     def __post_init__(self):
-        if self.stats is None:
-            self.statsx = {
+        # Ensure stats uses the expected key names (in case older data used different structure)
+        if not isinstance(self.stats, dict):
+            self.stats = {
                 "strength": 10,
                 "dexterity": 10,
                 "constitution": 10,
                 "intelligence": 10,
                 "wisdom": 10,
                 "charisma": 10
-            }
-        if self.inventory is None:
-            self.inventory = []
-        if self.currency is None:
-            self.currency = {
-                'cp': 0,  # Copper pieces
-                'sp': 0,  # Silver pieces
-                'ep': 0,  # Electrum pieces
-                'gp': 0,  # Gold pieces
-                'pp': 0   # Platinum pieces
             }
     
     # Currency Helper Methods
@@ -194,7 +193,7 @@ class Campaign:
     created_date: str
     current_phase: str
     party_size: int
-    characters: List[Dict] = None
+    characters: List[Dict] = field(default_factory=list)  # type: ignore
     setup_complete: bool = False
     adventure_complete: bool = False
     preparation_complete: bool = False

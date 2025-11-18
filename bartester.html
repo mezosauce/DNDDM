@@ -441,13 +441,15 @@
             }
         }
     </script>
-
+    
     <!-- Copy the barbarian.js content here or include it -->
     <script src="/static/js/class_features/barbarian.js"></script>
 
     <!-- Test page functionality -->
     <script>
-        const API_BASE = () => document.getElementById('api-url').value;
+        // Expose API_BASE on window to avoid duplicate `const` declarations
+        // (the external `barbarian.js` may also declare a top-level `API_BASE`).
+        window.API_BASE = () => document.getElementById('api-url').value;
 
         let barbarianManager = null;
 

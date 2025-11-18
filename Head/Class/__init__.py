@@ -4,14 +4,38 @@ Class Registry and Factory System
 Handles creation and serialization of class-specific Character objects
 """
 
-from typing import Dict, Type, Any
+from typing import Dict, Type, Any, Optional, TYPE_CHECKING, cast
 from dataclasses import asdict
 
-Barbarian = None
-Bard = None
-Cleric = None
-Druid = None
-Fighter = None
+# Class globals are initialized lazily; annotate for the type checker
+Barbarian: Optional[Type[Any]] = None
+Bard: Optional[Type[Any]] = None
+Cleric: Optional[Type[Any]] = None
+Druid: Optional[Type[Any]] = None
+Fighter: Optional[Type[Any]] = None
+Monk: Optional[Type[Any]] = None
+Paladin: Optional[Type[Any]] = None
+Ranger: Optional[Type[Any]] = None
+Rogue: Optional[Type[Any]] = None
+Sorcerer: Optional[Type[Any]] = None
+Warlock: Optional[Type[Any]] = None
+Wizard: Optional[Type[Any]] = None
+
+
+if TYPE_CHECKING:
+    # Help static type checkers know the real classes without importing at runtime
+    from Head.Class.barbarian import Barbarian as _Barbarian
+    from Head.Class.bard import Bard as _Bard
+    from Head.Class.cleric import Cleric as _Cleric
+    from Head.Class.druid import Druid as _Druid
+    from Head.Class.fighter import Fighter as _Fighter
+    from Head.Class.monk import Monk as _Monk
+    from Head.Class.paladin import Paladin as _Paladin
+    from Head.Class.ranger import Ranger as _Ranger
+    from Head.Class.rogue import Rogue as _Rogue
+    from Head.Class.sorcerer import Sorcerer as _Sorcerer
+    from Head.Class.warlock import Warlock as _Warlock
+    from Head.Class.wizard import Wizard as _Wizard
 
 
 # ============================================================================
@@ -183,21 +207,10 @@ def _ensure_character_in_registry():
 # FACTORY FUNCTIONS
 # ============================================================================
 
+
 def create_character(class_type: str, **kwargs):
     """
     Factory function to create a character of the specified class type.
-    
-    Args:
-        class_type: Name of the class (e.g., "Barbarian", "Bard")
-        **kwargs: Character attributes to pass to the constructor
-    
-    Returns:
-        Character instance of the appropriate class
-    
-    Example:
-        >>> barbarian = create_character("Barbarian", name="Grog", level=5)
-        >>> isinstance(barbarian, Barbarian)
-        True
     """
     # Ensure Character is in registry
     _ensure_character_in_registry()
@@ -208,9 +221,13 @@ def create_character(class_type: str, **kwargs):
     # Remove class_type from kwargs if present (it's metadata, not a field)
     kwargs.pop('class_type', None)
     
-    # Create and return the character
-    return character_class(**kwargs)
+    # ✅ FIX: Add char_class if not present (defaults to class_type)
+    # This is required by the Character dataclass
+    if 'char_class' not in kwargs:
+        kwargs['char_class'] = class_type
+    
 
+    return character_class(**kwargs)  
 
 def character_to_dict(character) -> Dict[str, Any]:
     """
@@ -229,14 +246,14 @@ def character_to_dict(character) -> Dict[str, Any]:
         >>> data['class_type']
         'Barbarian'
     """
-    # Get character data as dict
-    char_dict = asdict(character)
-    
+    # Get character data as dict (cast to help static type checkers)
+    char_dict: Dict[str, Any] = cast(Dict[str, Any], asdict(character))
+
     # Add class_type metadata
     # Determine the actual class type
     class_name = type(character).__name__
     char_dict['class_type'] = class_name
-    
+
     return char_dict
 
 
@@ -368,7 +385,7 @@ if __name__ == "__main__":
     
     print(f"Created: {barbarian}")
     print(f"Type: {type(barbarian).__name__}")
-    print(f"Is Barbarian: {isinstance(barbarian, Barbarian)}")
+    print(f"Is Barbarian: {Barbarian is not None and isinstance(barbarian, Barbarian)}")
     print(f"Rages per day: {barbarian.rages_per_day}")
     print(f"Rage damage: {barbarian.rage_damage}")
     
@@ -390,7 +407,7 @@ if __name__ == "__main__":
     restored_char = character_from_dict(char_dict)
     print(f"Restored: {restored_char}")
     print(f"Type: {type(restored_char).__name__}")
-    print(f"Is Barbarian: {isinstance(restored_char, Barbarian)}")
+    print(f"Is Barbarian: {Barbarian is not None and isinstance(restored_char, Barbarian)}")
     print(f"Name matches: {restored_char.name == barbarian.name}")
     print(f"Rages match: {restored_char.rages_per_day == barbarian.rages_per_day}")
     
@@ -410,7 +427,7 @@ if __name__ == "__main__":
     old_char = character_from_dict(old_format_data)
     print(f"Created from old format: {old_char}")
     print(f"Type: {type(old_char).__name__}")
-    print(f"Is Barbarian: {isinstance(old_char, Barbarian)}")
+    print(f"Is Barbarian: {Barbarian is not None and isinstance(old_char, Barbarian)}")
     
     # Test 5: Unknown class defaults to Character
     print("\n" + "-" * 60)

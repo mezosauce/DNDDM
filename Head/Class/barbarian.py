@@ -4,7 +4,9 @@ Barbarian Class - D&D 5e SRD Implementation
 Derived from the base Character class with full Barbarian features
 """
 import os
+import pathlib
 import sys
+
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
