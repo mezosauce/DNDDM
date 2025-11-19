@@ -65,7 +65,7 @@
             "Once I pick a goal, I become obsessed with it to the detriment of everything else in my life."
         ];
         
-        const MAX_POINTS = 0;
+        const MAX_POINTS = 60;
         let selectedSkills = [];
         let selectedLanguages = [];
         let selectedTraits = [];
