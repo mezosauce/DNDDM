@@ -1,0 +1,428 @@
+{
+  "Barbarian": {
+    "name": "Barbarian",
+    "description": "A fierce warrior of primitive background who can enter a battle rage",
+    "hit_die": "d12",
+    "primary_abilities": ["Strength", "Constitution"],
+    "saves": ["Strength", "Constitution"],
+    "armor_proficiencies": ["Light armor", "Medium armor", "Shields"],
+    "weapon_proficiencies": ["Simple weapons", "Martial weapons"],
+    "tool_proficiencies": [],
+    "skills": {
+      "choose": 2,
+      "from": [
+        "Animal Handling",
+        "Athletics",
+        "Intimidation",
+        "Nature",
+        "Perception",
+        "Survival"
+      ]
+    },
+    "starting_equipment": {
+      "choice_1": {
+        "desc": "Choose one",
+        "options": [
+          "Greataxe",
+          "Any martial melee weapon"
+        ]
+      },
+      "choice_2": {
+        "desc": "Choose one",
+        "options": [
+          "Two handaxes",
+          "Any simple weapon"
+        ]
+      },
+      "default": [
+        "Explorer's pack",
+        "Four javelins"
+      ]
+    },
+    "subclasses": {
+      "level": 3,
+      "name": "Primal Path",
+      "options": [
+        {
+          "name": "Path of the Berserker",
+          "description": "For some barbarians, rage is a means to an end—that end being violence."
+        },
+        {
+          "name": "Path of the Totem Warrior",
+          "description": "The Path of the Totem Warrior is a spiritual journey, as the barbarian accepts a spirit animal as guide, protector, and inspiration."
+        }
+      ]
+    },
+    "features_by_level": {
+      "1": ["Rage", "Unarmored Defense"],
+      "2": ["Reckless Attack", "Danger Sense"],
+      "3": ["Primal Path"],
+      "4": ["Ability Score Improvement"],
+      "5": ["Extra Attack", "Fast Movement"],
+      "6": ["Path Feature"],
+      "7": ["Feral Instinct"],
+      "8": ["Ability Score Improvement"],
+      "9": ["Brutal Critical (1 die)"],
+      "10": ["Path Feature"],
+      "11": ["Relentless Rage"],
+      "12": ["Ability Score Improvement"],
+      "13": ["Brutal Critical (2 dice)"],
+      "14": ["Path Feature"],
+      "15": ["Persistent Rage"],
+      "16": ["Ability Score Improvement"],
+      "17": ["Brutal Critical (3 dice)"],
+      "18": ["Indomitable Might"],
+      "19": ["Ability Score Improvement"],
+      "20": ["Primal Champion"]
+    }
+  },
+
+  "Bard": {
+    "name": "Bard",
+    "description": "An inspiring magician whose power echoes the music of creation",
+    "hit_die": "d8",
+    "primary_abilities": ["Charisma"],
+    "saves": ["Dexterity", "Charisma"],
+    "armor_proficiencies": ["Light armor"],
+    "weapon_proficiencies": ["Simple weapons", "Hand crossbows", "Longswords", "Rapiers", "Shortswords"],
+    "tool_proficiencies": ["Three musical instruments of your choice"],
+    "skills": {
+      "choose": 3,
+      "from": "Any"
+    },
+    "starting_equipment": {
+      "choice_1": {
+        "desc": "Choose one",
+        "options": [
+          "Rapier",
+          "Longsword",
+          "Any simple weapon"
+        ]
+      },
+      "choice_2": {
+        "desc": "Choose one",
+        "options": [
+          "Diplomat's pack",
+          "Entertainer's pack"
+        ]
+      },
+      "choice_3": {
+        "desc": "Choose one",
+        "options": [
+          "Lute",
+          "Any other musical instrument"
+        ]
+      },
+      "default": [
+        "Leather armor",
+        "Dagger"
+      ]
+    },
+    "subclasses": {
+      "level": 3,
+      "name": "Bard College",
+      "options": [
+        {
+          "name": "College of Lore",
+          "description": "Bards of the College of Lore know something about most things, collecting bits of knowledge from sources as diverse as scholarly tomes and peasant tales."
+        },
+        {
+          "name": "College of Valor",
+          "description": "Bards of the College of Valor are daring skalds whose tales keep alive the memory of the great heroes of the past."
+        }
+      ]
+    },
+    "features_by_level": {
+      "1": ["Spellcasting", "Bardic Inspiration (d6)"],
+      "2": ["Jack of All Trades", "Song of Rest (d6)"],
+      "3": ["Bard College", "Expertise"],
+      "4": ["Ability Score Improvement"],
+      "5": ["Bardic Inspiration (d8)", "Font of Inspiration"],
+      "6": ["Countercharm", "Bard College Feature"],
+      "7": [],
+      "8": ["Ability Score Improvement"],
+      "9": ["Song of Rest (d8)"],
+      "10": ["Bardic Inspiration (d10)", "Expertise", "Magical Secrets"],
+      "11": [],
+      "12": ["Ability Score Improvement"],
+      "13": ["Song of Rest (d10)"],
+      "14": ["Magical Secrets", "Bard College Feature"],
+      "15": ["Bardic Inspiration (d12)"],
+      "16": ["Ability Score Improvement"],
+      "17": ["Song of Rest (d12)"],
+      "18": ["Magical Secrets"],
+      "19": ["Ability Score Improvement"],
+      "20": ["Superior Inspiration"]
+    }
+  },
+
+  "Cleric": {
+    "name": "Cleric",
+    "description": "A priestly champion who wields divine magic in service of a higher power",
+    "hit_die": "d8",
+    "primary_abilities": ["Wisdom"],
+    "saves": ["Wisdom", "Charisma"],
+    "armor_proficiencies": ["Light armor", "Medium armor", "Shields"],
+    "weapon_proficiencies": ["Simple weapons"],
+    "tool_proficiencies": [],
+    "skills": {
+      "choose": 2,
+      "from": [
+        "History",
+        "Insight",
+        "Medicine",
+        "Persuasion",
+        "Religion"
+      ]
+    },
+    "starting_equipment": {
+      "choice_1": {
+        "desc": "Choose one",
+        "options": [
+          "Mace",
+          "Warhammer (if proficient)"
+        ]
+      },
+      "choice_2": {
+        "desc": "Choose one",
+        "options": [
+          "Scale mail",
+          "Leather armor",
+          "Chain mail (if proficient)"
+        ]
+      },
+      "choice_3": {
+        "desc": "Choose one",
+        "options": [
+          "Light crossbow and 20 bolts",
+          "Any simple weapon"
+        ]
+      },
+      "choice_4": {
+        "desc": "Choose one",
+        "options": [
+          "Priest's pack",
+          "Explorer's pack"
+        ]
+      },
+      "default": [
+        "Shield",
+        "Holy symbol"
+      ]
+    },
+    "subclasses": {
+      "level": 1,
+      "name": "Divine Domain",
+      "options": [
+        {
+          "name": "Life Domain",
+          "description": "The Life domain focuses on the vibrant positive energy that sustains all life."
+        },
+        {
+          "name": "Knowledge Domain",
+          "description": "The gods of knowledge value learning and understanding above all."
+        },
+        {
+          "name": "Light Domain",
+          "description": "Gods of light promote the ideals of rebirth and renewal, truth, vigilance, and beauty."
+        },
+        {
+          "name": "Nature Domain",
+          "description": "Gods of nature are as varied as the natural world itself."
+        },
+        {
+          "name": "Tempest Domain",
+          "description": "Gods whose portfolios include the Tempest domain govern storms, sea, and sky."
+        },
+        {
+          "name": "Trickery Domain",
+          "description": "Gods of trickery are mischief-makers and instigators who stand as a constant challenge to the accepted order."
+        },
+        {
+          "name": "War Domain",
+          "description": "War has many manifestations, and the gods of war watch over warriors and reward them for their great deeds."
+        }
+      ]
+    },
+    "features_by_level": {
+      "1": ["Spellcasting", "Divine Domain"],
+      "2": ["Channel Divinity (1/rest)", "Divine Domain Feature"],
+      "3": [],
+      "4": ["Ability Score Improvement"],
+      "5": ["Destroy Undead (CR 1/2)"],
+      "6": ["Channel Divinity (2/rest)", "Divine Domain Feature"],
+      "7": [],
+      "8": ["Ability Score Improvement", "Destroy Undead (CR 1)", "Divine Domain Feature"],
+      "9": [],
+      "10": ["Divine Intervention"],
+      "11": ["Destroy Undead (CR 2)"],
+      "12": ["Ability Score Improvement"],
+      "13": [],
+      "14": ["Destroy Undead (CR 3)"],
+      "15": [],
+      "16": ["Ability Score Improvement"],
+      "17": ["Destroy Undead (CR 4)", "Divine Domain Feature"],
+      "18": ["Channel Divinity (3/rest)"],
+      "19": ["Ability Score Improvement"],
+      "20": ["Divine Intervention Improvement"]
+    }
+  },
+
+  "Druid": {
+    "name": "Druid",
+    "description": "A priest of the Old Faith, wielding the powers of nature and adopting animal forms",
+    "hit_die": "d8",
+    "primary_abilities": ["Wisdom"],
+    "saves": ["Intelligence", "Wisdom"],
+    "armor_proficiencies": ["Light armor", "Medium armor", "Shields (druids will not wear armor or use shields made of metal)"],
+    "weapon_proficiencies": ["Clubs", "Daggers", "Darts", "Javelins", "Maces", "Quarterstaffs", "Scimitars", "Sickles", "Slings", "Spears"],
+    "tool_proficiencies": ["Herbalism kit"],
+    "skills": {
+      "choose": 2,
+      "from": [
+        "Arcana",
+        "Animal Handling",
+        "Insight",
+        "Medicine",
+        "Nature",
+        "Perception",
+        "Religion",
+        "Survival"
+      ]
+    },
+    "starting_equipment": {
+      "choice_1": {
+        "desc": "Choose one",
+        "options": [
+          "Wooden shield",
+          "Any simple weapon"
+        ]
+      },
+      "choice_2": {
+        "desc": "Choose one",
+        "options": [
+          "Scimitar",
+          "Any simple melee weapon"
+        ]
+      },
+      "default": [
+        "Leather armor",
+        "Explorer's pack",
+        "Druidic focus"
+      ]
+    },
+    "subclasses": {
+      "level": 2,
+      "name": "Druid Circle",
+      "options": [
+        {
+          "name": "Circle of the Land",
+          "description": "The Circle of the Land is made up of mystics and sages who safeguard ancient knowledge and rites through a vast oral tradition.",
+          "land_types": [
+            "Arctic",
+            "Coast",
+            "Desert",
+            "Forest",
+            "Grassland",
+            "Mountain",
+            "Swamp"
+          ]
+        },
+        {
+          "name": "Circle of the Moon",
+          "description": "Druids of the Circle of the Moon are fierce guardians of the wilds, with primal power enabling them to transform into powerful beasts."
+        }
+      ]
+    },
+    "features_by_level": {
+      "1": ["Druidic", "Spellcasting"],
+      "2": ["Wild Shape", "Druid Circle"],
+      "3": ["Circle Feature"],
+      "4": ["Wild Shape Improvement", "Ability Score Improvement"],
+      "5": [],
+      "6": ["Circle Feature"],
+      "7": [],
+      "8": ["Wild Shape Improvement", "Ability Score Improvement"],
+      "9": [],
+      "10": ["Circle Feature"],
+      "11": [],
+      "12": ["Ability Score Improvement"],
+      "13": [],
+      "14": ["Circle Feature"],
+      "15": [],
+      "16": ["Ability Score Improvement"],
+      "17": [],
+      "18": ["Timeless Body", "Beast Spells"],
+      "19": ["Ability Score Improvement"],
+      "20": ["Archdruid"]
+    },
+    "spellcasting": {
+      "ability": "Wisdom",
+      "cantrips_known": {
+        "1": 2,
+        "4": 3,
+        "10": 4
+      },
+      "spell_slots_by_level": {
+        "1": [2, 0, 0, 0, 0, 0, 0, 0, 0],
+        "2": [3, 0, 0, 0, 0, 0, 0, 0, 0],
+        "3": [4, 2, 0, 0, 0, 0, 0, 0, 0],
+        "4": [4, 3, 0, 0, 0, 0, 0, 0, 0],
+        "5": [4, 3, 2, 0, 0, 0, 0, 0, 0],
+        "6": [4, 3, 3, 0, 0, 0, 0, 0, 0],
+        "7": [4, 3, 3, 1, 0, 0, 0, 0, 0],
+        "8": [4, 3, 3, 2, 0, 0, 0, 0, 0],
+        "9": [4, 3, 3, 3, 1, 0, 0, 0, 0],
+        "10": [4, 3, 3, 3, 2, 0, 0, 0, 0],
+        "11": [4, 3, 3, 3, 2, 1, 0, 0, 0],
+        "12": [4, 3, 3, 3, 2, 1, 0, 0, 0],
+        "13": [4, 3, 3, 3, 2, 1, 1, 0, 0],
+        "14": [4, 3, 3, 3, 2, 1, 1, 0, 0],
+        "15": [4, 3, 3, 3, 2, 1, 1, 1, 0],
+        "16": [4, 3, 3, 3, 2, 1, 1, 1, 0],
+        "17": [4, 3, 3, 3, 2, 1, 1, 1, 1],
+        "18": [4, 3, 3, 3, 3, 1, 1, 1, 1],
+        "19": [4, 3, 3, 3, 3, 2, 1, 1, 1],
+        "20": [4, 3, 3, 3, 3, 2, 2, 1, 1]
+      },
+      "prepared_spells_formula": "Wisdom modifier + druid level (minimum 1)"
+    },
+    "wild_shape": {
+      "uses_per_rest": 2,
+      "improvements": {
+        "2": {
+          "max_cr": 0.25,
+          "limitations": "No flying or swimming speed",
+          "examples": ["Wolf", "Giant Badger"]
+        },
+        "4": {
+          "max_cr": 0.5,
+          "limitations": "No flying speed",
+          "examples": ["Crocodile", "Giant Wasp"]
+        },
+        "8": {
+          "max_cr": 1,
+          "limitations": "None",
+          "examples": ["Giant Eagle", "Brown Bear"]
+        }
+      },
+      "duration_formula": "hours equal to half your druid level (rounded down)"
+    },
+    "circle_features": {
+      "Circle of the Land": {
+        "2": ["Bonus Cantrip", "Natural Recovery"],
+        "3": ["Circle Spells (based on land type)"],
+        "6": ["Land's Stride"],
+        "10": ["Nature's Ward"],
+        "14": ["Nature's Sanctuary"]
+      },
+      "Circle of the Moon": {
+        "2": ["Combat Wild Shape", "Circle Forms"],
+        "6": ["Primal Strike"],
+        "10": ["Elemental Wild Shape"],
+        "14": ["Thousand Forms"]
+      }
+    }
+  }
+  
+}

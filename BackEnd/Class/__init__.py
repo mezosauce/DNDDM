@@ -12,30 +12,15 @@ Barbarian: Optional[Type[Any]] = None
 Bard: Optional[Type[Any]] = None
 Cleric: Optional[Type[Any]] = None
 Druid: Optional[Type[Any]] = None
-Fighter: Optional[Type[Any]] = None
-Monk: Optional[Type[Any]] = None
-Paladin: Optional[Type[Any]] = None
-Ranger: Optional[Type[Any]] = None
-Rogue: Optional[Type[Any]] = None
-Sorcerer: Optional[Type[Any]] = None
-Warlock: Optional[Type[Any]] = None
-Wizard: Optional[Type[Any]] = None
 
 
 if TYPE_CHECKING:
     # Help static type checkers know the real classes without importing at runtime
-    from Head.Class.barbarian import Barbarian as _Barbarian
-    from Head.Class.bard import Bard as _Bard
-    from Head.Class.cleric import Cleric as _Cleric
-    from Head.Class.druid import Druid as _Druid
-    from Head.Class.fighter import Fighter as _Fighter
-    from Head.Class.monk import Monk as _Monk
-    from Head.Class.paladin import Paladin as _Paladin
-    from Head.Class.ranger import Ranger as _Ranger
-    from Head.Class.rogue import Rogue as _Rogue
-    from Head.Class.sorcerer import Sorcerer as _Sorcerer
-    from Head.Class.warlock import Warlock as _Warlock
-    from Head.Class.wizard import Wizard as _Wizard
+    from BackEnd.Class.barbarian import Barbarian as _Barbarian
+    from BackEnd.Class.bard import Bard as _Bard
+    from BackEnd.Class.cleric import Cleric as _Cleric
+    from BackEnd.Class.druid import Druid as _Druid
+    
 
 
 # ============================================================================
@@ -46,7 +31,7 @@ def _import_barbarian():
     """Lazy import Barbarian to avoid circular dependency"""
     global Barbarian
     if Barbarian is None:
-        from Head.Class.barbarian import Barbarian as BarbarianClass
+        from BackEnd.Class.barbarian import Barbarian as BarbarianClass
         Barbarian = BarbarianClass
     return Barbarian
 
@@ -54,7 +39,7 @@ def _import_bard():
     """Lazy import Bard to avoid circular dependency"""
     global Bard
     if Bard is None:
-        from Head.Class.bard import Bard as BardClass
+        from BackEnd.Class.bard import Bard as BardClass
         Bard = BardClass
     return Bard
 
@@ -62,7 +47,7 @@ def _import_cleric():
     """Lazy import Cleric to avoid circular dependency"""
     global Cleric
     if Cleric is None:
-        from Head.Class.cleric import Cleric as ClericClass
+        from BackEnd.Class.cleric import Cleric as ClericClass
         Cleric = ClericClass
     return Cleric
 
@@ -70,71 +55,9 @@ def _import_druid():
     """Lazy import Druid to avoid circular dependency"""
     global Druid
     if Druid is None:
-        from Head.Class.druid import Druid as DruidClass
+        from BackEnd.Class.druid import Druid as DruidClass
         Druid = DruidClass
     return Druid
-
-def _import_fighter():
-    """Lazy import Fighter to avoid circular dependency"""
-    global Fighter
-    if Fighter is None:
-        from Head.Class.fighter import Fighter as FighterClass
-        Fighter = FighterClass
-    return Fighter
-
-def _import_monk():
-    """Lazy import Monk to avoid circular dependency"""
-    global Monk
-    if Monk is None:
-        from Head.Class.monk import Monk as MonkClass
-        Monk = MonkClass
-    return Monk
-
-def _import_paladin():
-    """Lazy import Paladin to avoid circular dependency"""
-    global Paladin
-    if Paladin is None:
-        from Head.Class.paladin import Paladin as PaladinClass
-        Paladin = PaladinClass
-    return Paladin
-
-def _import_ranger():
-    """Lazy import Ranger to avoid circular dependency"""
-    global Ranger
-    if Ranger is None:
-        from Head.Class.ranger import Ranger as RangerClass
-        Ranger = RangerClass
-    return Ranger
-
-def _import_rogue():
-    """Lazy import Rogue to avoid circular dependency"""
-    global Rogue
-    if Rogue is None:
-        from Head.Class.rogue import Rogue as RogueClass
-        Rogue = RogueClass
-    return Rogue
-def _import_sorcerer():
-    """Lazy import Sorcerer to avoid circular dependency"""
-    global Sorcerer
-    if Sorcerer is None:
-        from Head.Class.sorcerer import Sorcerer as SorcererClass
-        Sorcerer = SorcererClass
-    return Sorcerer
-
-def _import_warlock():
-    """Lazy import Warlock to avoid circular dependency"""
-    global Warlock
-    if Warlock is None:
-        from Head.Class.warlock import Warlock as WarlockClass
-        Warlock = WarlockClass
-    return Warlock
-def _import_wizard():
-    """Lazy import Wizard to avoid circular dependency"""
-    global Wizard
-    if Wizard is None:
-        from Head.Class.wizard import Wizard as WizardClass
-        Wizard = WizardClass
-    return Wizard
 
 
 
@@ -154,14 +77,7 @@ def _initialize_registry():
         _import_bard()
         _import_cleric()
         _import_druid()
-        _import_fighter()
-        _import_monk()
-        _import_paladin()
-        _import_ranger()
-        _import_rogue()
-        _import_sorcerer()
-        _import_warlock()
-        _import_wizard()
+ 
 
         if Barbarian:
             CLASS_REGISTRY["Barbarian"] = Barbarian
@@ -171,28 +87,12 @@ def _initialize_registry():
             CLASS_REGISTRY["Cleric"] = Cleric
         if Druid:
             CLASS_REGISTRY["Druid"] = Druid
-        if Fighter:
-            CLASS_REGISTRY["Fighter"] = Fighter
-        if Monk:
-            CLASS_REGISTRY["Monk"] = Monk
-        if Paladin:
-            CLASS_REGISTRY["Paladin"] = Paladin
-        if Ranger:
-            CLASS_REGISTRY["Ranger"] = Ranger
-        if Rogue:
-            CLASS_REGISTRY["Rogue"] = Rogue
-        if Sorcerer:
-            CLASS_REGISTRY["Sorcerer"] = Sorcerer
-        if Warlock:
-            CLASS_REGISTRY["Warlock"] = Warlock
-        if Wizard:
-            CLASS_REGISTRY["Wizard"] = Wizard
 
 
 
 def _get_base_character_class():
     """Lazy import of base Character class to avoid circular dependency"""
-    from Head.campaign_manager import Character
+    from BackEnd.campaign_manager import Character
     return Character
 
 
@@ -338,14 +238,6 @@ __all__ = [
     'Bard',
     'Cleric',
     'Druid',
-    'Fighter',
-    'Monk',
-    'Paladin',
-    'Ranger',
-    'Rogue',
-    'Sorcerer',
-    'Warlock',
-    'Wizard',
 ]
 
 

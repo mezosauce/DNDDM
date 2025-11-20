@@ -13,9 +13,9 @@ from pathlib import Path
 from datetime import datetime
 
 # Import core modules
-from Head.campaign_manager import get_campaign_manager, Character
-from Head.prompt_templates import PromptTemplates, create_full_prompt
-from Head.search_engine import SRDSearchEngine, create_search_api, FAISS_AVAILABLE, EMBEDDINGS_AVAILABLE
+from campaign_manager import get_campaign_manager, Character
+from prompt_templates import PromptTemplates, create_full_prompt
+from search_engine import SRDSearchEngine, create_search_api, FAISS_AVAILABLE, EMBEDDINGS_AVAILABLE
 
 # Import AI DM components with better error handling
 OllamaDM = None
@@ -28,7 +28,7 @@ Phase3SRDLoader = None
 
 
 try:
-    from Head.ai_dm_free import OllamaDM, GameState
+    from ai_dm_free import OllamaDM, GameState
     print("✓ AI DM core modules loaded")
 except ImportError as e:
     print(f"⚠ AI DM modules not found: {e}")
@@ -41,14 +41,14 @@ except ImportError:
     print("⚠ Query router not found - Phase 2 will work without SRD content")
 
 try:
-    from Head.ai_dm_free import SRDContentLoader
+    from ai_dm_free import SRDContentLoader
     print("✓ SRD content loader available")
 except (ImportError, AttributeError):
     print("⚠ SRD content loader not available")
 
 # Import Phase 3 enhanced router
 try:
-    from Head.phase3_DM import (
+    from phase3_DM import (
         Phase3QueryRouter, 
         create_phase3_prompt,
         SRDContentLoader as Phase3SRDLoader
@@ -79,8 +79,10 @@ except ImportError as e:
     print(f"⚠ Phase 3 routes not found: {e}")
     register_phase3_routes = None
 
-# Initialize Flask app
-app = Flask(__name__)
+# Initialize Flask app with proper template path
+template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../FrontEnd/templates'))
+static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../FrontEnd/static'))
+app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 app.config['SECRET_KEY'] = secrets.token_hex(16)
 socketio = SocketIO(app, cors_allowed_origins="*")
 

@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 
-from Head.campaign_manager import Character
+from BackEnd.campaign_manager import Character
 
 
 @dataclass

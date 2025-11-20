@@ -13,7 +13,7 @@ from typing import Dict, List, Optional
 from dataclasses import dataclass, asdict, field
 import shutil
 
-from Head.Class import character_to_dict, character_from_dict
+from Class import character_to_dict, character_from_dict
 
 
 def default_stats() -> Dict[str, int]:
@@ -240,7 +240,7 @@ class CampaignManager:
         }
     }
     
-    def __init__(self, campaigns_dir: str = "./campaigns"):
+    def __init__(self, campaigns_dir: str = "../campaigns"):
         self.campaigns_dir = Path(campaigns_dir)
         self.campaigns_dir.mkdir(exist_ok=True)
     
