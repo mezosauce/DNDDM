@@ -373,7 +373,6 @@ def register_phase1_routes(app, campaign_mgr, Character):
                     'circle_spells': data.get('circle_spells', [])
                 })
             
-
             # Merge base and additional parameters
             all_params = {**base_params, **additional_params}
             
@@ -390,11 +389,6 @@ def register_phase1_routes(app, campaign_mgr, Character):
             })
         except Exception as e:
             return jsonify({'error': str(e)}), 400
-
-
-
-
-
 
 
     @app.route('/campaign/<campaign_name>/character/<character_name>/currency/remove', methods=['POST'])

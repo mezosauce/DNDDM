@@ -40,15 +40,15 @@ class Character:
     ac: int = 10
     stats: Dict[str, int] = field(default_factory=default_stats)
 
-    inventory: List[str] = field(default_factory=list)  # type: ignore
+    # inventory: List[str] = field(default_factory=list)  # type: ignore 
     notes: str = ""
-    armor_worn: str = ""
+    # armor_worn: str = "" 
 
     background_feature: str = ""  # Description of background feature
-    background_equipment: List[str] = field(default_factory=list)  # Equipment from background  # type: ignore
+    # background_equipment: List[str] = field(default_factory=list)  # Equipment from background  # type: ignore
     
     skill_proficiencies: List[str] = field(default_factory=list)  # All skills (class + background)  # type: ignore
-    tool_proficiencies: List[str] = field(default_factory=list)  # Tools from background  # type: ignore
+    # tool_proficiencies: List[str] = field(default_factory=list)  # Tools from background  # type: ignore
 
     languages_known: List[str] = field(default_factory=list)  # Combines racial + background languages  # type: ignore
     

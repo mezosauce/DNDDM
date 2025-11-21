@@ -23,8 +23,8 @@ from unittest.mock import Mock, patch, MagicMock
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from Head.Class.barbarian import Barbarian
-from Head.Class import create_character, character_to_dict, character_from_dict
+from BackEnd.Class.barbarian import Barbarian
+from BackEnd.Class import create_character, character_to_dict, character_from_dict
 
 
 # ============================================================================
