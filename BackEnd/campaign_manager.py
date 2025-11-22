@@ -64,7 +64,7 @@ class Character:
 
     
     
-    saving_throw_proficiencies: List[str] = field(default_factory=list)  # type: ignore
+    # saving_throw_proficiencies: List[str] = field(default_factory=list)  # type: ignore
     # currency: full denominations, default to zero for each type
     currency: Dict[str, int] = field(default_factory=lambda: {
         'cp': 0,
