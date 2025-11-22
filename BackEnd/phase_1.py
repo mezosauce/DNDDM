@@ -10,7 +10,7 @@ from dataclasses import asdict
 # These will be imported from main.py when we integrate
 # from main import app, campaign_mgr, Character
 
-from Class import create_character
+from component.Class import create_character
 
 
 def _get_json():

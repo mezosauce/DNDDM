@@ -13,9 +13,9 @@ from pathlib import Path
 from datetime import datetime
 
 # Import core modules
-from campaign_manager import get_campaign_manager, Character
-from prompt_templates import PromptTemplates, create_full_prompt
-from search_engine import SRDSearchEngine, create_search_api, FAISS_AVAILABLE, EMBEDDINGS_AVAILABLE
+from component.campaign_manager import get_campaign_manager, Character
+from LLM_Comp.prompt_templates import PromptTemplates, create_full_prompt
+from FAISS.search_engine import SRDSearchEngine, create_search_api, FAISS_AVAILABLE, EMBEDDINGS_AVAILABLE
 
 # Import AI DM components with better error handling
 OllamaDM = None
@@ -28,27 +28,27 @@ Phase3SRDLoader = None
 
 
 try:
-    from ai_dm_free import OllamaDM, GameState
+    from LLM_Comp.ai_dm_free import OllamaDM, GameState
     print("✓ AI DM core modules loaded")
 except ImportError as e:
     print(f"⚠ AI DM modules not found: {e}")
 
 
 try:
-    from ai_dm_query_router import QueryRouter
+    from LLM_Comp.ai_dm_query_router import QueryRouter
     print("✓ Query router loaded (Phase 2)")
 except ImportError:
     print("⚠ Query router not found - Phase 2 will work without SRD content")
 
 try:
-    from ai_dm_free import SRDContentLoader
+    from LLM_Comp.ai_dm_free import SRDContentLoader
     print("✓ SRD content loader available")
 except (ImportError, AttributeError):
     print("⚠ SRD content loader not available")
 
 # Import Phase 3 enhanced router
 try:
-    from phase3_DM import (
+    from LLM_Comp.phase3_DM import (
         Phase3QueryRouter, 
         create_phase3_prompt,
         SRDContentLoader as Phase3SRDLoader
