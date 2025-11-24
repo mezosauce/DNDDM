@@ -67,6 +67,7 @@ class Character:
     })
     # type: ignore
     
+
     def __post_init__(self):
         # Ensure stats uses the expected key names (in case older data used different structure)
         if not isinstance(self.stats, dict):
