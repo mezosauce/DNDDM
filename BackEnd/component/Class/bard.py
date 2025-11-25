@@ -7,7 +7,7 @@ Derived from the base Character class with full Bard features
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
-from campaign_manager import Character
+from Class.Character import Character
 
 
 @dataclass
@@ -426,10 +426,6 @@ class Bard(Character):
             "spells": self.spells_known,
             "magical_secrets_spells": self.magical_secrets,
             
-            "inventory": self.inventory,
-            "currency": self.currency,
-            "total_wealth_gp": self.get_total_gold_value(),
-            
             "personality": {
                 "traits": self.personality_traits,
                 "ideal": self.ideal,
@@ -486,9 +482,6 @@ if __name__ == "__main__":
         flaw="I'll do anything to win fame and renown"
     )
     
-    # Set starting equipment
-    bard.inventory = ["Rapier", "Lute", "Leather Armor", "Dagger", "Entertainer's Pack"]
-    bard.currency['gp'] = 15
     
     print("=" * 60)
     print("BARD CHARACTER SHEET")
@@ -551,8 +544,6 @@ if __name__ == "__main__":
     print()
     
     print("Equipment:")
-    for item in bard.inventory:
-        print(f"  • {item}")
     print()
     
     # Learn some spells

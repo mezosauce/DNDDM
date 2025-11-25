@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 
-from Character import Character
+from Class.Character import Character
 
 
 @dataclass

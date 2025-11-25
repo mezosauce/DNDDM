@@ -7,7 +7,7 @@ Derived from the base Character class with full Cleric features
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
-from campaign_manager import Character
+from Class.Character import Character
 
 
 @dataclass
@@ -419,9 +419,6 @@ class Cleric(Character):
                 "Supreme Healing": self.supreme_healing
             } if self.divine_domain == "Life" else {},
             
-            "inventory": self.inventory,
-            "currency": self.currency,
-            "total_wealth_gp": self.get_total_gold_value(),
             
             "personality": {
                 "traits": self.personality_traits,
@@ -466,9 +463,6 @@ if __name__ == "__main__":
         flaw="I judge others harshly, and myself even more severely"
     )
     
-    # Set starting equipment
-    cleric.inventory = ["Mace", "Scale Mail", "Light Crossbow", "20 Bolts", "Priest's Pack", "Shield", "Holy Symbol"]
-    cleric.currency = {'cp': 0, 'sp': 0, 'ep': 0, 'gp': 15, 'pp': 0}
     
     print("=" * 60)
     print("CLERIC CHARACTER SHEET")
@@ -525,9 +519,6 @@ if __name__ == "__main__":
                 print(f"  • {feature}: {value if isinstance(value, str) else '✓'}")
         print()
     
-    print("Equipment:")
-    for item in cleric.inventory:
-        print(f"  • {item}")
     print()
     
     print(f"Currency: {sheet['total_wealth_gp']:.2f} gp total")

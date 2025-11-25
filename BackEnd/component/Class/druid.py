@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 
-from campaign_manager import Character
+from Class.Character import Character
 
 
 @dataclass
@@ -471,9 +471,6 @@ class Druid(Character):
             "known_cantrips": self.known_cantrips,
             "prepared_spells": self.prepared_spells,
             
-            "inventory": self.inventory,
-            "currency": self.currency,
-            "total_wealth_gp": self.get_total_gold_value(),
             
             "personality": {
                 "traits": self.personality_traits,
@@ -516,8 +513,6 @@ if __name__ == "__main__":
         flaw="I put too much trust in those who wield power within my temple's hierarchy"
     )
     
-    # Set starting equipment
-    druid.inventory = ["Wooden Shield", "Scimitar", "Leather Armor", "Explorer's Pack", "Druidic Focus"]
     
     # Add some starting cantrips
     druid.known_cantrips = ["Druidcraft", "Produce Flame"]
@@ -569,11 +564,6 @@ if __name__ == "__main__":
     for feature, value in sheet['features'].items():
         if value and value is not False:
             print(f"  • {feature}: {value if isinstance(value, str) else '✓'}")
-    print()
-    
-    print("Equipment:")
-    for item in druid.inventory:
-        print(f"  • {item}")
     print()
     
     # Test leveling up to 2 and choosing Circle
