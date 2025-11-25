@@ -10,7 +10,7 @@ Handles combat-specific logic, turn order, and action resolution.
 import sys
 from pathlib import Path
 from enum import Enum
-
+import re
 project_root = Path(__file__).resolve().parents[1]  # Goes up 1 levels to DNDDM folder
 sys.path.insert(0, str(project_root))
 
@@ -293,73 +293,79 @@ class CombatState:
         
         # Start first turn
         self.start_turn()
-    
-    def from_dm_description(cls,
+
+
+    @classmethod
+    def from_dm_description(
+        cls,
         dm_text: str,
         characters: List[Character],
-        available_monsters: Dict[str, Monster],
-        dice_state: Optional[DiceRollState] = None
+        dice_state: Optional[DiceRollState] = None,
+        index_path: str = "../../../srd_story_cycle/08_monsters_and_npcs/INDEX.md"
     ) -> 'CombatState':
-        """Parse DM combat Setup
+        """Parse DM combat Setup using INDEX.md for monster lookup
+        
         Args:
             dm_text: DM's description of the encounter
             characters: List of player characters
-            available_monsters: Dict mapping monster names to Monster objects
             dice_state: Optional DiceRollState
+            index_path: Path to the monster INDEX.md file
             
         Returns:
             Initialized CombatState
             
         Example:
-            dm_text = "You encounter 3 goblins and 1 goblin boss in the cave"
-            available_monsters = {"goblin": goblin_template, "goblin boss": boss_template}
+            dm_text = "You encounter 3 goblins and 1 ogre in the cave"
         """
-
-        import re
-
+        
         lines = dm_text.split('.')
         encounter_name = lines[0].strip() if lines else "Unknown Encounter"
-
-
+        
+        # Parse monster counts from description
         monster_pattern = r'(\d+)\s+([a-zA-Z\s]+?)(?:s|es)?\s*(?:and|in|at|,|\.|\n|$)'
         matches = re.findall(monster_pattern, dm_text.lower())
-
+        
         monsters = []
         monster_summary = []
-
+        
+        # Load monster index
+        monster_index = cls._load_monster_index(index_path)
+        
         for count_str, monster_name in matches:
             count = int(count_str)
             monster_name = monster_name.strip()
             
-            # Find matching monster template
-            template = None
-            for key, monster_template in available_monsters.items():
-                if key.lower() in monster_name or monster_name in key.lower():
-                    template = monster_template
-                    break
+            # Find matching monster in index
+            monster_file_path = cls._find_monster_in_index(monster_name, monster_index)
             
-            if template:
-                # Create copies of the monster
-                for _ in range(count):
-                    # Create a copy of the monster
-                    monster_copy = Monster(
-                        name=template.name,
-                        monster_type=template.monster_type,
-                        size=template.size,
-                        alignment=template.alignment,
-                        challenge_rating=template.challenge_rating,
-                        hp=template.hp,
-                        ac=template.ac,
-                        stats=template.stats.copy(),
-                        abilities=template.abilities.copy(),
-                        actions=template.actions.copy(),
-                        legendary_actions=template.legendary_actions.copy(),
-                        lair_actions=template.lair_actions.copy(),
-                        description=template.description
-                    )
-                    monsters.append(monster_copy)
+            if monster_file_path:
+                # Load monster from markdown file
+                base_path = Path(index_path).parent
+                full_path = base_path / monster_file_path
                 
-                monster_summary.append(f"{count} {template.name}{'s' if count > 1 else ''}")
+                monster_template = cls._load_monster_from_markdown(full_path)
+                
+                if monster_template:
+                    # Create copies of the monster
+                    for _ in range(count):
+                        monster_copy = Monster(
+                            name=monster_template.name,
+                            monster_type=monster_template.monster_type,
+                            size=monster_template.size,
+                            alignment=monster_template.alignment,
+                            challenge_rating=monster_template.challenge_rating,
+                            hp=monster_template.hp,
+                            ac=monster_template.ac,
+                            stats=monster_template.stats.copy(),
+                            abilities=monster_template.abilities.copy(),
+                            actions=monster_template.actions.copy(),
+                            legendary_actions=monster_template.legendary_actions.copy(),
+                            lair_actions=monster_template.lair_actions.copy(),
+                            description=monster_template.description
+                        )
+                        monsters.append(monster_copy)
+                    
+                    monster_summary.append(f"{count} {monster_template.name}{'s' if count > 1 else ''}")
         
         # Create combat state
         combat = cls(
@@ -375,7 +381,162 @@ class CombatState:
         
         return combat
 
-# ========================================================================
+
+    @staticmethod
+    def _load_monster_index(index_path: str) -> Dict[str, str]:
+        """Load monster names and file paths from INDEX.md
+        
+        Returns:
+            Dict mapping lowercase monster names to file paths
+        """
+        monster_index = {}
+        
+        try:
+            with open(index_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                
+            # Pattern to match: * [Monster Name](path/to/monster.md)
+            pattern = r'\*\s*\[([^\]]+)\]\(([^\)]+)\)'
+            matches = re.findall(pattern, content)
+            
+            for name, path in matches:
+                # Store with lowercase name for easier matching
+                monster_index[name.lower()] = path
+                
+        except FileNotFoundError:
+            print(f"Warning: Monster index not found at {index_path}")
+        
+        return monster_index
+
+
+    @staticmethod
+    def _find_monster_in_index(search_name: str, monster_index: Dict[str, str]) -> Optional[str]:
+        """Find monster file path by name
+        
+        Args:
+            search_name: Name to search for (from DM description)
+            monster_index: Dict of monster names to file paths
+            
+        Returns:
+            File path if found, None otherwise
+        """
+        search_name = search_name.lower().strip()
+        
+        # Try exact match first
+        if search_name in monster_index:
+            return monster_index[search_name]
+        
+        # Try singular form (remove trailing 's')
+        if search_name.endswith('s'):
+            singular = search_name[:-1]
+            if singular in monster_index:
+                return monster_index[singular]
+        
+        # Try partial match
+        for name, path in monster_index.items():
+            if search_name in name or name in search_name:
+                return path
+        
+        print(f"Warning: Monster '{search_name}' not found in index")
+        return None
+
+
+    @staticmethod
+    def _load_monster_from_markdown(file_path: Path) -> Optional[Monster]:
+        """Parse monster markdown file and create Monster object
+        
+        Args:
+            file_path: Path to monster markdown file
+            
+        Returns:
+            Monster object or None if parsing fails
+        """
+        
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            # Parse YAML frontmatter
+            name_match = re.search(r'^name:\s*(.+)$', content, re.MULTILINE)
+            cr_match = re.search(r'^cr:\s*(\d+(?:\.\d+)?)$', content, re.MULTILINE)
+            type_match = re.search(r'^type:\s*(.+)$', content, re.MULTILINE)
+            
+            # Parse main content
+            size_align_match = re.search(r'_([^,]+),\s*([^_]+)_', content)
+            ac_match = re.search(r'\*\*Armor Class\*\*\s*(\d+)', content)
+            hp_match = re.search(r'\*\*Hit Points\*\*\s*(\d+)', content)
+            
+            # Parse stat block
+            stats = {}
+            stat_pattern = r'\|\s*(\d+)\s*\(([+-]?\d+)\)\s*\|'
+            stat_matches = re.findall(stat_pattern, content)
+            if len(stat_matches) >= 6:
+                stat_names = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma']
+                for i, (score, modifier) in enumerate(stat_matches[:6]):
+                    stats[stat_names[i]] = int(score)
+            
+            # Parse actions
+            actions = []
+            actions_section = re.search(r'### Actions\s*(.+?)(?:###|$)', content, re.DOTALL)
+            if actions_section:
+                action_pattern = r'\*\*([^*]+?)\.\*\*\s*(.+?)(?=\*\*[^*]+?\.\*\*|\Z)'
+                action_matches = re.findall(action_pattern, actions_section.group(1), re.DOTALL)
+                for action_name, action_desc in action_matches:
+                    actions.append({
+                        'name': action_name.strip(),
+                        'description': action_desc.strip()
+                    })
+            
+            # Parse abilities
+            abilities = []
+            abilities_section = re.search(r'\*\*Challenge\*\*.*?\n\n(.+?)(?:### Actions)', content, re.DOTALL)
+            if abilities_section:
+                ability_pattern = r'\*\*([^*]+?)\.\*\*\s*(.+?)(?=\*\*[^*]+?\.\*\*|\n\n|\Z)'
+                ability_matches = re.findall(ability_pattern, abilities_section.group(1), re.DOTALL)
+                for ability_name, ability_desc in ability_matches:
+                    abilities.append({
+                        'name': ability_name.strip(),
+                        'description': ability_desc.strip()
+                    })
+            
+            # Parse legendary actions
+            legendary_actions = []
+            legendary_section = re.search(r'### Legendary Actions\s*(.+?)$', content, re.DOTALL)
+            if legendary_section:
+                leg_pattern = r'\*\*([^*]+?)\.*\*\*\s*(.+?)(?=\*\*[^*]+?\.|\Z)'
+                leg_matches = re.findall(leg_pattern, legendary_section.group(1), re.DOTALL)
+                for leg_name, leg_desc in leg_matches:
+                    legendary_actions.append({
+                        'name': leg_name.strip(),
+                        'description': leg_desc.strip()
+                    })
+            
+            # Create Monster object
+            if name_match and ac_match and hp_match:
+                size_category = size_align_match.group(1).split()[0] if size_align_match else "Medium"
+                alignment = size_align_match.group(2).strip() if size_align_match else "unaligned"
+                
+                return Monster(
+                    name=name_match.group(1),
+                    monster_type=type_match.group(1) if type_match else "unknown",
+                    size=size_category,
+                    alignment=alignment,
+                    challenge_rating=float(cr_match.group(1)) if cr_match else 1,
+                    hp=int(hp_match.group(1)),
+                    ac=int(ac_match.group(1)),
+                    stats=stats,
+                    abilities=abilities,
+                    actions=actions,
+                    legendary_actions=legendary_actions,
+                    lair_actions=[],
+                    description=f"A {size_category.lower()} {type_match.group(1) if type_match else 'creature'}"
+                )
+                
+        except Exception as e:
+            print(f"Error loading monster from {file_path}: {e}")
+        
+        return None
+    # ========================================================================
     # HELPER METHODS
     # ========================================================================
     

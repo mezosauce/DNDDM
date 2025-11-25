@@ -12,10 +12,23 @@ import os
 from pathlib import Path
 from datetime import datetime
 
+
+import sys
+from pathlib import Path
+
+project_root = Path(__file__).resolve().parents[3]  # Goes up 1 levels to DNDDM folder
+sys.path.insert(0, str(project_root))
+
+
+
+
+
 # Import core modules
-from component.campaign_manager import get_campaign_manager, Character
+from component.Class.Character import Character
+from component.campaign_manager import get_campaign_manager
 from LLM_Comp.prompt_templates import PromptTemplates, create_full_prompt
 from FAISS.search_engine import SRDSearchEngine, create_search_api, FAISS_AVAILABLE, EMBEDDINGS_AVAILABLE
+from combat_test_route import register_combat_test_routes
 
 # Import AI DM components with better error handling
 OllamaDM = None
@@ -118,6 +131,9 @@ if FAISS_AVAILABLE and EMBEDDINGS_AVAILABLE:
 else:
     print("⚠️  Search engine not available")
 
+
+register_combat_test_routes(app)
+print("✓ Combat test routes registered")
 
 # ============================================================================
 # MAIN ROUTES

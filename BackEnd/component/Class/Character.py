@@ -62,4 +62,26 @@ class Character:
                 "wisdom": 10,
                 "charisma": 10
             }
+
+def character_to_dict(character: Character) -> Dict:
+    """Convert Character to dict with class type metadata for serialization"""
+    char_dict = asdict(character)
+    # Add class type metadata to support potential Character subclasses
+    char_dict['_class_type'] = character.__class__.__name__
+    return char_dict
+
+
+def character_from_dict(char_data: Dict) -> Character:
+    """Create Character from dict, handling class type metadata"""
+    # Remove metadata that's not part of Character dataclass fields
+    data = char_data.copy()
+    class_type = data.pop('_class_type', 'Character')
     
+    # Create appropriate character class instance
+    # This supports future Character subclasses (e.g., Fighter, Wizard, etc.)
+    if class_type == 'Character':
+        return Character(**data)
+    else:
+        # Default to base Character if unknown type
+        # Could be extended to handle subclasses in the future
+        return Character(**data)
