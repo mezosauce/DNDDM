@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 
-from campaign_manager import Character
+from Character import Character
 
 
 @dataclass
@@ -24,7 +24,6 @@ class Barbarian(Character):
     Inherits from Character and adds Barbarian-specific features
     """
     
-    # Barbarian-specific attributes (all with defaults to avoid dataclass issues)
     primal_path: str = ""  # "Path of the Berserker" or "Path of the Totem Warrior"
     
     # Rage mechanics
@@ -369,10 +368,6 @@ class Barbarian(Character):
                 "Primal Champion": self.primal_champion
             },
             
-            "inventory": self.inventory,
-            "currency": self.currency,
-            "total_wealth_gp": self.get_total_gold_value(),
-            
             "personality": {
                 "traits": self.personality_traits,
                 "ideal": self.ideal,
@@ -414,9 +409,6 @@ if __name__ == "__main__":
         flaw="I am too enamored of ale, wine, and other intoxicants"
     )
     
-    # Set starting equipment
-    barbarian.inventory = ["Greataxe", "Handaxe", "Handaxe", "Explorer's Pack", "Javelin x4"]
-    
     print("=" * 60)
     print("BARBARIAN CHARACTER SHEET")
     print("=" * 60)
@@ -457,9 +449,6 @@ if __name__ == "__main__":
             print(f"  • {feature}: {value if isinstance(value, str) else '✓'}")
     print()
     
-    print("Equipment:")
-    for item in barbarian.inventory:
-        print(f"  • {item}")
     print()
     
     # Test rage mechanics
