@@ -115,3 +115,5 @@ if __name__ == "__main__":
 
     goblin = Monster.from_dict(goblin_data)
     print(goblin.full_description())
+    print(goblin.to_dict())
+    

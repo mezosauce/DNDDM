@@ -13,12 +13,6 @@ from pathlib import Path
 from datetime import datetime
 
 
-import sys
-from pathlib import Path
-
-project_root = Path(__file__).resolve().parents[3]  # Goes up 1 levels to DNDDM folder
-sys.path.insert(0, str(project_root))
-
 
 
 
