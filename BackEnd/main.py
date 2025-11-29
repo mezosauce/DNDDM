@@ -13,16 +13,13 @@ from pathlib import Path
 from datetime import datetime
 
 
-
-
-
-
 # Import core modules
 from component.Class.Character import Character
 from component.campaign_manager import get_campaign_manager
 from LLM_Comp.prompt_templates import PromptTemplates, create_full_prompt
 from FAISS.search_engine import SRDSearchEngine, create_search_api, FAISS_AVAILABLE, EMBEDDINGS_AVAILABLE
 from combat_test_route import register_combat_test_routes
+
 
 # Import AI DM components with better error handling
 OllamaDM = None
@@ -85,6 +82,8 @@ try:
 except ImportError as e:
     print(f"⚠ Phase 3 routes not found: {e}")
     register_phase3_routes = None
+
+
 
 # Initialize Flask app with proper template path
 template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../FrontEnd/templates'))

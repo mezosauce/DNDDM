@@ -12,7 +12,9 @@ from typing import Dict, List, Optional
 from dataclasses import dataclass, asdict, field
 import shutil
 
-from Class.Character import Character, character_to_dict, character_from_dict
+
+from component.Class.Character import Character, character_to_dict, character_from_dict
+
 
 @dataclass
 class Campaign:
@@ -21,7 +23,7 @@ class Campaign:
     created_date: str
     current_phase: str
     party_size: int
-    characters: List[Dict] = field(default_factory=list)  # type: ignore
+    characters: List[Dict] = field(default_factory=list) 
     setup_complete: bool = False
     adventure_complete: bool = False
     preparation_complete: bool = False
