@@ -326,9 +326,9 @@
             event.target.classList.add('active');
         }
         
-        // Initialize on load
+        
         window.onload = () => {
-            // Class selection handler
+           
             function onClassChange() {
     const classSelect = document.getElementById('char-class');
     const selectedClass = classSelect.value;
@@ -353,14 +353,14 @@
         updateClassSkills();
     }
 }
-
+/*
         // Level change handler - GLOBAL
         function onLevelChange() {
             const level = parseInt(document.getElementById('char-level').value) || 1;
             updateSubclassDisplay(level);
             updatePoints(); // Existing function
         }
-
+*/
         function updateSubclassDisplay(level) {
             const classSelect = document.getElementById('char-class');
             const selectedClass = classSelect.value;
@@ -500,8 +500,6 @@
         }
         
         function checkSkillConflicts() {
-            // This would check against class skills
-            // For now, just warn if more than 2 selected
             const warningBox = document.getElementById('skill-warning');
             const warningText = document.getElementById('skill-warning-text');
             
@@ -514,8 +512,6 @@
         }
         
         function updateClassSkills() {
-            // This would be enhanced to show which skills the class already grants
-            // For now, just a placeholder
         }
         
         // Languages List
@@ -660,20 +656,12 @@
                 },
                 background_feature: document.getElementById('char-bg-feature').value,
                 skill_proficiencies: selectedSkills,
-                tool_proficiencies: tools,
                 languages_known: allLanguages,
                 personality_traits: selectedTraits,           
                 ideal: selectedIdeal || '',                   
                 bond: selectedBond || '',                     
                 flaw: selectedFlaw || '',                     
-                currency: {
-                    pp: parseInt(document.getElementById('curr-pp').value) || 0,
-                    gp: parseInt(document.getElementById('curr-gp').value) || 0,
-                    ep: parseInt(document.getElementById('curr-ep').value) || 0,
-                    sp: parseInt(document.getElementById('curr-sp').value) || 0,
-                    cp: parseInt(document.getElementById('curr-cp').value) || 0
-                },
-                inventory: inventory,
+
                 notes: document.getElementById('char-notes').value
             };
             

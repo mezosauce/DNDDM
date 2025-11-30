@@ -99,39 +99,31 @@ def register_phase1_routes(app, campaign_mgr, Character):
             # Get class type from request (defaults to "Character" if not provided)
             class_type = data.get('class', 'Character')
             
-            # Prepare base parameters that all characters need
             base_params = {
                 'name': data['name'],
                 'race': data['race'],
                 'char_class': data['class'],
                 'background': data['background'],
-                'level': int(data.get('level', 1)),
+                'level': int(data.get('level', 1)), 
                 'hp': int(data.get('hp', 10)),
                 'max_hp': int(data.get('max_hp', 10)),
                 'ac': int(data.get('ac', 10)),
                 'stats': data.get('stats', {}),
-                'inventory': data.get('inventory', []),
                 'notes': data.get('notes', ''),
-                'alignment': data.get('alignment', 'True Neutral'),
-                'has_inspiration': data.get('has_inspiration', False),
-                'armor_worn': data.get('armor_worn', ''),
+                'alignment': data.get('alignment', 'True Neutral'), 
+                
                 'background_feature': data.get('background_feature', ''),
                 'skill_proficiencies': data.get('skill_proficiencies', []),
-                'tool_proficiencies': data.get('tool_proficiencies', []),
+                
                 'languages_known': data.get('languages_known', []),
                 'personality_traits': data.get('personality_traits', []),
                 'ideal': data.get('ideal', ''),
                 'bond': data.get('bond', ''),
                 'flaw': data.get('flaw', ''),
-                'saving_throw_proficiencies': data.get('saving_throw_proficiencies', []),
-                'background_equipment': data.get('background_equipment', [])
+
             }
             
-            # Handle currency separately
-            base_params['currency'] = data.get('currency', {'cp': 0, 'sp': 0, 'ep': 0, 'gp': 0, 'pp': 0})
-            
-            # For class-specific parameters, pass them directly and let the factory handle them
-            # The factory will ignore unknown parameters for each class
+
             additional_params = {}
             
             # Barbarian-specific fields

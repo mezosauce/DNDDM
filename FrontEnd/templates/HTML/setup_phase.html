@@ -36,7 +36,6 @@
                     <button class="tab" onclick="showTab('stats')">Stats</button>
                     <button class="tab" onclick="showTab('background')">Background</button>
                     <button class="tab" onclick="showTab('personality')">Personality</button>
-                    <button class="tab" onclick="showTab('details')">Details</button>
                 </div>
                 
                 <form id="character-form">
@@ -72,38 +71,23 @@
                         <div id="class-info-panel" class="class-info-panel" style="display: none;">
                             <h3 style="color: #4dabf7; margin-top: 0;">Class Information</h3>
                             <div class="class-info-grid">
+
                                 <div class="class-info-item">
                                     <div class="class-info-label">Hit Die</div>
                                     <div class="class-info-value" id="class-hit-die">-</div>
                                 </div>
+
+
                                 <div class="class-info-item">
                                     <div class="class-info-label">Primary Abilities</div>
                                     <div class="class-info-value" id="class-primary-abilities">-</div>
                                 </div>
-                                <div class="class-info-item">
-                                    <div class="class-info-label">Saving Throws</div>
-                                    <div class="class-info-value" id="class-saves">-</div>
-                                </div>
-                                <div class="class-info-item">
-                                    <div class="class-info-label">Armor Proficiencies</div>
-                                    <div class="class-info-value" id="class-armor-prof">-</div>
-                                </div>
                             </div>
+
                             <div style="margin-top: 10px;">
                                 <div class="class-info-label">Weapon Proficiencies</div>
                                 <div class="class-info-value" id="class-weapon-prof">-</div>
                             </div>
-                        </div>
-
-                        <!-- Subclass Selector (shows at appropriate level) -->
-                        <div id="subclass-selector-container" class="subclass-selector" style="display: none;">
-                            <label>Subclass / Archetype</label>
-                            <select id="subclass-select">
-                                <option value="">Choose subclass...</option>
-                            </select>
-                            <small style="color: #888; display: block; margin-top: 5px;">
-                                Available at level <span id="subclass-level-req">3</span>
-                            </small>
                         </div>
                         
                         <label>Alignment *</label>
@@ -215,8 +199,6 @@
                             <!-- Will be populated by JavaScript -->
                         </div>
                         
-                        <h3>Tool Proficiencies</h3>
-                        <input type="text" id="char-tools" placeholder="e.g., Thieves' tools, Smith's tools">
                     </div>
                     
                     
@@ -309,43 +291,10 @@
                                 </div>
                             </div>
                         </div>
+                        <button type="submit">✨ Create Character</button>
                     </div>
                     
-                    <!-- TAB 5: DETAILS -->
-                    <div id="tab-details" class="tab-content">
-                        <h3>Starting Currency</h3>
-                        <div class="currency-grid">
-                            <div>
-                                <div class="currency-label">PP</div>
-                                <input type="number" class="currency-input" id="curr-pp" min="0" value="0">
-                            </div>
-                            <div>
-                                <div class="currency-label">GP</div>
-                                <input type="number" class="currency-input" id="curr-gp" min="0" value="0">
-                            </div>
-                            <div>
-                                <div class="currency-label">EP</div>
-                                <input type="number" class="currency-input" id="curr-ep" min="0" value="0">
-                            </div>
-                            <div>
-                                <div class="currency-label">SP</div>
-                                <input type="number" class="currency-input" id="curr-sp" min="0" value="0">
-                            </div>
-                            <div>
-                                <div class="currency-label">CP</div>
-                                <input type="number" class="currency-input" id="curr-cp" min="0" value="0">
-                            </div>
-                        </div>
-                        <small style="color: #888;">Total: <span id="total-gold">0</span> gp</small>
-                        
-                        <h3 style="margin-top: 20px;">Starting Equipment</h3>
-                        <textarea id="char-inventory" placeholder="List starting equipment (comma-separated)"></textarea>
-                        
-                        <label>Character Notes</label>
-                        <textarea id="char-notes" placeholder="Backstory, goals, appearance, etc."></textarea>
-                    </div>
                     
-                    <button type="submit">✨ Create Character</button>
                 </form>
             </div>
             
