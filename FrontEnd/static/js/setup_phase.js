@@ -79,34 +79,58 @@
         let bondRolled = false;
         let flawRolled = false;
 
-        // Dice Rolling
         function rollD8() {
-    if (traitsRolled) {
-        alert('You have already rolled for personality traits. Click on the options to manually change your selection.');
-        return;
-    }
-    
-    const roll = Math.floor(Math.random() * 8);
-    selectPersonalityTrait(roll);
-    
-    // Add visual feedback
-    const option = document.querySelectorAll('.dice-option')[roll];
-    option.classList.add('roll-animation');
-    setTimeout(() => option.classList.remove('roll-animation'), 600);
-    
-    // Disable the roll button
-    traitsRolled = true;
-    const btn = document.getElementById('roll-traits-btn');
-    btn.disabled = true;
-    btn.textContent = '🎲 Already Rolled (click options to change)';
-    btn.classList.add('rolled');
-}
+            if (traitsRolled) {
+                alert('You have already rolled for personality traits. Click on the options to manually change your selection.');
+                return;
+            }
+            
+            // Roll 2d8 - get two different random numbers
+            const roll1 = Math.floor(Math.random() * 8);
+            let roll2 = Math.floor(Math.random() * 8);
+            
+            // Make sure second roll is different from first
+            while (roll2 === roll1) {
+                roll2 = Math.floor(Math.random() * 8);
+            }
+            
+            // Select both traits
+            selectPersonalityTrait(roll1);
+            selectPersonalityTrait(roll2);
+            
+            // Add visual feedback for both rolls
+            const options = document.querySelectorAll('#personality-traits-list .dice-option');
+            if (options[roll1]) {
+                options[roll1].classList.add('roll-animation');
+                setTimeout(() => options[roll1].classList.remove('roll-animation'), 600);
+            }
+            if (options[roll2]) {
+                // Delay second animation slightly for visual effect
+                setTimeout(() => {
+                    options[roll2].classList.add('roll-animation');
+                    setTimeout(() => options[roll2].classList.remove('roll-animation'), 600);
+                }, 300);
+            }
+            
+            // Disable the roll button
+            traitsRolled = true;
+            const btn = document.getElementById('roll-traits-btn');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '🎲 Already Rolled (click options to change)';
+                btn.classList.add('rolled');
+            }
+        }
 
 
             function selectPersonalityTrait(index) {
                 const trait = PERSONALITY_TRAITS[index];
                 const options = document.querySelectorAll('#personality-traits-list .dice-option');
                 
+                if (!options[index]) {
+                    console.error
+                }
+
                 // Allow up to 2 traits
                 if (selectedTraits.length < 2) {
                     selectedTraits.push(trait);
@@ -126,7 +150,10 @@
                 });
                 
                 // Add new selection
-                document.querySelectorAll('#ideals-list .dice-option')[index].classList.add('selected');
+                const options = document.querySelectorAll('#ideals-list .dice-option');
+                if (options[index]) {
+                    options[index].classList.add('selected');
+                }
                 updateIdealDisplay();
             }
 
@@ -140,7 +167,10 @@
                 });
                 
                 // Add new selection
-                document.querySelectorAll('#bonds-list .dice-option')[index].classList.add('selected');
+                const options = document.querySelectorAll('#bonds-list .dice-option');
+                if (options[index]) {
+                    options[index].classList.add('selected');
+                }
                 updateBondDisplay();
             }
 
@@ -154,7 +184,10 @@
                 });
                 
                 // Add new selection
-                document.querySelectorAll('#flaws-list .dice-option')[index].classList.add('selected');
+                const options = document.querySelectorAll('#flaws-list .dice-option');
+                if (options[index]) {
+                    options[index].classList.add('selected');
+                }
                 updateFlawDisplay();
             }
 
@@ -221,7 +254,38 @@
             btn.classList.add('rolled');
         }
 
+        function handleTraitClick(index) {
+        const trait = PERSONALITY_TRAITS[index];
+        const options = document.querySelectorAll('#personality-traits-list .dice-option');
         
+        if (selectedTraits.includes(trait)) {
+            // Deselect
+            selectedTraits = selectedTraits.filter(t => t !== trait);
+            options[index].classList.remove('selected');
+        } else {
+            // Select (max 2)
+            if (selectedTraits.length < 2) {
+                selectedTraits.push(trait);
+                options[index].classList.add('selected');
+            } else {
+                alert('You can only select 2 personality traits. Deselect one first.');
+            }
+        }
+            updateTraitsDisplay();
+        }
+
+        function handleIdealClick(index) {
+            selectIdeal(index);
+        }
+
+        function handleBondClick(index) {
+            selectBond(index);
+        }
+
+        function handleFlawClick(index) {
+            selectFlaw(index);
+        }
+
 
         // ============================================================================
         // DISPLAY UPDATE FUNCTIONS
@@ -272,7 +336,7 @@
         function populatePersonalityTraits() {
             const container = document.getElementById('personality-traits-list');
             container.innerHTML = PERSONALITY_TRAITS.map((trait, index) => `
-                <div class="dice-option">
+                <div class="dice-option" onclick="handleTraitClick({$index})">
                     <span class="dice-number">${index + 1}</span>
                     <span class="dice-text">${trait}</span>
                 </div>
@@ -282,7 +346,7 @@
         function populateIdealsList() {
             const container = document.getElementById('ideals-list');
             container.innerHTML = IDEALS.map((ideal, index) => `
-                <div class="dice-option">
+                <div class="dice-option onclick="handleIdealClick(${index})">
                     <span class="dice-number">${index + 1}</span>
                     <span class="dice-text">${ideal}</span>
                 </div>
@@ -292,7 +356,7 @@
         function populateBondsList() {
             const container = document.getElementById('bonds-list');
             container.innerHTML = BONDS.map((bond, index) => `
-                <div class="dice-option">
+                <div class="dice-option onclick="handleBondClick(${index})">
                     <span class="dice-number">${index + 1}</span>
                     <span class="dice-text">${bond}</span>
                 </div>
@@ -302,7 +366,7 @@
         function populateFlawsList() {
             const container = document.getElementById('flaws-list');
             container.innerHTML = FLAWS.map((flaw, index) => `
-                <div class="dice-option">
+                <div class="dice-option onclick="handleFlawClick(${index})">
                     <span class="dice-number">${index + 1}</span>
                     <span class="dice-text">${flaw}</span>
                 </div>
@@ -568,23 +632,6 @@
             });
         }
         
-        
-        function toggleTrait(index) {
-            const trait = PERSONALITY_TRAITS[index];
-            const element = document.querySelectorAll('.trait-option')[index];
-            
-            if (selectedTraits.includes(trait)) {
-                selectedTraits = selectedTraits.filter(t => t !== trait);
-                element.classList.remove('selected');
-            } else {
-                if (selectedTraits.length < 2) {
-                    selectedTraits.push(trait);
-                    element.classList.add('selected');
-                } else {
-                    alert('You can only select 2 personality traits. Deselect one first.');
-                }
-            }
-        }
         
         // Background Info
         function updateBackgroundInfo() {
