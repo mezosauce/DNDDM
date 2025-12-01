@@ -52,30 +52,7 @@ class ClassFeatureManager {
         return tracker;
     }
 
-    showSubclassSelector(level) {
-        const metadata = window.classSelector?.getSelectedClassMetadata();
-        if (!metadata || !metadata.subclasses) return;
-
-        const subclassLevel = metadata.subclasses.level;
-        if (level < subclassLevel) return;
-
-        const container = document.getElementById('subclass-selector-container');
-        if (!container) return;
-
-        container.style.display = 'block';
-        const select = document.getElementById('subclass-select');
-        if (!select) return;
-
-        // Populate options
-        select.innerHTML = `<option value="">Choose ${metadata.subclasses.name}...</option>`;
-        metadata.subclasses.options.forEach(option => {
-            const opt = document.createElement('option');
-            opt.value = option.name;
-            opt.textContent = option.name;
-            opt.title = option.description;
-            select.appendChild(opt);
-        });
-    }
+    
 }
 
 // Utility function to update resource displays

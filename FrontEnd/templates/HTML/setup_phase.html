@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/setup_phase.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/class_selector.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/class_features.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/class_abilities.css') }}">
 </head>
 <body>
     <div class="container">
@@ -66,18 +67,14 @@
                             <option value="Cleric">Cleric</option>
                             <option value="Druid">Druid</option>
                         </select>
-
                         <!-- Class Information Panel -->
                         <div id="class-info-panel" class="class-info-panel" style="display: none;">
                             <h3 style="color: #4dabf7; margin-top: 0;">Class Information</h3>
                             <div class="class-info-grid">
-
                                 <div class="class-info-item">
                                     <div class="class-info-label">Hit Die</div>
                                     <div class="class-info-value" id="class-hit-die">-</div>
                                 </div>
-
-
                                 <div class="class-info-item">
                                     <div class="class-info-label">Primary Abilities</div>
                                     <div class="class-info-value" id="class-primary-abilities">-</div>
@@ -85,11 +82,27 @@
                             </div>
 
                             <div style="margin-top: 10px;">
-                                <div class="class-info-label">Weapon Proficiencies</div>
-                                <div class="class-info-value" id="class-weapon-prof">-</div>
+                                <div class="class-info-label">Saving Throw Proficiencies</div>
+                                <div class="class-info-value" id="class-saves">-</div>
                             </div>
+
+                            <div style="margin-top: 10px;">
+                                <div class="class-info-label">Skill Proficiencies</div>
+                                <div class="class-info-value" id="class-skills">-</div>
+                            </div>
+
+                            <!-- Class Abilities by Level -->
+                            <div style="margin-top: 15px;">
+                                <div class="class-info-label">📜 Class Abilities by Level</div>
+                                <div id="class-abilities-list">
+                                    <p style="color: #888; font-size: 0.9em;">Select a class to view abilities</p>
+                                </div>
+                            </div>
+
+                            <!-- Class Features Container -->
+                            <div id="class-features-container" style="margin-top: 15px;"></div>
                         </div>
-                        
+
                         <label>Alignment *</label>
                         <select id="char-alignment" required>
                             <option value="Lawful Good">Lawful Good</option>
@@ -359,6 +372,9 @@
     <script src="{{ url_for('static', filename='js/setup_phase.js') }}"></script>
     <script src="{{ url_for('static', filename='js/class_features/base.js') }}"></script>
     <script src="{{ url_for('static', filename='js/class_features/barbarian.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/class_features/bard.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/class_features/cleric.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/class_features/druid.js') }}"></script>
     <script src="{{ url_for('static', filename='js/class_selector.js') }}"></script>
 </body>
 </html>

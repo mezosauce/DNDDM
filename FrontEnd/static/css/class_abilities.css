@@ -1,0 +1,128 @@
+/* Class Abilities Grid - Level 1-20 Display */
+
+.abilities-full-grid {
+    border: 1px solid #3a3a4a;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.abilities-grid-header {
+    display: grid;
+    grid-template-columns: 50px 1fr;
+    background: #2a2a3a;
+    padding: 8px 12px;
+    font-weight: bold;
+    font-size: 0.85em;
+    color: #4dabf7;
+    border-bottom: 2px solid #4dabf7;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.ability-row {
+    display: grid;
+    grid-template-columns: 50px 1fr;
+    padding: 8px 12px;
+    border-bottom: 1px solid #2a2a3a;
+    transition: background 0.2s ease;
+}
+
+.ability-row:last-child {
+    border-bottom: none;
+}
+
+.ability-row:hover {
+    background: rgba(77, 171, 247, 0.1);
+}
+
+.ability-row.unlocked {
+    background: rgba(81, 207, 102, 0.1);
+}
+
+.ability-row.unlocked .ability-level-cell {
+    color: #51cf66;
+    font-weight: bold;
+}
+
+.ability-row.locked {
+    opacity: 0.6;
+}
+
+.ability-row.locked .ability-level-cell {
+    color: #868e96;
+}
+
+.ability-level-cell {
+    font-weight: bold;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4dabf7;
+}
+
+.ability-features-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.ability-tag {
+    background: linear-gradient(135deg, #4dabf7 0%, #3b8dd4 100%);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.ability-row.unlocked .ability-tag {
+    background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+}
+
+.ability-row.locked .ability-tag {
+    background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+}
+
+.no-ability {
+    color: #495057;
+    font-style: italic;
+    font-size: 0.85em;
+}
+
+/* Scrollbar styling for abilities grid */
+.abilities-full-grid::-webkit-scrollbar {
+    width: 8px;
+}
+
+.abilities-full-grid::-webkit-scrollbar-track {
+    background: #1a1a2a;
+    border-radius: 4px;
+}
+
+.abilities-full-grid::-webkit-scrollbar-thumb {
+    background: #4dabf7;
+    border-radius: 4px;
+}
+
+.abilities-full-grid::-webkit-scrollbar-thumb:hover {
+    background: #74c0fc;
+}
+
+/* Class Info Panel Updates */
+#class-abilities-list {
+    margin-top: 15px;
+}
+
+.class-abilities-header {
+    color: #4dabf7;
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 0.95em;
+}

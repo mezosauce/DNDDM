@@ -17,10 +17,9 @@ class BarbarianFeatureManager extends ClassFeatureManager {
         this.stats = { strength: 10, dexterity: 10, constitution: 10 };
     }
 
-    initialize(level, stats, subclass = '') {
+    initialize(level, stats) {
         this.level = level;
         this.stats = stats || this.stats;
-        this.subclass = subclass;
         this.updateRageProgression();
         this.render();
     }
@@ -133,7 +132,7 @@ class BarbarianFeatureManager extends ClassFeatureManager {
             { level: 1, name: 'Unarmored Defense', desc: '10 + DEX + CON when not wearing armor' },
             { level: 2, name: 'Reckless Attack', desc: 'Advantage on melee attacks, enemies have advantage on you' },
             { level: 2, name: 'Danger Sense', desc: 'Advantage on DEX saves vs. effects you can see' },
-            { level: 3, name: 'Primal Path', desc: this.subclass || 'Choose your path' },
+            { level: 3, name: 'Primal Path', desc: 'Choose' || 'Choose your path' },
             { level: 5, name: 'Extra Attack', desc: 'Attack twice when you take the Attack action' },
             { level: 5, name: 'Fast Movement', desc: '+10 ft speed when not wearing heavy armor' },
             { level: 7, name: 'Feral Instinct', desc: 'Advantage on initiative, can act in surprise round' },
@@ -267,10 +266,6 @@ class BarbarianFeatureManager extends ClassFeatureManager {
         }
     }
 
-    setSubclass(subclass) {
-        this.subclass = subclass;
-        this.render();
-    }
 
     setCharacterName(name) {
         this.characterName = name;

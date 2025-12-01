@@ -34,16 +34,19 @@ class ClassSelector {
         // Update info panel
         this.updateElement('class-hit-die', metadata.hit_die);
         this.updateElement('class-primary-abilities', metadata.primary_abilities.join(', '));
-        this.updateElement('class-saves', metadata.saves.join(', '));
-        this.updateElement('class-armor-prof', metadata.armor_proficiencies.join(', '));
-        this.updateElement('class-weapon-prof', metadata.weapon_proficiencies.join(', '));
-
-        // Update skill info
-        const skillInfo = `Choose ${metadata.skills.choose} from: ${metadata.skills.from.join(', ')}`;
-        this.updateElement('skill-class-info', skillInfo);
+        
+        // Update saving throw proficiencies
+        if (metadata.saves) {
+            this.updateElement('class-saves', metadata.saves.join(', '));
+        }
+        
+        // Update skill proficiencies info
+        if (metadata.skills) {
+            const skillInfo = `Choose ${metadata.skills.choose} from: ${metadata.skills.from.join(', ')}`;
+            this.updateElement('class-skills', skillInfo);
+        }
 
         const level = parseInt(document.getElementById('char-level')?.value) || 1;
-
     }
 
     updateElement(id, text) {

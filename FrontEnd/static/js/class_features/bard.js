@@ -40,10 +40,9 @@ class BardFeatureManager extends ClassFeatureManager {
         this.college = '';
     }
 
-    initialize(level, stats, subclass = '') {
+    initialize(level, stats) {
         this.level = level;
         this.stats = stats || this.stats;
-        this.college = subclass;
         this.updateProgression();
         this.render();
     }
@@ -413,10 +412,6 @@ class BardFeatureManager extends ClassFeatureManager {
         this.render();
     }
 
-    setSubclass(college) {
-        this.college = college;
-        this.render();
-    }
 
     updateSpellsKnown(cantrips, spells) {
         this.cantripsKnown = cantrips || 0;

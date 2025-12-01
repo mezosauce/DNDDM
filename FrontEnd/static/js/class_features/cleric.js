@@ -29,10 +29,9 @@ class ClericFeatureManager extends ClassFeatureManager {
         this.divineInterventionAutoSuccess = false;
     }
 
-    initialize(level, stats, subclass = '', deity = '') {
+    initialize(level, stats, deity = '') {
         this.level = level;
         this.stats = stats || this.stats;
-        this.divineDomain = subclass;
         this.deity = deity;
         this.updateSpellProgression();
         this.updateDomainFeatures();
@@ -425,12 +424,7 @@ class ClericFeatureManager extends ClassFeatureManager {
         this.updateDomainFeatures();
         this.render();
     }
-
-    setSubclass(subclass) {
-        this.divineDomain = subclass;
-        this.updateDomainFeatures();
-        this.render();
-    }
+    
 
     setDeity(deity) {
         this.deity = deity;

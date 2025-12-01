@@ -30,10 +30,9 @@ class DruidFeatureManager extends ClassFeatureManager {
         this.stats = { wisdom: 10, constitution: 10, dexterity: 10 };
     }
 
-    initialize(level, stats, subclass = '', circleLandType = '') {
+    initialize(level, stats, circleLandType = '') {
         this.level = level;
         this.stats = stats || this.stats;
-        this.druidCircle = subclass;
         this.circleLandType = circleLandType;
         this.updateWildShapeProgression();
         this.updateSpellSlots();
@@ -556,10 +555,6 @@ class DruidFeatureManager extends ClassFeatureManager {
         this.render();
     }
 
-    setSubclass(subclass) {
-        this.druidCircle = subclass;
-        this.render();
-    }
 
     setCircleLandType(landType) {
         this.circleLandType = landType;

@@ -5,17 +5,7 @@
     "hit_die": "d12",
     "primary_abilities": ["Strength", "Constitution"],
     "saves": ["Strength", "Constitution"],
-    "skills": {
-      "choose": 2,
-      "from": [
-        "Animal Handling",
-        "Athletics",
-        "Intimidation",
-        "Nature",
-        "Perception",
-        "Survival"
-      ]
-    },
+    
     "features_by_level": {
       "1": ["Rage", "Unarmored Defense"],
       "2": ["Reckless Attack", "Danger Sense"],
