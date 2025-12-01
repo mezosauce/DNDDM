@@ -614,10 +614,9 @@
                 languages_known: allLanguages,
                 personality_traits: selectedTraits,           
                 ideal: selectedIdeal || '',                   
-                bond: selectedBond || '',                     
+                bond: selectedBond || '',
                 flaw: selectedFlaw || '',                     
 
-                notes: document.getElementById('char-notes').value
             };
             
             const response = await fetch(`/campaign/${encodeURIComponent(window.campaignName)}/character/add`, {

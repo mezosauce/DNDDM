@@ -47,6 +47,40 @@ class ClassSelector {
         }
 
         const level = parseInt(document.getElementById('char-level')?.value) || 1;
+        
+        // Update class abilities for current level
+        this.updateClassAbilities(metadata, level);
+    }
+
+    updateClassAbilities(metadata, level) {
+        const container = document.getElementById('class-abilities-list');
+        if (!container) return;
+
+        if (!metadata || !metadata.features_by_level) {
+            container.innerHTML = '<p style="color: #888;">No abilities data available</p>';
+            return;
+        }
+
+        let html = '<div class="abilities-full-grid">';
+        html += '<div class="abilities-grid-header"><span>Level</span><span>Abilities</span></div>';
+        
+        for (let lvl = 1; lvl <= 20; lvl++) {
+            const features = metadata.features_by_level[lvl.toString()] || [];
+            const isUnlocked = lvl <= level;
+            const hasFeatures = features.length > 0;
+            
+            html += `
+                <div class="ability-row ${isUnlocked ? 'unlocked' : 'locked'}">
+                    <div class="ability-level-cell">${lvl}</div>
+                    <div class="ability-features-cell">
+                        ${hasFeatures ? features.map(f => `<span class="ability-tag">${f}</span>`).join('') : '<span class="no-ability">—</span>'}
+                    </div>
+                </div>
+            `;
+        }
+        
+        html += '</div>';
+        container.innerHTML = html;
     }
 
     updateElement(id, text) {
@@ -58,16 +92,16 @@ class ClassSelector {
 
 
     initializeClassManager() {
-        // Clean up existing manager
-        if (this.classManagers[this.selectedClass]) {
-            this.classManagers[this.selectedClass] = null;
-        }
+        // Clean up existing managers
+        Object.keys(this.classManagers).forEach(key => {
+            this.classManagers[key] = null;
+        });
 
         // Get current stats and level
         const level = parseInt(document.getElementById('char-level')?.value) || 1;
         const stats = this.getCurrentStats();
 
-        // Initialize class-specific container
+        // Create/update class-specific container
         this.createClassFeaturesContainer();
 
         // Initialize class-specific manager
@@ -86,36 +120,39 @@ class ClassSelector {
                 }
                 break;
 
-            
             case 'Cleric':
                 if (window.ClericFeatureManager) {
-                    this.classManagers.Cleric = new ClericFeatureManager()
-                    this. classManagers.Cleric.initialize(level, stats)
+                    this.classManagers.Cleric = new ClericFeatureManager();
+                    this.classManagers.Cleric.initialize(level, stats);
                 }
-
+                break;
 
             case 'Druid':
                 if (window.DruidFeatureManager) {
-                    this.classManagers.Druid = new DruidFeatureManager()
-                    this. classManagers.Druid.initialize(level, stats)
+                    this.classManagers.Druid = new DruidFeatureManager();
+                    this.classManagers.Druid.initialize(level, stats);
                 }
+                break;
+
             default:
                 this.showGenericFeatures(level);
         }
     }
 
     createClassFeaturesContainer() {
-        // Check if container exists
-        let container = document.getElementById('barbarian-features');
-        if (!container) {
-            // Create it in the appropriate tab
-            const detailsTab = document.getElementById('tab-details');
-            if (detailsTab) {
-                container = document.createElement('div');
-                container.id = 'barbarian-features';
-                detailsTab.insertBefore(container, detailsTab.firstChild);
-            }
-        }
+        // Get the parent container where class features should be rendered
+        const parentContainer = document.getElementById('class-features-container');
+        if (!parentContainer) return;
+
+        // Clear any existing class feature containers
+        parentContainer.innerHTML = '';
+
+        // Create container for the selected class
+        const classContainerId = `${this.selectedClass.toLowerCase()}-features`;
+        const container = document.createElement('div');
+        container.id = classContainerId;
+        container.className = 'class-features-wrapper';
+        parentContainer.appendChild(container);
     }
 
     getCurrentStats() {
@@ -130,18 +167,18 @@ class ClassSelector {
     }
 
     showGenericFeatures(level) {
-        const container = document.getElementById('barbarian-features');
+        const container = document.getElementById('class-features-container');
         if (!container) return;
 
         const metadata = this.classMetadata[this.selectedClass];
         if (!metadata || !metadata.features_by_level) {
-            container.innerHTML = '';
+            container.innerHTML = '<p style="color: #888; text-align: center;">Select a class to view features</p>';
             return;
         }
 
         // Display generic feature list
         let html = '<div class="class-specific-section active">';
-        html += '<div class="class-section-header">📖 Class Features</div>';
+        html += `<div class="class-section-header">📖 ${this.selectedClass} Features</div>`;
         html += '<div class="feature-tree">';
 
         for (let lvl = 1; lvl <= 20; lvl++) {
@@ -168,13 +205,19 @@ class ClassSelector {
     updateLevel(newLevel) {
         const level = parseInt(newLevel) || 1;
         
+        // Update class abilities display
+        const metadata = this.classMetadata[this.selectedClass];
+        if (metadata) {
+            this.updateClassAbilities(metadata, level);
+        }
+        
         // Update class manager if exists
         const manager = this.classManagers[this.selectedClass];
         if (manager && typeof manager.setLevel === 'function') {
             manager.setLevel(level);
-        } else {
-            // Update generic features
-            this.showGenericFeatures(level);
+        } else if (this.selectedClass) {
+            // Update generic features or reinitialize
+            this.initializeClassManager();
         }
     }
 

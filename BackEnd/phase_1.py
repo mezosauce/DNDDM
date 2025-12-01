@@ -109,7 +109,6 @@ def register_phase1_routes(app, campaign_mgr, Character):
                 'max_hp': int(data.get('max_hp', 10)),
                 'ac': int(data.get('ac', 10)),
                 'stats': data.get('stats', {}),
-                'notes': data.get('notes', ''),
                 'alignment': data.get('alignment', 'True Neutral'), 
                 
                 'background_feature': data.get('background_feature', ''),
