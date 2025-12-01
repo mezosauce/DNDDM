@@ -110,10 +110,8 @@ def register_phase1_routes(app, campaign_mgr, Character):
                 'ac': int(data.get('ac', 10)),
                 'stats': data.get('stats', {}),
                 'alignment': data.get('alignment', 'True Neutral'), 
-                
                 'background_feature': data.get('background_feature', ''),
                 'skill_proficiencies': data.get('skill_proficiencies', []),
-                
                 'languages_known': data.get('languages_known', []),
                 'personality_traits': data.get('personality_traits', []),
                 'ideal': data.get('ideal', ''),
@@ -372,16 +370,15 @@ def register_phase1_routes(app, campaign_mgr, Character):
             
             campaign = campaign_mgr.add_character(campaign_name, character)
             
-            return jsonify({
+            return jsonify({    
                 'success': True,
                 'setup_complete': campaign.setup_complete,
                 'characters_count': len(campaign.characters),
                 'party_size': campaign.party_size
             })
-        except Exception as e:
-            return jsonify({'error': str(e)}), 400
-
-
+        except KeyError as e:
+            return jsonify({'error': f'Missing required field: {str(e)}'}), 400
+  
 
     @app.route('/campaign/<campaign_name>/character/<character_name>', methods=['GET'])
     def get_character_sheet(campaign_name, character_name):
