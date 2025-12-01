@@ -79,56 +79,42 @@
         let bondRolled = false;
         let flawRolled = false;
 
-        function rollD8() {
-            if (traitsRolled) {
-                alert('You have already rolled for personality traits. Click on the options to manually change your selection.');
+        // Call this BEFORE anything else:
+        document.addEventListener('DOMContentLoaded', function() {
+            createPersonalityTraitsList();
+            
+        });
+
+        function createPersonalityTraitsList() {
+            const container = document.getElementById('personality-traits-list');
+            
+            if (!container) {
+                console.error('Container #personality-traits-list not found!');
                 return;
             }
             
-            // Roll 2d8 - get two different random numbers
-            const roll1 = Math.floor(Math.random() * 8);
-            let roll2 = Math.floor(Math.random() * 8);
+            container.innerHTML = ''; // Clear existing
             
-            // Make sure second roll is different from first
-            while (roll2 === roll1) {
-                roll2 = Math.floor(Math.random() * 8);
-            }
-            
-            // Select both traits
-            selectPersonalityTrait(roll1);
-            selectPersonalityTrait(roll2);
-            
-            // Add visual feedback for both rolls
-            const options = document.querySelectorAll('#personality-traits-list .dice-option');
-            if (options[roll1]) {
-                options[roll1].classList.add('roll-animation');
-                setTimeout(() => options[roll1].classList.remove('roll-animation'), 600);
-            }
-            if (options[roll2]) {
-                // Delay second animation slightly for visual effect
-                setTimeout(() => {
-                    options[roll2].classList.add('roll-animation');
-                    setTimeout(() => options[roll2].classList.remove('roll-animation'), 600);
-                }, 300);
-            }
-            
-            // Disable the roll button
-            traitsRolled = true;
-            const btn = document.getElementById('roll-traits-btn');
-            if (btn) {
-                btn.disabled = true;
-                btn.textContent = '🎲 Already Rolled (click options to change)';
-                btn.classList.add('rolled');
-            }
+            PERSONALITY_TRAITS.forEach((trait, index) => {
+                const div = document.createElement('div');
+                div.className = 'dice-option';
+                div.textContent = `${index + 1}. ${trait}`;
+                
+                container.appendChild(div);
+            });
         }
 
+    
 
+            
             function selectPersonalityTrait(index) {
                 const trait = PERSONALITY_TRAITS[index];
                 const options = document.querySelectorAll('#personality-traits-list .dice-option');
                 
+                 
                 if (!options[index]) {
-                    console.error
+                    console.error('Option not found at index:', index);
+                    return
                 }
 
                 // Allow up to 2 traits
@@ -191,11 +177,32 @@
                 updateFlawDisplay();
             }
 
-        function rollD6Ideal() {
-            if (idealRolled) {
-                alert('You have already rolled for your ideal. Click on the options to manually change your selection.');
-                return;
+            function rollD8() {
+
+                const roll1 = Math.floor(Math.random() * 8);
+                
+                selectPersonalityTrait(roll1);
+                
+                // Get all options
+                const allOptions = optionsList.querySelectorAll('.dice-option');
+                allOptions.forEach(opt => opt.classList.remove('highlighted'));
+                
+                // Highlight the rolled option
+                if (allOptions[result]) {
+                    allOptions[result].classList.add('highlighted');
+                    
+                    // Scroll into view
+                    allOptions[result].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+                
+                // Select the trait
+                selectPersonalityTrait(result);
             }
+
+            
+
+        function rollD6Ideal() {
+            
             
             const roll = Math.floor(Math.random() * 6);
             selectIdeal(roll);
@@ -210,7 +217,8 @@
             btn.disabled = true;
             btn.textContent = '🎲 Already Rolled (click options to change)';
             btn.classList.add('rolled');
-        }
+            
+    }
 
         function rollD6Bond() {
             if (bondRolled) {
@@ -231,7 +239,8 @@
             btn.disabled = true;
             btn.textContent = '🎲 Already Rolled (click options to change)';
             btn.classList.add('rolled');
-        }
+            
+    }
 
         function rollD6Flaw() {
             if (flawRolled) {
@@ -249,42 +258,12 @@
             // Disable the roll button
             flawRolled = true;
             const btn = document.getElementById('roll-flaw-btn');
+            
             btn.disabled = true;
             btn.textContent = '🎲 Already Rolled (click options to change)';
             btn.classList.add('rolled');
-        }
-
-        function handleTraitClick(index) {
-        const trait = PERSONALITY_TRAITS[index];
-        const options = document.querySelectorAll('#personality-traits-list .dice-option');
         
-        if (selectedTraits.includes(trait)) {
-            // Deselect
-            selectedTraits = selectedTraits.filter(t => t !== trait);
-            options[index].classList.remove('selected');
-        } else {
-            // Select (max 2)
-            if (selectedTraits.length < 2) {
-                selectedTraits.push(trait);
-                options[index].classList.add('selected');
-            } else {
-                alert('You can only select 2 personality traits. Deselect one first.');
-            }
-        }
-            updateTraitsDisplay();
-        }
-
-        function handleIdealClick(index) {
-            selectIdeal(index);
-        }
-
-        function handleBondClick(index) {
-            selectBond(index);
-        }
-
-        function handleFlawClick(index) {
-            selectFlaw(index);
-        }
+    }
 
 
         // ============================================================================
@@ -334,39 +313,39 @@
         // ============================================================================
 
         function populatePersonalityTraits() {
-            const container = document.getElementById('personality-traits-list');
-            container.innerHTML = PERSONALITY_TRAITS.map((trait, index) => `
-                <div class="dice-option" onclick="handleTraitClick({$index})">
-                    <span class="dice-number">${index + 1}</span>
-                    <span class="dice-text">${trait}</span>
-                </div>
-            `).join('');
-        }
+    const container = document.getElementById('personality-traits-list');
+    container.innerHTML = PERSONALITY_TRAITS.map((trait, index) => `
+        <div class="dice-option">
+            <span class="dice-number">${index + 1}</span>
+            <span class="dice-text">${trait}</span>
+        </div>
+    `).join('');
+}
 
         function populateIdealsList() {
             const container = document.getElementById('ideals-list');
             container.innerHTML = IDEALS.map((ideal, index) => `
-                <div class="dice-option onclick="handleIdealClick(${index})">
+                <div class="dice-option">
                     <span class="dice-number">${index + 1}</span>
                     <span class="dice-text">${ideal}</span>
                 </div>
             `).join('');
-        }
+}
 
-        function populateBondsList() {
-            const container = document.getElementById('bonds-list');
-            container.innerHTML = BONDS.map((bond, index) => `
-                <div class="dice-option onclick="handleBondClick(${index})">
-                    <span class="dice-number">${index + 1}</span>
-                    <span class="dice-text">${bond}</span>
-                </div>
-            `).join('');
-        }
+       function populateBondsList() {
+        const container = document.getElementById('bonds-list');
+        container.innerHTML = BONDS.map((bond, index) => `
+            <div class="dice-option" >
+                <span class="dice-number">${index + 1}</span>
+                <span class="dice-text">${bond}</span>
+            </div>
+        `).join('');
+    }
 
         function populateFlawsList() {
             const container = document.getElementById('flaws-list');
             container.innerHTML = FLAWS.map((flaw, index) => `
-                <div class="dice-option onclick="handleFlawClick(${index})">
+                <div class="dice-option" onclick="handleFlawClick(${index})">
                     <span class="dice-number">${index + 1}</span>
                     <span class="dice-text">${flaw}</span>
                 </div>
@@ -390,76 +369,31 @@
             event.target.classList.add('active');
         }
         
-        
-        window.onload = () => {
-           
-            function onClassChange() {
-    const classSelect = document.getElementById('char-class');
-    const selectedClass = classSelect.value;
-    
-    // Update class selector
-    if (window.classSelector) {
-        window.classSelector.selectClass(selectedClass);
-    }
-    
-    // Show/hide class info panel
-    const infoPanel = document.getElementById('class-info-panel');
-    if (infoPanel) {
-        infoPanel.style.display = selectedClass ? 'block' : 'none';
-    }
-    
-    // Check if subclass selector should be shown
-    const level = parseInt(document.getElementById('char-level').value) || 1;
-    updateSubclassDisplay(level);
-    
-    // Call existing function if it exists
-    if (typeof updateClassSkills === 'function') {
-        updateClassSkills();
-    }
-}
-/*
-        // Level change handler - GLOBAL
-        function onLevelChange() {
-            const level = parseInt(document.getElementById('char-level').value) || 1;
-            updateSubclassDisplay(level);
-            updatePoints(); // Existing function
-        }
-*/
-        function updateSubclassDisplay(level) {
+
+        function onClassChange() {
             const classSelect = document.getElementById('char-class');
             const selectedClass = classSelect.value;
             
-            if (!selectedClass || !window.classSelector) return;
+            // Update class selector
+            if (window.classSelector) {
+                window.classSelector.selectClass(selectedClass);
+            }
             
-            const subclassLevel = window.classSelector.getSubclassLevel();
-            const container = document.getElementById('subclass-selector-container');
-            const levelReq = document.getElementById('subclass-level-req');
+            // Show/hide class info panel
+            const infoPanel = document.getElementById('class-info-panel');
+            if (infoPanel) {
+                infoPanel.style.display = selectedClass ? 'block' : 'none';
+            }
             
-            if (container && levelReq) {
-                levelReq.textContent = subclassLevel;
-                container.style.display = level >= subclassLevel ? 'block' : 'none';
+            // Check if subclass selector should be shown
+            const level = parseInt(document.getElementById('char-level').value) || 1;
+            
+            // Call existing function if it exists
+            if (typeof updateClassSkills === 'function') {
+                updateClassSkills();
             }
         }
-
-        // ============================================================================
-        // TAB MANAGEMENT
-        // ============================================================================
-
-        // Tab Management
-        function showTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(el => {
-                el.classList.remove('active');
-            });
-            document.querySelectorAll('.tab').forEach(el => {
-                el.classList.remove('active');
-            });
-            
-            // Show selected tab
-            document.getElementById('tab-' + tabName).classList.add('active');
-            event.target.classList.add('active');
-        }
-
+     
         // ============================================================================
         // INITIALIZATION
         // ============================================================================
@@ -467,13 +401,6 @@
         // Initialize on load
         window.onload = () => {
             updatePoints();
-            populateSkillsList();
-            populateLanguagesList();
-            populatePersonalityTraits();
-            populateIdealsList();
-            populateBondsList();
-            populateFlawsList();
-            updateCurrencyTotal();
             
             // Initialize displays
             updateTraitsDisplay();
@@ -481,14 +408,12 @@
             updateBondDisplay();
             updateFlawDisplay();
             
-            // Add currency change listeners
-            ['pp', 'gp', 'ep', 'sp', 'cp'].forEach(coin => {
-                document.getElementById('curr-' + coin).addEventListener('input', updateCurrencyTotal);
-            });
-            
-            // Add level change listener
-            document.getElementById('char-level')?.addEventListener('change', onLevelChange);
-            document.getElementById('char-level')?.addEventListener('input', onLevelChange);
+            // Populate all the lists
+            populateSkillsList();
+            populateLanguagesList();
+            populateIdealsList();
+            populateBondsList();
+            populateFlawsList();
         };
         
         // Ability Score Points
@@ -513,19 +438,11 @@
             } else {
                 pointsDiv.classList.remove('over-budget');
             }
+
+ 
         }
         
-        // Currency Total
-        function updateCurrencyTotal() {
-            const pp = parseFloat(document.getElementById('curr-pp').value) || 0;
-            const gp = parseFloat(document.getElementById('curr-gp').value) || 0;
-            const ep = parseFloat(document.getElementById('curr-ep').value) || 0;
-            const sp = parseFloat(document.getElementById('curr-sp').value) || 0;
-            const cp = parseFloat(document.getElementById('curr-cp').value) || 0;
-            
-            const total = (pp * 10) + gp + (ep * 0.5) + (sp * 0.1) + (cp * 0.01);
-            document.getElementById('total-gold').textContent = total.toFixed(2);
-        }
+       
         
         // Skills List
         function populateSkillsList() {
@@ -672,15 +589,6 @@
                 return;
             }
             
-            // Collect inventory
-            const inventoryText = document.getElementById('char-inventory').value;
-            const inventory = inventoryText ? inventoryText.split(',').map(i => i.trim()) : [];
-            
-            // Collect tool proficiencies
-            const toolsText = document.getElementById('char-tools').value;
-            const tools = toolsText ? toolsText.split(',').map(t => t.trim()) : [];
-            
-            // Combine racial and selected languages
             const allLanguages = [...racialLanguages, ...selectedLanguages];
             
             const data = {
@@ -742,5 +650,5 @@
                 alert('Error: ' + result.error);
             }
         }
-        };
+    
         

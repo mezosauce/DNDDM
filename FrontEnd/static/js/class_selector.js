@@ -42,9 +42,8 @@ class ClassSelector {
         const skillInfo = `Choose ${metadata.skills.choose} from: ${metadata.skills.from.join(', ')}`;
         this.updateElement('skill-class-info', skillInfo);
 
-        // Show subclass selector if appropriate
         const level = parseInt(document.getElementById('char-level')?.value) || 1;
-        this.updateSubclassSelector(level);
+
     }
 
     updateElement(id, text) {
@@ -54,34 +53,6 @@ class ClassSelector {
         }
     }
 
-    updateSubclassSelector(level) {
-        const metadata = this.classMetadata[this.selectedClass];
-        if (!metadata || !metadata.subclasses) return;
-
-        const container = document.getElementById('subclass-selector-container');
-        const select = document.getElementById('subclass-select');
-        const levelReq = document.getElementById('subclass-level-req');
-
-        if (!container || !select || !levelReq) return;
-
-        levelReq.textContent = metadata.subclasses.level;
-
-        if (level >= metadata.subclasses.level) {
-            container.style.display = 'block';
-            
-            // Populate options
-            select.innerHTML = `<option value="">Choose ${metadata.subclasses.name}...</option>`;
-            metadata.subclasses.options.forEach(option => {
-                const opt = document.createElement('option');
-                opt.value = option.name;
-                opt.textContent = option.name;
-                opt.title = option.description;
-                select.appendChild(opt);
-            });
-        } else {
-            container.style.display = 'none';
-        }
-    }
 
     initializeClassManager() {
         // Clean up existing manager
@@ -92,7 +63,6 @@ class ClassSelector {
         // Get current stats and level
         const level = parseInt(document.getElementById('char-level')?.value) || 1;
         const stats = this.getCurrentStats();
-        const subclass = document.getElementById('subclass-select')?.value || '';
 
         // Initialize class-specific container
         this.createClassFeaturesContainer();
@@ -102,18 +72,30 @@ class ClassSelector {
             case 'Barbarian':
                 if (window.BarbarianFeatureManager) {
                     this.classManagers.Barbarian = new BarbarianFeatureManager();
-                    this.classManagers.Barbarian.initialize(level, stats, subclass);
+                    this.classManagers.Barbarian.initialize(level, stats);
                 }
                 break;
             
             case 'Bard':
                 if (window.BardFeatureManager) {
                     this.classManagers.Bard = new BardFeatureManager();
-                    this.classManagers.Bard.initialize(level, stats, subclass);
+                    this.classManagers.Bard.initialize(level, stats);
                 }
                 break;
 
-            // Add other classes as they're implemented
+            
+            case 'Cleric':
+                if (window.ClericFeatureManager) {
+                    this.classManagers.Cleric = new ClericFeatureManager()
+                    this. classManagers.Cleric.initialize(level, stats)
+                }
+
+
+            case 'Druid':
+                if (window.DruidFeatureManager) {
+                    this.classManagers.Druid = new DruidFeatureManager()
+                    this. classManagers.Druid.initialize(level, stats)
+                }
             default:
                 this.showGenericFeatures(level);
         }
@@ -182,7 +164,6 @@ class ClassSelector {
 
     updateLevel(newLevel) {
         const level = parseInt(newLevel) || 1;
-        this.updateSubclassSelector(level);
         
         // Update class manager if exists
         const manager = this.classManagers[this.selectedClass];
@@ -203,22 +184,10 @@ class ClassSelector {
         }
     }
 
-    updateSubclass(subclass) {
-        const manager = this.classManagers[this.selectedClass];
-        
-        if (manager && typeof manager.setSubclass === 'function') {
-            manager.setSubclass(subclass);
-        }
-    }
-
     getSelectedClassMetadata() {
         return this.classMetadata[this.selectedClass];
     }
 
-    getSubclassLevel() {
-        const metadata = this.classMetadata[this.selectedClass];
-        return metadata?.subclasses?.level || 3;
-    }
 }
 
 // Initialize global class selector
@@ -254,12 +223,4 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     });
-
-    // Subclass selection
-    const subclassSelect = document.getElementById('subclass-select');
-    if (subclassSelect) {
-        subclassSelect.addEventListener('change', (e) => {
-            window.classSelector.updateSubclass(e.target.value);
-        });
-    }
 });
