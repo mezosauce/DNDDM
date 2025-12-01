@@ -5,9 +5,6 @@
     "hit_die": "d12",
     "primary_abilities": ["Strength", "Constitution"],
     "saves": ["Strength", "Constitution"],
-    "armor_proficiencies": ["Light armor", "Medium armor", "Shields"],
-    "weapon_proficiencies": ["Simple weapons", "Martial weapons"],
-    "tool_proficiencies": [],
     "skills": {
       "choose": 2,
       "from": [
@@ -17,40 +14,6 @@
         "Nature",
         "Perception",
         "Survival"
-      ]
-    },
-    "starting_equipment": {
-      "choice_1": {
-        "desc": "Choose one",
-        "options": [
-          "Greataxe",
-          "Any martial melee weapon"
-        ]
-      },
-      "choice_2": {
-        "desc": "Choose one",
-        "options": [
-          "Two handaxes",
-          "Any simple weapon"
-        ]
-      },
-      "default": [
-        "Explorer's pack",
-        "Four javelins"
-      ]
-    },
-    "subclasses": {
-      "level": 3,
-      "name": "Primal Path",
-      "options": [
-        {
-          "name": "Path of the Berserker",
-          "description": "For some barbarians, rage is a means to an end—that end being violence."
-        },
-        {
-          "name": "Path of the Totem Warrior",
-          "description": "The Path of the Totem Warrior is a spiritual journey, as the barbarian accepts a spirit animal as guide, protector, and inspiration."
-        }
       ]
     },
     "features_by_level": {
@@ -83,55 +46,7 @@
     "hit_die": "d8",
     "primary_abilities": ["Charisma"],
     "saves": ["Dexterity", "Charisma"],
-    "armor_proficiencies": ["Light armor"],
-    "weapon_proficiencies": ["Simple weapons", "Hand crossbows", "Longswords", "Rapiers", "Shortswords"],
-    "tool_proficiencies": ["Three musical instruments of your choice"],
-    "skills": {
-      "choose": 3,
-      "from": "Any"
-    },
-    "starting_equipment": {
-      "choice_1": {
-        "desc": "Choose one",
-        "options": [
-          "Rapier",
-          "Longsword",
-          "Any simple weapon"
-        ]
-      },
-      "choice_2": {
-        "desc": "Choose one",
-        "options": [
-          "Diplomat's pack",
-          "Entertainer's pack"
-        ]
-      },
-      "choice_3": {
-        "desc": "Choose one",
-        "options": [
-          "Lute",
-          "Any other musical instrument"
-        ]
-      },
-      "default": [
-        "Leather armor",
-        "Dagger"
-      ]
-    },
-    "subclasses": {
-      "level": 3,
-      "name": "Bard College",
-      "options": [
-        {
-          "name": "College of Lore",
-          "description": "Bards of the College of Lore know something about most things, collecting bits of knowledge from sources as diverse as scholarly tomes and peasant tales."
-        },
-        {
-          "name": "College of Valor",
-          "description": "Bards of the College of Valor are daring skalds whose tales keep alive the memory of the great heroes of the past."
-        }
-      ]
-    },
+    
     "features_by_level": {
       "1": ["Spellcasting", "Bardic Inspiration (d6)"],
       "2": ["Jack of All Trades", "Song of Rest (d6)"],
@@ -162,88 +77,7 @@
     "hit_die": "d8",
     "primary_abilities": ["Wisdom"],
     "saves": ["Wisdom", "Charisma"],
-    "armor_proficiencies": ["Light armor", "Medium armor", "Shields"],
-    "weapon_proficiencies": ["Simple weapons"],
-    "tool_proficiencies": [],
-    "skills": {
-      "choose": 2,
-      "from": [
-        "History",
-        "Insight",
-        "Medicine",
-        "Persuasion",
-        "Religion"
-      ]
-    },
-    "starting_equipment": {
-      "choice_1": {
-        "desc": "Choose one",
-        "options": [
-          "Mace",
-          "Warhammer (if proficient)"
-        ]
-      },
-      "choice_2": {
-        "desc": "Choose one",
-        "options": [
-          "Scale mail",
-          "Leather armor",
-          "Chain mail (if proficient)"
-        ]
-      },
-      "choice_3": {
-        "desc": "Choose one",
-        "options": [
-          "Light crossbow and 20 bolts",
-          "Any simple weapon"
-        ]
-      },
-      "choice_4": {
-        "desc": "Choose one",
-        "options": [
-          "Priest's pack",
-          "Explorer's pack"
-        ]
-      },
-      "default": [
-        "Shield",
-        "Holy symbol"
-      ]
-    },
-    "subclasses": {
-      "level": 1,
-      "name": "Divine Domain",
-      "options": [
-        {
-          "name": "Life Domain",
-          "description": "The Life domain focuses on the vibrant positive energy that sustains all life."
-        },
-        {
-          "name": "Knowledge Domain",
-          "description": "The gods of knowledge value learning and understanding above all."
-        },
-        {
-          "name": "Light Domain",
-          "description": "Gods of light promote the ideals of rebirth and renewal, truth, vigilance, and beauty."
-        },
-        {
-          "name": "Nature Domain",
-          "description": "Gods of nature are as varied as the natural world itself."
-        },
-        {
-          "name": "Tempest Domain",
-          "description": "Gods whose portfolios include the Tempest domain govern storms, sea, and sky."
-        },
-        {
-          "name": "Trickery Domain",
-          "description": "Gods of trickery are mischief-makers and instigators who stand as a constant challenge to the accepted order."
-        },
-        {
-          "name": "War Domain",
-          "description": "War has many manifestations, and the gods of war watch over warriors and reward them for their great deeds."
-        }
-      ]
-    },
+    
     "features_by_level": {
       "1": ["Spellcasting", "Divine Domain"],
       "2": ["Channel Divinity (1/rest)", "Divine Domain Feature"],
@@ -274,66 +108,7 @@
     "hit_die": "d8",
     "primary_abilities": ["Wisdom"],
     "saves": ["Intelligence", "Wisdom"],
-    "armor_proficiencies": ["Light armor", "Medium armor", "Shields (druids will not wear armor or use shields made of metal)"],
-    "weapon_proficiencies": ["Clubs", "Daggers", "Darts", "Javelins", "Maces", "Quarterstaffs", "Scimitars", "Sickles", "Slings", "Spears"],
-    "tool_proficiencies": ["Herbalism kit"],
-    "skills": {
-      "choose": 2,
-      "from": [
-        "Arcana",
-        "Animal Handling",
-        "Insight",
-        "Medicine",
-        "Nature",
-        "Perception",
-        "Religion",
-        "Survival"
-      ]
-    },
-    "starting_equipment": {
-      "choice_1": {
-        "desc": "Choose one",
-        "options": [
-          "Wooden shield",
-          "Any simple weapon"
-        ]
-      },
-      "choice_2": {
-        "desc": "Choose one",
-        "options": [
-          "Scimitar",
-          "Any simple melee weapon"
-        ]
-      },
-      "default": [
-        "Leather armor",
-        "Explorer's pack",
-        "Druidic focus"
-      ]
-    },
-    "subclasses": {
-      "level": 2,
-      "name": "Druid Circle",
-      "options": [
-        {
-          "name": "Circle of the Land",
-          "description": "The Circle of the Land is made up of mystics and sages who safeguard ancient knowledge and rites through a vast oral tradition.",
-          "land_types": [
-            "Arctic",
-            "Coast",
-            "Desert",
-            "Forest",
-            "Grassland",
-            "Mountain",
-            "Swamp"
-          ]
-        },
-        {
-          "name": "Circle of the Moon",
-          "description": "Druids of the Circle of the Moon are fierce guardians of the wilds, with primal power enabling them to transform into powerful beasts."
-        }
-      ]
-    },
+    
     "features_by_level": {
       "1": ["Druidic", "Spellcasting"],
       "2": ["Wild Shape", "Druid Circle"],
