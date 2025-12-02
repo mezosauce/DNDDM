@@ -6,14 +6,14 @@ No API keys required - runs completely free on your computer!
 
 import os
 import json
-import requests
+import requests 
 from pathlib import Path
 from typing import List, Dict, Optional
 from dataclasses import dataclass
 
 # Import the query router (assumes it's in the same directory)
 try:
-    from ai_dm_query_router import QueryRouter, QueryType
+    from LLM_Comp.ai_dm_query_router import QueryRouter, QueryType
 except ImportError:
     print("Warning: Query router not found. Install ai_dm_query_router.py in the same directory.")
 

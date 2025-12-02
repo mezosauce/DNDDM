@@ -4,8 +4,8 @@ AI Dungeon Master - Complete Application
 Modular structure with separate phase files
 """
 
-from flask import Flask, render_template, request, jsonify, redirect, url_for
-from flask_socketio import SocketIO
+from flask import Flask, render_template, request, jsonify, redirect, url_for  
+from flask_socketio import SocketIO 
 from dataclasses import asdict  
 import secrets
 import os
@@ -24,7 +24,6 @@ from combat_test_route import register_combat_test_routes
 # Import AI DM components with better error handling
 OllamaDM = None
 GameState = None
-QueryRouter = None
 SRDContentLoader = None
 Phase3QueryRouter = None
 create_phase3_prompt = None
