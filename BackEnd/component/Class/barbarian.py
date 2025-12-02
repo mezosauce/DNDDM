@@ -79,7 +79,7 @@ class Barbarian(Character):
         
         # Set hit points based on level (1d12 per level)
         if self.level == 1:
-            self.max_hp = 12 + self._get_modifier("constitution")
+            self.max_hp = 100
             self.hp = self.max_hp
         
         # Initialize proficiencies if empty
@@ -93,7 +93,7 @@ class Barbarian(Character):
         
         # Calculate AC using Unarmored Defense if no armor
         if self.unarmored_defense_active and self.ac == 10:
-            self.calculate_unarmored_defense()
+            self.ac = 50
         
         # Apply level-based features
         self.apply_level_features()

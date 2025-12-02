@@ -79,9 +79,7 @@ def register_phase1_routes(app, campaign_mgr, Character):
                 char.alignment = data['alignment']
             if 'notes' in data:
                 char.notes = data['notes']
-            if 'has_inspiration' in data:
-                char.has_inspiration = data['has_inspiration']
-            
+
             # Update character in campaign
             campaign_mgr.update_character(campaign_name, char)
             
@@ -102,7 +100,7 @@ def register_phase1_routes(app, campaign_mgr, Character):
             base_params = {
                 'name': data['name'],
                 'race': data['race'],
-                'char_class': data['class'],
+                'char_class': data['char_class'],
                 'background': data['background'],
                 'level': int(data.get('level', 1)), 
                 'hp': int(data.get('hp', 10)),
@@ -124,9 +122,7 @@ def register_phase1_routes(app, campaign_mgr, Character):
             additional_params = {}
             
             # Barbarian-specific fields
-            if class_type == "Barbarian":
-                additional_params.update({
-                    """
+            """
                     primal_path: str = ""  # "Path of the Berserker" or "Path of the Totem Warrior"
                     rages_per_day: int = 2  # Based on level
                     rages_used: int = 0
@@ -153,7 +149,9 @@ def register_phase1_routes(app, campaign_mgr, Character):
                     path_feature_10: bool = False
                     path_feature_14: bool = False
                     """
-
+            if class_type == "Barbarian":
+                additional_params.update({
+                    
 
                     'primal_path': data.get('primal_path', ''),
                     'rages_per_day': int(data.get('rages_per_day', 2)),

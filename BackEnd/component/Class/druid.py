@@ -82,7 +82,7 @@ class Druid(Character):
         
         # Set hit points based on level (1d8 per level)
         if self.level == 1:
-            self.max_hp = 8 + self._get_modifier("constitution")
+            self.max_hp = 90
             self.hp = self.max_hp
         
         # Initialize proficiencies if empty

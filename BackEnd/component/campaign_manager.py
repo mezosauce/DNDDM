@@ -66,7 +66,7 @@ class CampaignManager:
         }
     }
     
-    def __init__(self, campaigns_dir: str = "../campaigns"):
+    def __init__(self, campaigns_dir: str = "./campaigns"):
         self.campaigns_dir = Path(campaigns_dir)
         self.campaigns_dir.mkdir(exist_ok=True)
     
@@ -344,7 +344,6 @@ Add your campaign notes, world-building, and story hooks here.
 
 **Proficiencies:**
 - Skills: {', '.join(char.skill_proficiencies) if char.skill_proficiencies else 'None'}
-- Tools: {', '.join(char.tool_proficiencies) if char.tool_proficiencies else 'None'}
 
 **Languages:** {', '.join(char.languages_known) if char.languages_known else 'Common'}
 
@@ -354,9 +353,6 @@ Add your campaign notes, world-building, and story hooks here.
 - Bond: {char.bond or 'None'}
 - Flaw: {char.flaw or 'None'}
 
-**Currency:** {char.currency['pp']}pp, {char.currency['gp']}gp, {char.currency['ep']}ep, {char.currency['sp']}sp, {char.currency['cp']}cp (Total: {char.get_total_gold_value():.2f} gp)
-
-**Inventory:** {', '.join(char.inventory) if char.inventory else 'None'}
 
 **Background Feature:** {char.background_feature or 'None'}
 

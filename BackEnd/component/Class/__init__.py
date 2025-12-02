@@ -31,7 +31,7 @@ def _import_barbarian():
     """Lazy import Barbarian to avoid circular dependency"""
     global Barbarian
     if Barbarian is None:
-        from barbarian import Barbarian as BarbarianClass
+        from .barbarian import Barbarian as BarbarianClass
         Barbarian = BarbarianClass
     return Barbarian
 
@@ -39,7 +39,7 @@ def _import_bard():
     """Lazy import Bard to avoid circular dependency"""
     global Bard
     if Bard is None:
-        from bard import Bard as BardClass
+        from .bard import Bard as BardClass
         Bard = BardClass
     return Bard
 
@@ -47,7 +47,7 @@ def _import_cleric():
     """Lazy import Cleric to avoid circular dependency"""
     global Cleric
     if Cleric is None:
-        from cleric import Cleric as ClericClass
+        from .cleric import Cleric as ClericClass
         Cleric = ClericClass
     return Cleric
 
@@ -55,7 +55,7 @@ def _import_druid():
     """Lazy import Druid to avoid circular dependency"""
     global Druid
     if Druid is None:
-        from druid import Druid as DruidClass
+        from .druid import Druid as DruidClass
         Druid = DruidClass
     return Druid
 
@@ -92,7 +92,7 @@ def _initialize_registry():
 
 def _get_base_character_class():
     """Lazy import of base Character class to avoid circular dependency"""
-    from campaign_manager import Character
+    from .Character import Character
     return Character
 
 

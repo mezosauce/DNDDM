@@ -111,55 +111,78 @@
                     
                     <!-- TAB 2: STATS -->
                     <div id="tab-stats" class="tab-content">
-                        <h3>Ability Scores (60 points total)</h3>
-                        <div id="points-remaining">
-                            Points Remaining: <span id="points-left">0</span>
-                        </div>
+                        <h3>Ability Scores</h3>
+                        <p style="color: #888; margin-bottom: 15px;">
+                            Your ability scores are determined by your chosen class. These represent your character's natural talents and training.
+                        </p>
                         
-                        <div class="stats-grid">
+                        <div class="stats-grid" style="pointer-events: none; opacity: 0.9;">
                             <div class="stat-wrapper">
                                 <label class="stat-label">STR</label>
-                                <input type="number" class="stat-input" id="str" min="1" max="20" value="10" onchange="updatePoints()">
+                                <input type="number" class="stat-input" id="str" value="10" readonly style="background: rgba(0,0,0,0.3);">
                             </div>
                             <div class="stat-wrapper">
                                 <label class="stat-label">DEX</label>
-                                <input type="number" class="stat-input" id="dex" min="1" max="20" value="10" onchange="updatePoints()">
+                                <input type="number" class="stat-input" id="dex" value="10" readonly style="background: rgba(0,0,0,0.3);">
                             </div>
                             <div class="stat-wrapper">
                                 <label class="stat-label">CON</label>
-                                <input type="number" class="stat-input" id="con" min="1" max="20" value="10" onchange="updatePoints()">
+                                <input type="number" class="stat-input" id="con" value="10" readonly style="background: rgba(0,0,0,0.3);">
                             </div>
                             <div class="stat-wrapper">
                                 <label class="stat-label">INT</label>
-                                <input type="number" class="stat-input" id="int" min="1" max="20" value="10" onchange="updatePoints()">
+                                <input type="number" class="stat-input" id="int" value="10" readonly style="background: rgba(0,0,0,0.3);">
                             </div>
                             <div class="stat-wrapper">
                                 <label class="stat-label">WIS</label>
-                                <input type="number" class="stat-input" id="wis" min="1" max="20" value="10" onchange="updatePoints()">
+                                <input type="number" class="stat-input" id="wis" value="10" readonly style="background: rgba(0,0,0,0.3);">
                             </div>
                             <div class="stat-wrapper">
                                 <label class="stat-label">CHA</label>
-                                <input type="number" class="stat-input" id="cha" min="1" max="20" value="10" onchange="updatePoints()">
+                                <input type="number" class="stat-input" id="cha" value="10" readonly style="background: rgba(0,0,0,0.3);">
                             </div>
                         </div>
                         
+                        <div style="background: rgba(81, 207, 102, 0.1); padding: 12px; border-radius: 6px; margin-top: 15px; border-left: 3px solid #51cf66;">
+                            <small style="color: #a0a0a0;">
+                                💡 <strong>Tip:</strong> These stats will update automatically when you select a class in the Basics tab. 
+                                Each class has optimal starting ability scores suited to their role.
+                            </small>
+                        </div>
+                        
                         <h3 style="margin-top: 20px;">Combat Stats</h3>
+                        <p style="color: #888; font-size: 0.9em; margin-bottom: 10px;">
+                            Combat statistics are determined by your class and will update automatically.
+                        </p>
+
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
                             <div>
                                 <label>Hit Points</label>
-                                <input type="number" id="char-hp" min="1" value="10">
+                                <input type="number" id="char-hp" min="1" value="10" readonly style="background: rgba(0,0,0,0.3); pointer-events: none;">
                             </div>
                             <div>
                                 <label>Max HP</label>
-                                <input type="number" id="char-max-hp" min="1" value="10">
+                                <input type="number" id="char-max-hp" min="1" value="10" readonly style="background: rgba(0,0,0,0.3); pointer-events: none;">
                             </div>
                             <div>
                                 <label>Armor Class</label>
-                                <input type="number" id="char-ac" min="1" value="10">
+                                <input type="number" id="char-ac" min="1" value="10" readonly style="background: rgba(0,0,0,0.3); pointer-events: none;">
                             </div>
                         </div>
+
+                        <div style="background: rgba(81, 207, 102, 0.1); padding: 12px; border-radius: 6px; margin-top: 15px; border-left: 3px solid #51cf66;">
+                            <small style="color: #a0a0a0;">
+                                💡 <strong>Class Combat Stats:</strong>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li><strong>Barbarian:</strong> 100 HP, 50 AC (Tank/Frontline)</li>
+                                    <li><strong>Bard:</strong> 80 HP, 12 AC (Support/Versatile)</li>
+                                    <li><strong>Cleric:</strong> 100 HP, 10 AC (Healer/Support)</li>
+                                    <li><strong>Druid:</strong> 90 HP, 11 AC (Caster/Wild Shape)</li>
+                                </ul>
+                            </small>
+                        </div>
+
                     </div>
-                    
                     <!-- TAB 3: BACKGROUND -->
                     <div id="tab-background" class="tab-content">
                         <label>Background *</label>
@@ -327,10 +350,7 @@
                                 <span>Languages:</span>
                                 <span>{{ ', '.join(char.languages_known) if char.languages_known else 'None' }}</span>
                             </div>
-                            <div class="char-detail-row">
-                                <span>Currency:</span>
-                                <span>{{ char.currency.gp }}gp, {{ char.currency.sp }}sp, {{ char.currency.cp }}cp</span>
-                            </div>
+                           
                         </div>
                         {% endfor %}
                     {% else %}

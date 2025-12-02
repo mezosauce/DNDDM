@@ -385,6 +385,9 @@
                 infoPanel.style.display = selectedClass ? 'block' : 'none';
             }
             
+            // Update displayed stats based on class
+            updateClassStats();
+            
             // Check if subclass selector should be shown
             const level = parseInt(document.getElementById('char-level').value) || 1;
             
@@ -394,13 +397,47 @@
             }
         }
      
+        // Update displayed stats based on selected class
+        function updateClassStats() {
+            const classSelect = document.getElementById('char-class');
+            const selectedClass = classSelect.value;
+            
+            // Default stats for each class (from the Python classes)
+            const classStats = {
+                'Barbarian': { strength: 15, dexterity: 13, constitution: 14, intelligence: 10, wisdom: 12, charisma: 8,  hp: 100, max_hp: 100, ac: 50 },
+                'Bard': { strength: 8, dexterity: 14, constitution: 12, intelligence: 10, wisdom: 13, charisma: 15,  hp: 80, max_hp: 80, ac: 12 },
+                'Cleric': { strength: 10, dexterity: 12, constitution: 14, intelligence: 11, wisdom: 16, charisma: 13, hp: 100, max_hp: 100, ac: 10},
+                'Druid': { strength: 10, dexterity: 13, constitution: 14, intelligence: 12, wisdom: 15, charisma: 8, hp: 90, max_hp: 90, ac: 11 }
+            };
+            
+            if (selectedClass && classStats[selectedClass]) {
+                const stats = classStats[selectedClass];
+                document.getElementById('str').value = stats.strength;
+                document.getElementById('dex').value = stats.dexterity;
+                document.getElementById('con').value = stats.constitution;
+                document.getElementById('int').value = stats.intelligence;
+                document.getElementById('wis').value = stats.wisdom;
+                document.getElementById('cha').value = stats.charisma;
+
+                document.getElementById('char-hp').value = stats.hp;
+                document.getElementById('char-max-hp').value = stats.max_hp;
+                document.getElementById('char-ac').value = stats.ac;
+            } else {
+                // Reset to default
+                ['str', 'dex', 'con', 'int', 'wis', 'cha'].forEach(stat => {
+                    document.getElementById(stat).value = 10;
+                });
+                document.getElementById('char-hp').value = 10;
+                document.getElementById('char-max-hp').value = 10;
+                document.getElementById('char-ac').value = 10;
+            }
+        }
         // ============================================================================
         // INITIALIZATION
         // ============================================================================
 
         // Initialize on load
         window.onload = () => {
-            updatePoints();
             
             // Initialize displays
             updateTraitsDisplay();
@@ -415,32 +452,6 @@
             populateBondsList();
             populateFlawsList();
         };
-        
-        // Ability Score Points
-        function updatePoints() {
-            const str = parseInt(document.getElementById('str').value) || 0;
-            const dex = parseInt(document.getElementById('dex').value) || 0;
-            const con = parseInt(document.getElementById('con').value) || 0;
-            const int = parseInt(document.getElementById('int').value) || 0;
-            const wis = parseInt(document.getElementById('wis').value) || 0;
-            const cha = parseInt(document.getElementById('cha').value) || 0;
-            
-            const total = str + dex + con + int + wis + cha;
-            const remaining = MAX_POINTS - total;
-            
-            const pointsLeftSpan = document.getElementById('points-left');
-            const pointsDiv = document.getElementById('points-remaining');
-            
-            pointsLeftSpan.textContent = remaining;
-            
-            if (remaining < 0) {
-                pointsDiv.classList.add('over-budget');
-            } else {
-                pointsDiv.classList.remove('over-budget');
-            }
-
- 
-        }
         
        
         
@@ -573,28 +584,19 @@
         // Form Submission
         document.getElementById('character-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            // Validate points
-            const str = parseInt(document.getElementById('str').value);
-            const dex = parseInt(document.getElementById('dex').value);
-            const con = parseInt(document.getElementById('con').value);
-            const int = parseInt(document.getElementById('int').value);
-            const wis = parseInt(document.getElementById('wis').value);
-            const cha = parseInt(document.getElementById('cha').value);
-            
-            const total = str + dex + con + int + wis + cha;
-            
-            if (total > MAX_POINTS) {
-                alert(`Total ability points (${total}) exceeds maximum of ${MAX_POINTS}!`);
-                return;
-            }
+            const str = parseInt(document.getElementById('str').value) || 10;
+            const dex = parseInt(document.getElementById('dex').value) || 10;
+            const con = parseInt(document.getElementById('con').value) || 10;
+            const int = parseInt(document.getElementById('int').value) || 10;
+            const wis = parseInt(document.getElementById('wis').value) || 10;
+            const cha = parseInt(document.getElementById('cha').value) || 10;
             
             const allLanguages = [...racialLanguages, ...selectedLanguages];
             
             const data = {
                 name: document.getElementById('char-name').value,
                 race: document.getElementById('char-race').value,
-                class: document.getElementById('char-class').value,
+                char_class: document.getElementById('char-class').value,
                 background: document.getElementById('char-background').value,
                 alignment: document.getElementById('char-alignment').value,
                 level: parseInt(document.getElementById('char-level').value),
