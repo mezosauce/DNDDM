@@ -34,7 +34,7 @@ def register_phase2_routes(app, campaign_mgr, dm, GameState):
         """Generate AI options for a specific quest setup step"""
         data = request.json
         step = data.get('step', '')
-        
+        selections = data.get('selections', {})
         # Check if AI is available
         if not dm:
             return jsonify({'error': 'AI not available - Ollama not running or ai_dm_free.py not found'}), 503
@@ -54,7 +54,7 @@ def register_phase2_routes(app, campaign_mgr, dm, GameState):
 Campaign: {campaign['name']}
 Party: {', '.join([c['name'] + ' (' + c['char_class'] + ')' for c in context['characters']])}
 
-For each quest hook, provide:
+For each QUEST HOOK, provide:
 - A catchy title
 - A 2-sentence description
 - Why this party would care
@@ -88,12 +88,66 @@ Format as:
 ## Option X: [Location Name]
 [Description with sights, sounds, atmosphere]""",
                 
-                'npcs': """Generate 4 key NPCs for this quest.
+                'npc1': f"""Generate 4 options for the FIRST key NPC for this quest.
 
-For each NPC include:
+Quest Hook: {selections.get('quest_hook', 'Not yet selected')}
+Objective: {selections.get('objective', 'Not yet selected')}
+
+For each NPC option include:
 - Name and role
 - Personality trait
 - How they connect to the quest
+
+Format as:
+## Option X: [NPC Name - Role]
+[Description and quest connection]""",
+                
+                'npc2': f"""Generate 4 options for the SECOND key NPC for this quest.
+
+Quest Hook: {selections.get('quest_hook', 'Not yet selected')}
+First NPC: {selections.get('npc1', 'Not yet selected')}
+
+This NPC should complement or contrast with the first NPC.
+
+For each NPC option include:
+- Name and role
+- Personality trait
+- How they connect to the quest or first NPC
+
+Format as:
+## Option X: [NPC Name - Role]
+[Description and quest connection]""",
+                
+                'npc3': f"""Generate 4 options for the THIRD key NPC for this quest.
+
+Quest Hook: {selections.get('quest_hook', 'Not yet selected')}
+First NPC: {selections.get('npc1', 'Not yet selected')}
+Second NPC: {selections.get('npc2', 'Not yet selected')}
+
+This NPC should add complexity or provide additional quest connections.
+
+For each NPC option include:
+- Name and role
+- Personality trait
+- How they connect to the quest or other NPCs
+
+Format as:
+## Option X: [NPC Name - Role]
+[Description and quest connection]""",
+                
+                'npc4': f"""Generate 4 options for the FOURTH key NPC for this quest.
+
+Quest Hook: {selections.get('quest_hook', 'Not yet selected')}
+First NPC: {selections.get('npc1', 'Not yet selected')}
+Second NPC: {selections.get('npc2', 'Not yet selected')}
+Third NPC: {selections.get('npc3', 'Not yet selected')}
+
+This final NPC should round out the cast or provide a twist.
+
+For each NPC option include:
+- Name and role
+- Personality trait
+- How they connect to the quest or other NPCs
 
 Format as:
 ## Option X: [NPC Name - Role]
@@ -127,7 +181,7 @@ Format as:
                 return jsonify({'error': 'Invalid step'}), 400
             
             # Add previous selections if they exist
-            selections = data.get('selections', {})
+            
             if selections:
                 context_str = "Previous selections:\n"
                 for key, value in selections.items():
@@ -219,7 +273,18 @@ Format as:
 {selections.get('location', '*Not selected*')}
 
 ### Key NPCs
-{selections.get('npcs', '*Not selected*')}
+
+#### NPC #1
+{selections.get('npc1', '*Not selected*')}
+
+#### NPC #2
+{selections.get('npc2', '*Not selected*')}
+
+#### NPC #3
+{selections.get('npc3', '*Not selected*')}
+
+#### NPC #4
+{selections.get('npc4', '*Not selected*')}
 
 ### Equipment Needed
 {selections.get('equipment', '*Not selected*')}

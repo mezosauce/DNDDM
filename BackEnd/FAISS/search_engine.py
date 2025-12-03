@@ -67,13 +67,13 @@ class SRDSearchEngine:
         self,
         srd_path: str = "../../srd_story_cycle",
         index_path: str = "../search_index",
-        model_name: str = "all-MiniLM-L6-v2"  # Fast, good quality
+        model_name: str = "all-MiniLM-L6-v2" 
     ):
         self.srd_path = Path(srd_path)
         self.index_path = Path(index_path)
         self.index_path.mkdir(exist_ok=True)
         
-        self.model_name = model_name
+        self.model_name = model_name    
         self.model = None
         self.index = None
         self.documents = []

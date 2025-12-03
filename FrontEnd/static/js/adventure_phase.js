@@ -3,7 +3,10 @@
             { key: 'quest_hook', name: 'Quest Hook', description: 'Choose the adventure that will draw your party in' },
             { key: 'objective', name: 'Main Objective', description: 'What does success look like?' },
             { key: 'location', name: 'Starting Location', description: 'Where does the adventure begin?' },
-            { key: 'npcs', name: 'Key NPCs', description: 'Who will the party interact with?' },
+            { key: 'npc1', name: 'Key NPC #1', description: 'The first important character the party will meet' },
+            { key: 'npc2', name: 'Key NPC #2', description: 'A second character who adds depth to the story' },
+            { key: 'npc3', name: 'Key NPC #3', description: 'Another character who influences the quest' },
+            { key: 'npc4', name: 'Key NPC #4', description: 'The final key character in this adventure' },
             { key: 'equipment', name: 'Equipment', description: 'What should the party bring?' },
             { key: 'roles', name: 'Party Roles', description: 'How will the party work together?' }
         ];
