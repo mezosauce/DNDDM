@@ -69,7 +69,7 @@ from BackEnd.prompts import (
     post_combat_prompt,
     post_diceroll_prompt,
     post_question_prompt,
-    warpup_prompt
+    wrapup_prompt
 )
 
 

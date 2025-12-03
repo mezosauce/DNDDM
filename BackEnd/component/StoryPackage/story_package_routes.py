@@ -60,7 +60,7 @@ def load_story_package_data(campaign_name: str) -> Tuple[Any, StoryPackageTracke
         )
     
     # Create flow orchestrator
-    flow = StoryPackageFlow()
+    flow = StoryPackageFlow(tracker=tracker, story_state=story_state)
     
     return campaign, tracker, story_state, flow
 

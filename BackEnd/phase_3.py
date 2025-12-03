@@ -15,14 +15,14 @@ import requests
 from pathlib import Path
 
 # Import backend components
-from BackEnd.component.campaign_manager import CampaignManager
-from BackEnd.component.StoryPackage.story_package_tracker import StoryPackageTracker
-from BackEnd.component.GameState.story_state import StoryState
-from BackEnd.component.StoryPackage.story_package_flow import StoryPackageFlow
-from BackEnd.component.GameState.combat_state import CombatState, CombatParticipant
-from BackEnd.component.GameState.dice_state import DiceRollState, DiceType, PlayerStats, RollType
-from BackEnd.component.GameState.question_state import QuestioningState, QuestionType, PlayerResponse
-from BackEnd.component.Class import character_from_dict
+from component.campaign_manager import CampaignManager
+from component.StoryPackage.story_package_tracker import StoryPackageTracker
+from component.GameState.story_state import StoryState
+from component.StoryPackage.story_package_flow import StoryPackageFlow
+from component.GameState.combat_state import CombatState, CombatParticipant
+from component.GameState.dice_state import DiceRollState, DiceType, PlayerStats, RollType
+from component.GameState.question_state import QuestioningState, QuestionType, PlayerResponse
+from component.Class import character_from_dict
 
 
 # ============================================================================
@@ -48,7 +48,9 @@ def load_story_package_data(campaign_name: str) -> Tuple[Any, StoryPackageTracke
     else:
         # First time - initialize at package 1, step 1
         tracker = StoryPackageTracker(campaign_name=campaign_name)
-        tracker.start_package(1)
+        tracker.current_package = 1
+        tracker.current_step = 1
+        tracker.completed_steps[1] = []
     
     # Load or initialize story_state
     if 'story_state' in campaign_dict:
@@ -60,7 +62,7 @@ def load_story_package_data(campaign_name: str) -> Tuple[Any, StoryPackageTracke
         )
     
     # Create flow orchestrator
-    flow = StoryPackageFlow()
+    flow = StoryPackageFlow(tracker, story_state)
     
     return campaign, tracker, story_state, flow
 
@@ -101,7 +103,7 @@ def build_story_context(campaign_name: str) -> Dict:
     context = manager.get_campaign_context(campaign_name)
     
     # Load preparations markdown if it exists
-    prep_path = Path(f"campaigns/{campaign_name}/preparations.md")
+    prep_path = Path(__file__).parent.parent / "campaigns" / campaign_name / "preparations.md"
     preparations = ""
     if prep_path.exists():
         with open(prep_path, 'r') as f:

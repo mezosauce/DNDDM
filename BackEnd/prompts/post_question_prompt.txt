@@ -1,0 +1,11 @@
+The party has made their decision. Based on their choice (Accept or Decline),
+narrate the immediate consequences and reactions.
+
+Your narration should:
+1. Acknowledge their decision
+2. Show NPC reactions if relevant
+3. Describe what happens next as a result
+4. Maintain story momentum
+5. Set up the next phase of the adventure
+
+Keep it to 2-3 paragraphs, focused on the immediate aftermath of their choice.

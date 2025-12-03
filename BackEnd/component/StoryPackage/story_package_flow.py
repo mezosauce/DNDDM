@@ -22,7 +22,7 @@ project_root = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(project_root))
 
 from BackEnd.prompts import (
-    campaign_init_prompt,
+    init_story_prompt,
     pre_combat_prompt,
     post_combat_prompt,
     pre_diceroll_prompt,
@@ -33,7 +33,7 @@ from BackEnd.prompts import (
 )
 
 from BackEnd.component.GameState.story_state import StoryState
-from StoryPackage.story_package_tracker import StoryPackageTracker
+from .story_package_tracker import StoryPackageTracker
 from BackEnd.component.GameState.dice_state import RollResult, RollOutcome
 
 
@@ -342,11 +342,11 @@ class StoryPackageFlow:
         if prompt_template == 'campaign_init':
             # First package or continuation
             if self.tracker.current_package == 1 and step_num == 1:
-                prompt_parts.append(campaign_init_prompt)
+                prompt_parts.append(init_story_prompt)
                 prompt_parts.append("\nThis is the beginning of the campaign. "
                                   "Establish the initial scene dramatically.")
             else:
-                prompt_parts.append(campaign_init_prompt)
+                prompt_parts.append(init_story_prompt)
                 prompt_parts.append(f"\nThis is package {self.tracker.get_package_display_name()}. "
                                   f"Continue the ongoing adventure with a new chapter.")
         

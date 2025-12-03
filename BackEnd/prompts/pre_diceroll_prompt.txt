@@ -1,0 +1,12 @@
+Set up a skill check or saving throw scenario that:
+1. Flows naturally from the current narrative
+2. Presents a clear challenge or obstacle
+3. Specifies what stat/skill is being tested
+4. Indicates the difficulty (mention a DC if appropriate)
+5. Makes the stakes clear
+
+Examples:
+- "The crumbling bridge sways dangerously. You'll need to make a Dexterity (Acrobatics) check, DC 15, to cross safely."
+- "The guard eyes you suspiciously. Make a Charisma (Deception) check, DC 13, to convince him."
+
+Keep it brief and focused on the immediate challenge.

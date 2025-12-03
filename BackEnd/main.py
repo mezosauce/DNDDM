@@ -65,6 +65,12 @@ except ImportError as e:
     print(f"⚠ Phase 2 routes not found: {e}")
     register_phase2_routes = None
 
+try:
+    from phase_3 import register_story_package_routes
+    print("✓ Phase 3 routes module loaded")
+except ImportError as e:
+    print(f"⚠ Phase 3 routes not found: {e}")
+    register_story_package_routes = None
 
 # Initialize Flask app with proper template path
 template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../FrontEnd/templates'))
@@ -106,6 +112,9 @@ else:
     print("⚠️  Search engine not available")
 
 
+# ============================================================================
+# TESTERS 
+# ============================================================================
 register_combat_test_routes(app)
 print("✓ Combat test routes registered")
 
@@ -173,6 +182,14 @@ if register_phase2_routes:
     print("✓ Phase 2 routes registered")
 else:
     print("⚠ Phase 2 routes not registered")
+
+# Phase 3: Story Package System (15-step flow)
+if register_story_package_routes:
+    register_story_package_routes(app)
+    print("✓ Phase 3 routes registered")
+else:
+    print("⚠ Phase 3 routes not registered")
+
 
 
 # ============================================================================

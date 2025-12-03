@@ -1,0 +1,12 @@
+Based on the current narrative situation, present the party with a meaningful
+binary choice that will affect the story direction.
+
+The question should:
+1. Be clear and unambiguous (Accept or Decline)
+2. Have meaningful consequences either way
+3. Connect to the current story situation
+4. Feel impactful to the characters
+5. Be answerable with "Accept" or "Decline"
+
+Format your response as a direct question to the party.
+Example: "Will you accept the merchant's dangerous quest to retrieve the stolen artifact?

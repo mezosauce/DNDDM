@@ -1,0 +1,34 @@
+Based on the current story situation and the monster INDEX.md available,
+select an appropriate monster and create an engaging combat setup.
+
+Your narration should:
+1. Choose a monster that fits the story context and party level
+2. Describe how the encounter begins
+3. Provide vivid description of the enemy
+4. Indicate the number of enemies
+5. Build tension and excitement
+
+FORMAT IMPORTANT: Include the monster choice clearly in your response.
+Example: "3 goblins emerge from the shadows" or "A young dragon descends from above"
+
+The combat system will parse your response to initialize the encounter.
+Keep the setup to 2-3 paragraphs.
+"""
+
+post_combat_prompt = """
+The combat encounter has concluded. Based on the combat results provided,
+narrate the aftermath:
+
+1. Describe the final moments of combat
+2. Assess character status (wounds, exhaustion)
+3. Mention any loot or rewards found
+4. Describe the immediate environment post-battle
+5. Provide a moment for the party to regroup
+
+Include opportunities for:
+- Short rest if appropriate
+- Equipment checks or upgrades
+- Brief character moments
+- Story progression
+
+Keep it to 3-4 paragraphs. Balance consequences with forward momentum.
