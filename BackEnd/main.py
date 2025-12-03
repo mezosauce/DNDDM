@@ -49,16 +49,6 @@ try:
 except (ImportError, AttributeError):
     print("⚠ SRD content loader not available")
 
-# Import Phase 3 enhanced router
-try:
-    from LLM_Comp.phase3_DM import (
-        Phase3QueryRouter, 
-        create_phase3_prompt,
-        SRDContentLoader as Phase3SRDLoader
-    )
-    print("✓ Phase 3 enhanced router loaded")
-except ImportError as e:
-    print(f"⚠ Phase 3 router not found: {e}")
 
 # Import phase route modules
 try:
@@ -74,14 +64,6 @@ try:
 except ImportError as e:
     print(f"⚠ Phase 2 routes not found: {e}")
     register_phase2_routes = None
-
-try:
-    from phase_3 import register_phase3_routes
-    print("✓ Phase 3 routes module loaded")
-except ImportError as e:
-    print(f"⚠ Phase 3 routes not found: {e}")
-    register_phase3_routes = None
-
 
 
 # Initialize Flask app with proper template path
@@ -192,17 +174,6 @@ if register_phase2_routes:
 else:
     print("⚠ Phase 2 routes not registered")
 
-# Phase 3: Active Campaign
-if register_phase3_routes:
-    register_phase3_routes(
-        app, campaign_mgr, dm, SRD_PATH, prompt_templates,
-        Phase3QueryRouter, Phase3SRDLoader, create_phase3_prompt,
-        QueryRouter, SRDContentLoader, create_full_prompt
-    )
-    print("✓ Phase 3 routes registered")
-else:
-    print("⚠ Phase 3 routes not registered")
-
 
 # ============================================================================
 # SEARCH API INTEGRATION
@@ -232,10 +203,7 @@ if __name__ == '__main__':
         print("⚠ Ollama not detected - AI features disabled")
         print("  To enable AI: Install Ollama and run 'ollama serve'")
     
-    if Phase3QueryRouter:
-        print("✓ Phase 3 Enhanced Router active")
-    else:
-        print("⚠ Phase 3 router not available")
+    
     
     if not QueryRouter:
         print("⚠ Phase 2 router not available")
