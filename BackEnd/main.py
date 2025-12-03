@@ -18,7 +18,8 @@ from component.Class.Character import Character
 from component.campaign_manager import get_campaign_manager
 from LLM_Comp.prompt_templates import PromptTemplates, create_full_prompt
 from FAISS.search_engine import SRDSearchEngine, create_search_api, FAISS_AVAILABLE, EMBEDDINGS_AVAILABLE
-from combat_test_route import register_combat_test_routes
+
+#from combat_test_route import register_combat_test_routes
 
 
 # Import AI DM components with better error handling
@@ -113,10 +114,10 @@ else:
 
 
 # ============================================================================
-# TESTERS 
+# TESTERS  
 # ============================================================================
-register_combat_test_routes(app)
-print("✓ Combat test routes registered")
+#register_combat_test_routes(app)
+#print("✓ Combat test routes registered")ss
 
 # ============================================================================
 # MAIN ROUTES
@@ -160,7 +161,8 @@ def campaign_home(campaign_name):
         elif campaign.current_phase == "call_to_adventure":
             return redirect(url_for('adventure_phase', campaign_name=campaign_name))
         else:
-            return redirect(url_for('active_campaign', campaign_name=campaign_name))
+            
+            return redirect(url_for('story_package_hub', campaign_name=campaign_name))
     except Exception as e:
         return f"Error loading campaign: {e}", 404
 

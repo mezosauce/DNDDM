@@ -212,10 +212,16 @@
     
     try {
         // Save quest setup to markdown file
-        await fetch(`/campaign/${encodeURIComponent(window.campaignName)}/save-quest-setup`, {
+        await fetch(`/campaign/${campaignName}/complete-phase`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({selections: selections})
+            body: JSON.stringify({phase: 'call_to_adventure'})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = `/campaign/${campaignName}`;
+            }
         });
         
         // Mark phase complete

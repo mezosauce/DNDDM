@@ -1,52 +1,66 @@
+// Story State Page - Phase 3
+const campaignName = window.location.pathname.split('/')[2];
 
-const campaignName = {{ campaign_name | tojson }};
-
-async function generateNarrative() {
+function generateNarrative() {
+    const button = document.querySelector('.generate-btn');
     const narrativeBox = document.getElementById('narrative-content');
-    const actionButtons = document.getElementById('action-buttons');
-
-    // Show loading
-    narrativeBox.innerHTML = '<div class="loading"><div class="spinner"></div><p>Generating narrative...</p></div>';
-    actionButtons.innerHTML = '';
-
-    try {
-        const response = await fetch(`/campaign/${encodeURIComponent(campaignName)}/story-state/ai-generate`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                force_regenerate: false
-            })
-        });
-
-        const data = await response.json();
-
-        if (data.error) {
-            narrativeBox.innerHTML = `<p style="color: #ff6b6b;">Error: ${data.error}</p>`;
-            return;
+    
+    button.disabled = true;
+    button.textContent = '⏳ Generating...';
+    
+    narrativeBox.innerHTML = '<div class="loading"><p>Generating narrative content...</p></div>';
+    
+    fetch(`/campaign/${campaignName}/story-state/ai-generate`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({force_regenerate: false})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            narrativeBox.innerHTML = `<p>${data.content}</p>`;
+            
+            // Replace generate button with continue button
+            const actionButtons = document.getElementById('action-buttons');
+            actionButtons.innerHTML = `
+                <button class="continue-btn" onclick="advanceStory()">
+                    → Continue to Next Step
+                </button>
+            `;
+        } else {
+            narrativeBox.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+            button.disabled = false;
+            button.textContent = '✨ Generate Story Content';
         }
-
-        // Display content
-        narrativeBox.innerHTML = data.content;
-
-        // Show continue button
-        actionButtons.innerHTML = `
-            <button class="continue-btn" onclick="advanceStory()">
-                → Continue to Next Step
-            </button>
-        `;
-
-    } catch (error) {
-        narrativeBox.innerHTML = `<p style="color: #ff6b6b;">Error: ${error.message}</p>`;
-    }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        narrativeBox.innerHTML = `<p style="color: red;">Error generating content</p>`;
+        button.disabled = false;
+        button.textContent = '✨ Generate Story Content';
+    });
 }
 
 function advanceStory() {
-    if (!confirm('Ready to continue to the next step?')) return;
-
-    // Submit form to advance
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = `/campaign/${encodeURIComponent(campaignName)}/story-state/advance`;
-    document.body.appendChild(form);
-    form.submit();
+    const button = document.querySelector('.continue-btn');
+    button.disabled = true;
+    button.textContent = '⏳ Advancing...';
+    
+    fetch(`/campaign/${campaignName}/story-state/advance`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(response => {
+        if (response.redirected) {
+            window.location.href = response.url;
+        } else {
+            return response.json();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error advancing story');
+        button.disabled = false;
+        button.textContent = '→ Continue to Next Step';
+    });
 }

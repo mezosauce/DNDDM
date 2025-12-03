@@ -47,146 +47,199 @@ def register_phase2_routes(app, campaign_mgr, dm, GameState):
             context = campaign_mgr.get_campaign_context(campaign_name)
             campaign = context['campaign']
             
-            # Create prompts for each step
-            prompts = {
-                'quest_hook': f"""Generate 5 unique quest hooks for this D&D party.
+            # Create prompts for each step - each builds on previous selections
+            prompt = ""
 
-Campaign: {campaign['name']}
-Party: {', '.join([c['name'] + ' (' + c['char_class'] + ')' for c in context['characters']])}
+            if step == 'quest_hook':
+                prompt = f"""Generate 5 unique quest hooks for this D&D party.
 
-For each QUEST HOOK, provide:
-- A catchy title
-- A 2-sentence description
-- Why this party would care
+            Campaign: {campaign['name']}
+            Party: {', '.join([c['name'] + ' (' + c['char_class'] + ')' for c in context['characters']])}
 
-Format each option as:
-## Option X: [Title]
-[Description]
-*Why your party cares:* [Reason]
+            For each QUEST HOOK, provide:
+            - A catchy title
+            - A 2-sentence description
+            - Why this party would care
 
-Generate 5 diverse options.""",
-                
-                'objective': """Based on the chosen quest hook, generate 4 possible main objectives.
+            Format each option as:
+            ## Option X: [Title]
+            [Description]
+            *Why your party cares:* [Reason]
 
-Each objective should be:
-- Clear and achievable
-- Appropriate for the party level
-- Connected to the quest hook
+            Generate 5 diverse options."""
 
-Format as:
-## Option X: [Objective Title]
-[What success looks like]""",
-                
-                'location': """Generate 4 starting locations for this adventure.
+            elif step == 'objective':
+                prompt = f"""Based on the chosen quest hook, generate 4 possible main objectives.
 
-Each location should:
-- Match the quest theme
-- Provide opportunities for exploration
-- Include sensory details
+            QUEST HOOK SELECTED:
+            {selections.get('quest_hook', 'Not yet selected')}
 
-Format as:
-## Option X: [Location Name]
-[Description with sights, sounds, atmosphere]""",
-                
-                'npc1': f"""Generate 4 options for the FIRST key NPC for this quest.
+            Each objective should be:
+            - Clear and achievable
+            - Appropriate for the party level
+            - Directly connected to the quest hook above
 
-Quest Hook: {selections.get('quest_hook', 'Not yet selected')}
-Objective: {selections.get('objective', 'Not yet selected')}
+            Format as:
+            ## Option X: [Objective Title]
+            [What success looks like and how it connects to the quest hook]"""
 
-For each NPC option include:
-- Name and role
-- Personality trait
-- How they connect to the quest
+            elif step == 'location':
+                prompt = f"""Generate 1-4 starting locations for this adventure.
 
-Format as:
-## Option X: [NPC Name - Role]
-[Description and quest connection]""",
-                
-                'npc2': f"""Generate 4 options for the SECOND key NPC for this quest.
+            QUEST HOOK:
+            {selections.get('quest_hook', 'Not yet selected')}
 
-Quest Hook: {selections.get('quest_hook', 'Not yet selected')}
-First NPC: {selections.get('npc1', 'Not yet selected')}
+            OBJECTIVE:
+            {selections.get('objective', 'Not yet selected')}
 
-This NPC should complement or contrast with the first NPC.
+            Each location should:
+            - Match both the quest theme and objective
+            - Provide opportunities for exploration
+            - Include sensory details that set the mood
 
-For each NPC option include:
-- Name and role
-- Personality trait
-- How they connect to the quest or first NPC
+            Format as:
+            ## Option X: [Location Name]
+            [Description with sights, sounds, atmosphere that fits the quest]"""
 
-Format as:
-## Option X: [NPC Name - Role]
-[Description and quest connection]""",
-                
-                'npc3': f"""Generate 4 options for the THIRD key NPC for this quest.
+            elif step == 'npc1':
+                prompt = f"""Generate 4 options for the FIRST key NPC for this quest.
 
-Quest Hook: {selections.get('quest_hook', 'Not yet selected')}
-First NPC: {selections.get('npc1', 'Not yet selected')}
-Second NPC: {selections.get('npc2', 'Not yet selected')}
+            QUEST HOOK:
+            {selections.get('quest_hook', 'Not yet selected')}
 
-This NPC should add complexity or provide additional quest connections.
+            OBJECTIVE:
+            {selections.get('objective', 'Not yet selected')}
 
-For each NPC option include:
-- Name and role
-- Personality trait
-- How they connect to the quest or other NPCs
+            LOCATION:
+            {selections.get('location', 'Not yet selected')}
 
-Format as:
-## Option X: [NPC Name - Role]
-[Description and quest connection]""",
-                
-                'npc4': f"""Generate 4 options for the FOURTH key NPC for this quest.
+            For each NPC option include:
+            - Name and role
+            - Personality trait
+            - How they connect to the quest hook and why they'd be at this location
 
-Quest Hook: {selections.get('quest_hook', 'Not yet selected')}
-First NPC: {selections.get('npc1', 'Not yet selected')}
-Second NPC: {selections.get('npc2', 'Not yet selected')}
-Third NPC: {selections.get('npc3', 'Not yet selected')}
+            Format as:
+            ## Option X: [NPC Name - Role]
+            [Description and quest connection]"""
 
-This final NPC should round out the cast or provide a twist.
+            elif step == 'npc2':
+                prompt = f"""Generate 4 options for the SECOND key NPC for this quest.
 
-For each NPC option include:
-- Name and role
-- Personality trait
-- How they connect to the quest or other NPCs
+            QUEST HOOK:
+            {selections.get('quest_hook', 'Not yet selected')}
 
-Format as:
-## Option X: [NPC Name - Role]
-[Description and quest connection]""",
-                
-                'equipment': """Suggest 4 equipment loadouts for this adventure.
+            OBJECTIVE:
+            {selections.get('objective', 'Not yet selected')}
 
-Each loadout should include:
-- Essential gear for the quest type
-- Tactical items
-- Estimated cost
+            LOCATION:
+            {selections.get('location', 'Not yet selected')}
 
-Format as:
-## Option X: [Loadout Name]
-[Items and reasoning]""",
-                
-                'roles': """Suggest 4 party role assignments based on the characters.
+            FIRST NPC:
+            {selections.get('npc1', 'Not yet selected')}
 
-For each suggestion include:
-- Who does what
-- Tactical synergies
-- Backup plans
+            This NPC should complement or contrast with the first NPC and fit the quest context.
 
-Format as:
-## Option X: [Strategy Name]
-[Role assignments and reasoning]"""
-            }
-            
-            prompt = prompts.get(step, '')
-            if not prompt:
+            For each NPC option include:
+            - Name and role
+            - Personality trait
+            - How they relate to the first NPC and the quest
+
+            Format as:
+            ## Option X: [NPC Name - Role]
+            [Description and connections]"""
+
+            elif step == 'npc3':
+                prompt = f"""Generate 4 options for the THIRD key NPC for this quest.
+
+            QUEST CONTEXT:
+            Hook: {selections.get('quest_hook', 'Not yet selected')}
+            Objective: {selections.get('objective', 'Not yet selected')}
+            Location: {selections.get('location', 'Not yet selected')}
+
+            EXISTING NPCs:
+            1. {selections.get('npc1', 'Not yet selected')}
+            2. {selections.get('npc2', 'Not yet selected')}
+
+            This NPC should add complexity or provide additional quest connections that work with the existing NPCs.
+
+            For each NPC option include:
+            - Name and role
+            - Personality trait
+            - How they connect to the quest or other NPCs
+
+            Format as:
+            ## Option X: [NPC Name - Role]
+            [Description and connections]"""
+
+            elif step == 'npc4':
+                prompt = f"""Generate 4 options for the FOURTH key NPC for this quest.
+
+            QUEST CONTEXT:
+            Hook: {selections.get('quest_hook', 'Not yet selected')}
+            Objective: {selections.get('objective', 'Not yet selected')}
+            Location: {selections.get('location', 'Not yet selected')}
+
+            EXISTING NPCs:
+            1. {selections.get('npc1', 'Not yet selected')}
+            2. {selections.get('npc2', 'Not yet selected')}
+            3. {selections.get('npc3', 'Not yet selected')}
+
+            This final NPC should round out the cast or provide a twist that ties into the overall quest.
+
+            For each NPC option include:
+            - Name and role
+            - Personality trait
+            - How they connect to the quest or other NPCs
+
+            Format as:
+            ## Option X: [NPC Name - Role]
+            [Description and connections]"""
+
+            elif step == 'equipment':
+                prompt = f"""Suggest 4 equipment loadouts for this adventure.
+
+            QUEST CONTEXT:
+            Hook: {selections.get('quest_hook', 'Not yet selected')}
+            Objective: {selections.get('objective', 'Not yet selected')}
+            Location: {selections.get('location', 'Not yet selected')}
+
+            PARTY:
+            {', '.join([c['name'] + ' (' + c['char_class'] + ')' for c in context['characters']])}
+
+            Each loadout should include:
+            - Essential gear for the quest type and location
+            - Tactical items that help achieve the objective
+            - Estimated cost
+
+            Format as:
+            ## Option X: [Loadout Name]
+            [Items and reasoning based on the quest context]"""
+
+            elif step == 'roles':
+                prompt = f"""Suggest 4 party role assignments based on the characters and quest.
+
+            QUEST CONTEXT:
+            Hook: {selections.get('quest_hook', 'Not yet selected')}
+            Objective: {selections.get('objective', 'Not yet selected')}
+            Location: {selections.get('location', 'Not yet selected')}
+
+            PARTY:
+            {chr(10).join([f"- {c['name']} ({c['char_class']}, Level {c['level']})" for c in context['characters']])}
+
+            EQUIPMENT PLAN:
+            {selections.get('equipment', 'Not yet selected')}
+
+            For each suggestion include:
+            - Who does what (specific to the quest objective)
+            - Tactical synergies for this particular quest
+            - Backup plans
+
+            Format as:
+            ## Option X: [Strategy Name]
+            [Role assignments and reasoning]"""
+
+            else:
                 return jsonify({'error': 'Invalid step'}), 400
-            
-            # Add previous selections if they exist
-            
-            if selections:
-                context_str = "Previous selections:\n"
-                for key, value in selections.items():
-                    context_str += f"{key}: {value}\n"
-                prompt = context_str + "\n" + prompts[step]
             
             # Create game state if GameState is available
             game_state = None
@@ -329,8 +382,40 @@ Format as:
         
         try:
             campaign = campaign_mgr.mark_phase_complete(campaign_name, phase)
+            
+            # If completing Phase 2, initialize Phase 3 story package tracker
+            if phase == "call_to_adventure":
+                from component.StoryPackage.story_package_tracker import StoryPackageTracker
+                from component.GameState.story_state import StoryState
+                from dataclasses import asdict
+                
+                # Load campaign
+                campaign_dict = asdict(campaign)
+                
+                # Initialize tracker if not exists
+                if 'story_package_tracker' not in campaign_dict:
+                    tracker = StoryPackageTracker(campaign_name=campaign_name)
+                    tracker.current_package = 1
+                    tracker.current_step = 1
+                    tracker.completed_steps[1] = []
+                    campaign_dict['story_package_tracker'] = tracker.to_dict()
+                
+                # Initialize story_state if not exists
+                if 'story_state' not in campaign_dict:
+                    story_state = StoryState(
+                        story_package_number=1,
+                        package_phase=1
+                    )
+                    campaign_dict['story_state'] = story_state.to_dict()
+                
+                # Save back
+                campaign_mgr._save_campaign_dict(campaign_name, campaign_dict)
+            
             return jsonify({'success': True})
         except Exception as e:
+            print(f"Error completing phase: {e}")
+            import traceback
+            traceback.print_exc()
             return jsonify({'error': str(e)}), 400
 
 
