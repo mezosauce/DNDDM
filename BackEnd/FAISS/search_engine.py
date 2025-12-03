@@ -65,8 +65,8 @@ class SRDSearchEngine:
     
     def __init__(
         self,
-        srd_path: str = "../../srd_story_cycle",
-        index_path: str = "../search_index",
+        srd_path: str = "./srd_story_cycle",
+        index_path: str = "./BackEnd/search_index",
         model_name: str = "all-MiniLM-L6-v2" 
     ):
         self.srd_path = Path(srd_path)

@@ -112,26 +112,39 @@ def build_story_context(campaign_name: str) -> Dict:
     # Build character summaries
     characters = []
     for char in context.get('characters', []):
-        characters.append({
-            'name': char.name,
-            'race': char.race,
-            'class': char.char_class,
-            'level': char.level,
-            'hp': char.hp,
-            'max_hp': char.max_hp,
-            'stats': char.stats
-        })
+        # Handle both dict and Character object formats
+        if isinstance(char, dict):
+            characters.append({
+                'name': char.get('name', 'Unknown'),
+                'race': char.get('race', 'Unknown'),
+                'class': char.get('char_class', char.get('class', 'Unknown')),
+                'level': char.get('level', 1),
+                'hp': char.get('hp', 0),
+                'max_hp': char.get('max_hp', 0),
+                'stats': char.get('stats', {})
+            })
+        else:
+            # Character object
+            characters.append({
+                'name': char.name,
+                'race': char.race,
+                'class': char.char_class,
+                'level': char.level,
+                'hp': char.hp,
+                'max_hp': char.max_hp,
+                'stats': char.stats
+            })
     
     return {
-        'characters': characters,
-        'campaign': {
-            'name': context['campaign'].name,
-            'description': context['campaign'].description,
-            'session_number': context['campaign'].session_number
-        },
-        'preparations': preparations,
-        'session_notes': context.get('session_notes', '')
-    }
+    'characters': characters,
+    'campaign': {
+        'name': context['campaign']['name'],        
+        'description': context['campaign']['description'],
+        'session_number': context['campaign']['session_number']
+    },
+    'preparations': preparations,
+    'session_notes': context.get('session_notes', '')
+}
 
 
 def call_claude_api(prompt: str, max_tokens: int = 1000) -> str:

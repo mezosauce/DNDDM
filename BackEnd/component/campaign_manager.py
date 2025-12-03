@@ -119,7 +119,15 @@ class CampaignManager:
         
         with open(metadata_file, 'w', encoding='utf-8') as f:
             json.dump(asdict(campaign), f, indent=2)
-    
+
+    def _save_campaign_dict(self, campaign_name: str, campaign_dict: dict):
+        """Save campaign metadata from dict"""
+        folder = self._get_campaign_folder(campaign_name)
+        metadata_file = folder / "campaign.json"
+        
+        with open(metadata_file, 'w', encoding='utf-8') as f:
+            json.dump(campaign_dict, f, indent=2)
+
     def load_campaign(self, campaign_name: str) -> Campaign:
         """Load campaign from disk"""
         folder = self._get_campaign_folder(campaign_name)
