@@ -96,7 +96,7 @@ if OllamaDM:
         dm = None
 else:
     print("⚠ AI DM not available - install ai_dm_free.py")
-
+    
 # Initialize Search Engine
 search_engine = None
 

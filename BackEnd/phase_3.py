@@ -320,7 +320,7 @@ def register_story_package_routes(app):
                 'package_progress': f"{current_step}/15"
             }
             
-            return render_template('story_state.html', **context_data)
+            return render_template('HTML/story_state.html', **context_data)
             
         except Exception as e:
             print(f"Error in story_state_page: {e}")
@@ -483,7 +483,7 @@ def register_story_package_routes(app):
                 'consequences_decline': 'You will seek another path.'
             }
             
-            return render_template('questioning_state.html', **context_data)
+            return render_template('HTML/questioning_state.html', **context_data)
             
         except Exception as e:
             print(f"Error in question_state_page: {e}")
@@ -565,7 +565,7 @@ def register_story_package_routes(app):
                 'skill': dice_situation.get('skill', None)
             }
             
-            return render_template('dice_roll_state.html', **context_data)
+            return render_template('HTML/dice_roll_state.html', **context_data)
             
         except Exception as e:
             print(f"Error in dice_state_page: {e}")
@@ -682,7 +682,7 @@ def register_story_package_routes(app):
                 'initiative_order': combat_data.get('initiative_order', [])
             }
             
-            return render_template('combat_state.html', **context_data)
+            return render_template('HTML/combat_state.html', **context_data)
             
         except Exception as e:
             print(f"Error in combat_state_page: {e}")
