@@ -1,0 +1,102 @@
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1e1e2e 0%, #2d1b3d 100%);
+        color: #e0e0e0;
+        min-height: 100vh;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .container {
+        max-width: 800px;
+        width: 100%;
+    }
+    .panel {
+        background: rgba(30, 30, 46, 0.9);
+        border: 2px solid #4a4a6a;
+        border-radius: 15px;
+        padding: 40px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+        color: #ff6b6b;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2em;
+    }
+    .question-box {
+        background: rgba(0, 0, 0, 0.3);
+        border-left: 4px solid #ffd700;
+        padding: 25px;
+        border-radius: 8px;
+        margin: 30px 0;
+        font-size: 1.2em;
+        line-height: 1.8;
+    }
+    .context-box {
+        background: rgba(0, 0, 0, 0.2);
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+        color: #b0b0b0;
+        line-height: 1.6;
+    }
+    .choices {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-top: 40px;
+    }
+    .choice-card {
+        background: rgba(0, 0, 0, 0.3);
+        border: 3px solid #4a4a6a;
+        border-radius: 12px;
+        padding: 30px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: center;
+    }
+    .choice-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(81, 207, 102, 0.3);
+    }
+    .choice-accept {
+        border-color: #51cf66;
+    }
+    .choice-accept:hover {
+        background: rgba(81, 207, 102, 0.15);
+        border-color: #51cf66;
+    }
+    .choice-decline {
+        border-color: #ff6b6b;
+    }
+    .choice-decline:hover {
+        background: rgba(255, 107, 107, 0.15);
+        border-color: #ff6b6b;
+    }
+    .choice-icon {
+        font-size: 3em;
+        margin-bottom: 15px;
+    }
+    .choice-title {
+        font-size: 1.5em;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+    .choice-consequence {
+        font-size: 0.9em;
+        color: #b0b0b0;
+        margin-top: 10px;
+    }
+    .badge {
+        display: inline-block;
+        padding: 8px 15px;
+        background: rgba(77, 171, 247, 0.2);
+        border: 1px solid #4dabf7;
+        border-radius: 6px;
+        font-size: 0.9em;
+        margin-bottom: 20px;
+    }

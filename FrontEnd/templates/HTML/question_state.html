@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decision Point - {{ campaign_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/question_state.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="panel">
+            <span class="badge">📍 Story Package {{ tracker.current_package }} - Decision Point</span>
+            
+            <h1>⚖️ A Choice Must Be Made</h1>
+
+            <!-- Context/Setup -->
+            {% if question_context %}
+            <div class="context-box">
+                {{ question_context }}
+            </div>
+            {% endif %}
+
+            <!-- The Question -->
+            <div class="question-box">
+                {{ question_text }}
+            </div>
+
+            <!-- Choices -->
+            <div class="choices">
+                <!-- Accept -->
+                <div class="choice-card choice-accept" onclick="makeChoice('accept')">
+                    <div class="choice-icon">✅</div>
+                    <div class="choice-title">Accept</div>
+                    {% if consequences_accept %}
+                    <div class="choice-consequence">
+                        {{ consequences_accept }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Decline -->
+                <div class="choice-card choice-decline" onclick="makeChoice('decline')">
+                    <div class="choice-icon">❌</div>
+                    <div class="choice-title">Decline</div>
+                    {% if consequences_decline %}
+                    <div class="choice-consequence">
+                        {{ consequences_decline }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/question_state.js') }}"></script>
+
+</body>
+</html>

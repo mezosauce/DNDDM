@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Package - {{ campaign_name }}</title>
+    
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📖 {{ campaign_name }}</h1>
+            <p>Story Package {{ package_number }} - Step {{ current_step }} of 15</p>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ (current_step / 15 * 100)|int }}%">
+                    {{ (current_step / 15 * 100)|int }}%
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Main Story Panel -->
+            <div>
+                <div class="panel">
+                    <!-- Step Info -->
+                    <div class="step-info">
+                        <span class="step-number">{{ current_step }}</span>
+                        <strong>{{ step_definition.name }}</strong>
+                        <p style="margin-top: 10px; color: #b0b0b0;">{{ step_definition.description }}</p>
+                    </div>
+
+                    <!-- Narrative Content -->
+                    <h2>🎭 The Story Unfolds...</h2>
+                    <div class="narrative-box" id="narrative-content">
+                        {% if narrative_content %}
+                            {{ narrative_content }}
+                        {% else %}
+                            <div class="loading">
+                                <p>Ready to generate narrative content for this step</p>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div id="action-buttons">
+                        {% if not narrative_content %}
+                            <button class="generate-btn" onclick="generateNarrative()">
+                                ✨ Generate Story Content
+                            </button>
+                        {% else %}
+                            {% if is_conditional_evaluation %}
+                                <button class="continue-btn" onclick="advanceStory()">
+                                    🎲 Evaluate Dice Result & Continue
+                                </button>
+                            {% else %}
+                                <button class="continue-btn" onclick="advanceStory()">
+                                    → Continue to Next Step
+                                </button>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div>
+                <div class="panel">
+                    <h2>📊 Package Progress</h2>
+                    <div style="margin-top: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                            <span>Current Package:</span>
+                            <strong>{{ package_number }}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                            <span>Current Step:</span>
+                            <strong>{{ current_step }}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                            <span>Steps Remaining:</span>
+                            <strong>{{ 15 - current_step }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel" style="margin-top: 20px;">
+                    <h2>ℹ️ Step Type</h2>
+                    <p style="margin-top: 15px; color: #b0b0b0;">
+                        {{ step_definition.state_type|upper }}
+                    </p>
+                    <p style="margin-top: 10px; font-size: 0.9em; color: #888;">
+                        {% if step_definition.requires_ai %}
+                            ✓ AI-generated content
+                        {% endif %}
+                        {% if step_definition.is_transition %}
+                            ⚡ Transition to {{ step_definition.next_state_type }}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/story_state.js') }}"></script>
+    
+</body>
+</html>
