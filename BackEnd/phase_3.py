@@ -636,7 +636,7 @@ def register_story_package_routes(app):
             # Record in player decisions
             story_state.add_player_decision(
                 decision=answer,
-                context= f"Player chose to {answer}"
+                outcome= f"Player chose to {answer}"
             )
             
             # Clear pending question
