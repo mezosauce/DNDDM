@@ -133,6 +133,9 @@ class StoryPackageTracker:
         """
         return step in [12, 13, 14]
     
+    
+
+
     # ========================================================================
     # STEP PROGRESSION
     # ========================================================================
@@ -270,6 +273,30 @@ class StoryPackageTracker:
         
         return True
     
+    def start_package(self, package_number: int):
+        """
+        Start a specific package.
+        
+        Args:
+            package_number: Package number (1-5) to start
+        """
+        if package_number < 1 or package_number > 5:
+            raise ValueError(f"Package number must be between 1 and 5, got {package_number}")
+        
+        self.current_package = package_number
+        self.current_step = 1
+        
+        # Ensure completed_steps entry exists for this package
+        if package_number not in self.completed_steps:
+            self.completed_steps[package_number] = []
+        
+        # Ensure conditional combat tracking exists
+        if package_number not in self.conditional_combat_triggered:
+            self.conditional_combat_triggered[package_number] = False
+        
+        self.last_updated = datetime.now().isoformat()
+        
+        
     def start_next_package(self):
         """
         Start the next story package.

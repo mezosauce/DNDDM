@@ -381,23 +381,24 @@ def register_phase2_routes(app, campaign_mgr, dm, GameState):
         phase = data.get('phase')
         
         try:
-            campaign = campaign_mgr.mark_phase_complete(campaign_name, phase)
-            
-            # If completing Phase 2, initialize Phase 3 story package tracker
+            # If completing Phase 2, initialize Phase 3 components AND update phase
             if phase == "call_to_adventure":
                 from component.StoryPackage.story_package_tracker import StoryPackageTracker
                 from component.GameState.story_state import StoryState
                 from dataclasses import asdict
                 
                 # Load campaign
+                campaign = campaign_mgr.load_campaign(campaign_name)
                 campaign_dict = asdict(campaign)
+                
+                # Update phase to story_package (or whatever the next phase is called)
+                campaign_dict['current_phase'] = 'story_package'
                 
                 # Initialize tracker if not exists
                 if 'story_package_tracker' not in campaign_dict:
                     tracker = StoryPackageTracker(campaign_name=campaign_name)
-                    tracker.current_package = 1
-                    tracker.current_step = 1
-                    tracker.completed_steps[1] = []
+                    tracker.start_package(1)
+                    
                     campaign_dict['story_package_tracker'] = tracker.to_dict()
                 
                 # Initialize story_state if not exists
@@ -408,8 +409,11 @@ def register_phase2_routes(app, campaign_mgr, dm, GameState):
                     )
                     campaign_dict['story_state'] = story_state.to_dict()
                 
-                # Save back
+                # Save everything in one operation
                 campaign_mgr._save_campaign_dict(campaign_name, campaign_dict)
+            else:
+                # For other phases, just mark complete normally
+                campaign_mgr.mark_phase_complete(campaign_name, phase)
             
             return jsonify({'success': True})
         except Exception as e:
@@ -417,7 +421,6 @@ def register_phase2_routes(app, campaign_mgr, dm, GameState):
             import traceback
             traceback.print_exc()
             return jsonify({'error': str(e)}), 400
-
 
 # ============================================================================
 # HELPER FUNCTIONS

@@ -139,7 +139,7 @@
             const step = steps[currentStep];
             const selected = currentOptions[selectedOptionIndex];
             
-            selections[step.key] = selected.title;
+            selections[step.key] = `${selected.title}\n\n${selected.content.trim()}`;
             
             currentStep++;
             selectedOptionIndex = null;
@@ -211,39 +211,36 @@
     if (!confirm('Ready to begin the adventure? This will start Session 1.')) return;
     
     try {
-        // Save quest setup to markdown file
-        await fetch(`/campaign/${campaignName}/complete-phase`, {
+        // First, save the quest setup to preparations.md
+        const saveResponse = await fetch(`/campaign/${encodeURIComponent(window.campaignName)}/save-quest-setup`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({phase: 'call_to_adventure'})
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.href = `/campaign/${campaignName}`;
-            }
+            body: JSON.stringify({selections: selections})
         });
         
-        // Mark phase complete
-        await fetch(`/campaign/${encodeURIComponent(window.campaignName)}/complete-phase`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({phase: 'call_to_adventure'})
-        });
-                
-                // Advance to next phase
-                const response = await fetch(`/campaign/${encodeURIComponent(window.campaignName)}/advance`, {
-                    method: 'POST'
-                });
-                
-                const result = await response.json();
-        
-            if (result.success) {
-            alert('✓ Quest preparation saved to preparations.md!');
-            location.href = `/campaign/${encodeURIComponent(window.campaignName)}`;
-        } else {
-            alert('Error: ' + result.error);
+        const saveResult = await saveResponse.json();
+        if (!saveResult.success) {
+            alert('Error saving quest setup: ' + (saveResult.error || 'Unknown error'));
+            return;
         }
+        
+        // Then mark phase as complete
+        const completeResponse = await fetch(`/campaign/${encodeURIComponent(window.campaignName)}/complete-phase`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({phase: 'call_to_adventure'})
+        });
+        
+        const completeResult = await completeResponse.json();
+        if (!completeResult.success) {
+            alert('Error completing phase: ' + (completeResult.error || 'Unknown error'));
+            return;
+        }
+        
+        // Success! Navigate back to campaign page
+        alert('✓ Quest preparation saved to preparations.md!');
+        window.location.href = `/campaign/${encodeURIComponent(window.campaignName)}`;
+        
     } catch (error) {
         alert('Error: ' + error.message);
     }

@@ -29,6 +29,8 @@ class Campaign:
     preparation_complete: bool = False
     session_number: int = 0
     description: str = ""
+    story_package_tracker: Optional[Dict] = None    
+    story_state: Optional[Dict] = None
     
     def __post_init__(self):
         if self.characters is None:

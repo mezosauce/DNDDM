@@ -43,19 +43,22 @@ def load_story_package_data(campaign_name: str) -> Tuple[Any, StoryPackageTracke
     campaign_dict = asdict(campaign)
     
     # Load or initialize tracker
-    if 'story_package_tracker' in campaign_dict:
-        tracker = StoryPackageTracker.from_dict(campaign_dict['story_package_tracker'])
+    tracker_data = campaign_dict.get('story_package_tracker')
+    if tracker_data is not None and isinstance(tracker_data, dict):
+        # Load existing tracker
+        tracker = StoryPackageTracker.from_dict(tracker_data)
     else:
-        # First time - initialize at package 1, step 1
+        # First time or corrupted data - initialize at package 1, step 1
         tracker = StoryPackageTracker(campaign_name=campaign_name)
-        tracker.current_package = 1
-        tracker.current_step = 1
-        tracker.completed_steps[1] = []
+        tracker.start_package(1)
     
     # Load or initialize story_state
-    if 'story_state' in campaign_dict:
-        story_state = StoryState.from_dict(campaign_dict['story_state'])
+    story_state_data = campaign_dict.get('story_state')
+    if story_state_data is not None and isinstance(story_state_data, dict):
+        # Load existing story state
+        story_state = StoryState.from_dict(story_state_data)
     else:
+        # First time or corrupted data - initialize
         story_state = StoryState(
             story_package_number=1,
             package_phase=1
@@ -257,6 +260,7 @@ def extract_question_from_response(ai_response: str) -> Optional[Dict]:
             }
     
     return None
+
 
 
 # ============================================================================
