@@ -153,10 +153,17 @@ class StoryPackageTracker:
             >>> print(tracker.current_step)
             11
         """
+         # Defensive: Ensure completed_steps has entry for current package
+        if self.current_package not in self.completed_steps:
+            self.completed_steps[self.current_package] = []
+        
+        # Defensive: Ensure conditional_combat_triggered has entry
+        if self.current_package not in self.conditional_combat_triggered:
+            self.conditional_combat_triggered[self.current_package] = False
+        
         # Mark current step as completed
         if self.current_step not in self.completed_steps[self.current_package]:
             self.completed_steps[self.current_package].append(self.current_step)
-        
         # Log step completion
         self._log_step_transition(
             from_step=self.current_step,
@@ -295,7 +302,7 @@ class StoryPackageTracker:
             self.conditional_combat_triggered[package_number] = False
         
         self.last_updated = datetime.now().isoformat()
-        
+
         
     def start_next_package(self):
         """
@@ -590,6 +597,42 @@ class StoryPackageTracker:
         Returns:
             StoryPackageTracker instance
         """
+        completed_steps_raw = data.get("completed_steps", {})
+        completed_steps = {}
+        for key, value in completed_steps_raw.items():
+            completed_steps[int(key)] = value
+        # Fill in missing keys
+        for i in range(1, 6):
+            if i not in completed_steps:
+                completed_steps[i] = []
+        
+        # Ensure conditional_combat_triggered has all package keys (1-5) as integers
+        conditional_raw = data.get("conditional_combat_triggered", {})
+        conditional_combat_triggered = {}
+        for key, value in conditional_raw.items():
+            conditional_combat_triggered[int(key)] = value
+        # Fill in missing keys
+        for i in range(1, 6):
+            if i not in conditional_combat_triggered:
+                conditional_combat_triggered[i] = False
+        
+        # Ensure step_state_map has integer keys
+        step_state_map_raw = data.get("step_state_map", {})
+        step_state_map = {}
+        
+        if step_state_map_raw:
+            # Convert string keys to integers
+            for key, value in step_state_map_raw.items():
+                step_state_map[int(key)] = value
+        
+        # If empty or incomplete, use default mapping
+        if not step_state_map or len(step_state_map) < 15:
+            step_state_map = {
+                1: 'story', 2: 'question', 3: 'story', 4: 'story', 5: 'dice',
+                6: 'story', 7: 'combat', 8: 'story', 9: 'story', 10: 'dice',
+                11: 'story', 12: 'story', 13: 'combat', 14: 'story', 15: 'story'
+            }
+            
         return cls(
             campaign_name=data["campaign_name"],
             current_package=data.get("current_package", 1),

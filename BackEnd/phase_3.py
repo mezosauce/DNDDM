@@ -360,7 +360,11 @@ def register_story_package_routes(app):
             # Get current state type from tracker
             state_type = tracker.get_current_state_type()
             
-            # Route to appropriate page
+            print(f"[HUB] Campaign: {campaign_name}")
+            print(f"[HUB] Package: {tracker.current_package}, Step: {tracker.current_step}")
+            print(f"[HUB] State Type: {state_type}")
+            
+            # Route to appropriate page based on state
             if state_type == 'story':
                 return redirect(url_for('story_state_page', campaign_name=campaign_name))
             elif state_type == 'question':
@@ -370,14 +374,14 @@ def register_story_package_routes(app):
             elif state_type == 'combat':
                 return redirect(url_for('combat_state_page', campaign_name=campaign_name))
             else:
+                print(f"[HUB ERROR] Invalid state type: {state_type}")
                 return f"Invalid state type: {state_type}", 500
                 
         except Exception as e:
-            print(f"Error in story_package_hub: {e}")
+            print(f"[HUB ERROR] Error in story_package_hub: {e}")
             import traceback
             traceback.print_exc()
             return f"Error: {str(e)}", 500
-    
     
     # ========================================================================
     # 2. STORY STATE PAGE
@@ -401,18 +405,26 @@ def register_story_package_routes(app):
             is_conditional = (current_step == 11)
             
             # Build context data
+
             context_data = {
-                'campaign_name': campaign_name,
-                'tracker': tracker.to_dict(),
-                'story_state': story_state.to_dict(),
-                'current_step': current_step,
-                'step_definition': step_definition,
-                'narrative_content': narrative_content,
-                'show_continue_button': True,
-                'is_conditional_evaluation': is_conditional,
-                'package_number': tracker.current_package,
-                'package_progress': f"{current_step}/15"
-            }
+            'campaign_name': campaign_name,
+            'tracker': tracker.to_dict(),
+            'story_state': story_state.to_dict(),
+            'current_step': current_step,
+            'step_definition': {
+                'name': step_definition.get('description', 'Story Step'),
+                'description': step_definition.get('purpose', ''),
+                'state_type': step_definition.get('state', 'story'),
+                'requires_ai': step_definition.get('requires_ai', True),
+                'is_transition': step_definition.get('next_state_trigger') is not None,
+                'next_state_type': step_definition.get('state', 'story')
+            },
+            'narrative_content': narrative_content,
+            'show_continue_button': True,
+            'is_conditional_evaluation': is_conditional,
+            'package_number': tracker.current_package,
+            'package_progress': f"{current_step}/15"
+        }
             
             return render_template('HTML/story_state.html', **context_data)
             
@@ -442,14 +454,27 @@ def register_story_package_routes(app):
                 last_dice_result = story_state.last_dice_result
                 
                 if not last_dice_result:
-                    return jsonify({'error': 'No dice result found for conditional'}), 400
+                    return jsonify({'error': 'No dice result found for conditional evaluation'}), 400
                 
-                # Route based on dice outcome
+                # Determine if conditional combat triggers based on dice success
                 success = last_dice_result.get('success', False)
-                new_step = flow.evaluate_and_route_conditional(success)
                 
-                # Update tracker
-                tracker.current_step = new_step
+                if success:
+                    # Dice roll succeeded - skip conditional combat (steps 12-14)
+                    tracker.skip_conditional_combat()
+                    story_state.add_story_event(
+                        event_type="conditional_skip",
+                        narrative_text="Dice roll succeeded - skipping conditional combat",
+                        metadata={"dice_result": last_dice_result}
+                    )
+                else:
+                    # Dice roll failed - trigger conditional combat
+                    tracker.trigger_conditional_combat()
+                    story_state.add_story_event(
+                        event_type="conditional_trigger",
+                        narrative_text="Dice roll failed - triggering conditional combat",
+                        metadata={"dice_result": last_dice_result}
+                    )
                 
                 # Clear cached content for new step
                 session.pop(f"step_{current_step}_content", None)
@@ -464,15 +489,17 @@ def register_story_package_routes(app):
             # Save everything
             save_story_package_data(campaign_name, tracker, story_state)
             
-            # Redirect back to hub (which will route to next state)
-            return redirect(url_for('story_package_hub', campaign_name=campaign_name))
+            # Return success with redirect
+            return jsonify({
+                'success': True,
+                'redirect': url_for('story_package_hub', campaign_name=campaign_name)
+            })
             
         except Exception as e:
             print(f"Error in story_state_advance: {e}")
             import traceback
             traceback.print_exc()
             return jsonify({'error': str(e)}), 500
-    
     
     # ========================================================================
     # 4. STORY STATE AI GENERATE
@@ -577,7 +604,7 @@ def register_story_package_routes(app):
                 'consequences_decline': 'You will seek another path.'
             }
             
-            return render_template('HTML/questioning_state.html', **context_data)
+            return render_template('HTML/question_state.html', **context_data)
             
         except Exception as e:
             print(f"Error in question_state_page: {e}")
@@ -608,9 +635,8 @@ def register_story_package_routes(app):
             
             # Record in player decisions
             story_state.add_player_decision(
-                decision_type='question',
                 decision=answer,
-                context=story_state.pending_question
+                context= f"Player chose to {answer}"
             )
             
             # Clear pending question
@@ -739,7 +765,8 @@ def register_story_package_routes(app):
                 'success': True,
                 'result': story_state.last_dice_result,
                 'narrative': result.get_narrative_result(),
-                'breakdown': result.get_roll_breakdown()
+                'breakdown': result.get_roll_breakdown(),
+                'redirect': url_for('story_package_hub', campaign_name=campaign_name)
             })
             
         except Exception as e:
@@ -747,7 +774,6 @@ def register_story_package_routes(app):
             import traceback
             traceback.print_exc()
             return jsonify({'error': str(e)}), 500
-    
     
     # ========================================================================
     # 9. COMBAT STATE PAGE
