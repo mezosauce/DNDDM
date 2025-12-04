@@ -51,21 +51,25 @@ class CampaignManager:
             "description": "Set up the quest and prepare for the journey",
             "story_phases": ["03_call_to_adventure", "04_preparation_and_planning"]
         },
-        "active_campaign": {
-            "name": "Active Campaign",
-            "description": "The adventure begins!",
-            "story_phases": [
-                "05_journey_and_exploration",
-                "06_obstacles_and_challenges",
-                "07_confrontation_and_combat",
-                "08_monsters_and_npcs",
-                "09_crisis_and_setback",
-                "10_magic_and_extraordinary_solutions",
-                "11_climax_and_resolution",
-                "12_aftermath_and_growth",
-                "13_new_horizons"
-            ]
-        }
+        
+        "story_package": {
+        "name": "Story Package System",
+        "description": "15-step structured story progression through 5 packages",
+        "story_phases": [
+            "05_journey_and_exploration",
+            "06_obstacles_and_challenges",
+            "07_confrontation_and_combat",
+            "08_monsters_and_npcs",
+            "09_crisis_and_setback",
+            "10_magic_and_extraordinary_solutions",
+            "11_climax_and_resolution",
+            "12_aftermath_and_growth",
+            "13_new_horizons"
+        ]
+    },
+
+
+        
     }
     
     def __init__(self, campaigns_dir: str = "./campaigns"):
