@@ -632,15 +632,15 @@ class StoryPackageTracker:
                 6: 'story', 7: 'combat', 8: 'story', 9: 'story', 10: 'dice',
                 11: 'story', 12: 'story', 13: 'combat', 14: 'story', 15: 'story'
             }
-            
+
         return cls(
             campaign_name=data["campaign_name"],
             current_package=data.get("current_package", 1),
             current_step=data.get("current_step", 1),
-            completed_steps=data.get("completed_steps", {}),
+            completed_steps=completed_steps,  
             completed_packages=data.get("completed_packages", []),
-            step_state_map=data.get("step_state_map", {}),
-            conditional_combat_triggered=data.get("conditional_combat_triggered", {}),
+            step_state_map=step_state_map,  
+            conditional_combat_triggered=conditional_combat_triggered,  
             campaign_complete=data.get("campaign_complete", False),
             started_at=data.get("started_at", datetime.now().isoformat()),
             last_updated=data.get("last_updated", datetime.now().isoformat()),
