@@ -332,9 +332,14 @@ class StoryPackageFlow:
             if 'campaign' in context_data:
                 campaign = context_data['campaign']
                 context_parts.append(f"Campaign: {campaign.get('name', 'Unknown')}")
-            
+                        
             if 'preparations' in context_data:
                 context_parts.append(f"Quest Preparations Available: Yes")
+                context_parts.append(f"\n=== QUEST PREPARATIONS ===")
+                preparations = context_data['preparations']
+                
+                context_parts.append(str(preparations))  
+                context_parts.append(f"")
             
             context_parts.append(f"")
         

@@ -51,7 +51,7 @@ class CampaignManager:
             "description": "Set up the quest and prepare for the journey",
             "story_phases": ["03_call_to_adventure", "04_preparation_and_planning"]
         },
-        
+
         "story_package": {
         "name": "Story Package System",
         "description": "15-step structured story progression through 5 packages",
@@ -251,7 +251,7 @@ class CampaignManager:
         elif campaign.current_phase == "call_to_adventure":
             if not campaign.adventure_complete:
                 raise ValueError("Cannot advance: Mark adventure phase as complete first")
-            campaign.current_phase = "active_campaign"
+            campaign.current_phase = "story_package"
             campaign.session_number = 1
             self._create_session_file(campaign, 1)
             
@@ -279,7 +279,7 @@ class CampaignManager:
         """Start a new session in active campaign"""
         campaign = self.load_campaign(campaign_name)
         
-        if campaign.current_phase != "active_campaign":
+        if campaign.current_phase != "story_package":
             raise ValueError("Can only create sessions in active campaign phase")
         
         campaign.session_number += 1
@@ -448,7 +448,7 @@ Add your campaign notes, world-building, and story hooks here.
         
         # Get latest session notes if in active campaign
         latest_session = ""
-        if campaign.current_phase == "active_campaign" and campaign.session_number > 0:
+        if campaign.current_phase == "story_package" and campaign.session_number > 0:
             session_file = folder / "sessions" / f"session_{campaign.session_number:03d}.md"
             if session_file.exists():
                 with open(session_file, 'r', encoding='utf-8') as f:

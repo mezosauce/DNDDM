@@ -90,6 +90,79 @@ def save_story_package_data(
     manager._save_campaign_dict(campaign_name, campaign_dict)
 
 
+def parse_preparations(preparations_text: str) -> Dict:
+    """
+    Parse preparations.md to extract key sections for LLM context.
+    
+    Returns:
+        {
+            'quest_hook': str,
+            'main_objective': str,
+            'starting_location': str,
+            'key_npc_1': str,
+            'equipment_needed': str,
+            'party_roles': str
+        }
+    """
+    sections = {
+        'quest_hook': '',
+        'main_objective': '',
+        'starting_location': '',
+        'key_npc_1': '',
+        'equipment_needed': '',
+        'party_roles': ''
+    }
+    
+    if not preparations_text:
+        return sections
+    
+    lines = preparations_text.split('\n')
+    current_section = None
+    current_content = []
+    
+    for line in lines:
+        # Detect section headers
+        if '### Quest Hook' in line:
+            current_section = 'quest_hook'
+            current_content = []
+        elif '### Main Objective' in line:
+            current_section = 'main_objective'
+            current_content = []
+        elif '### Starting Location' in line:
+            current_section = 'starting_location'
+            current_content = []
+        elif '#### NPC #1' in line:
+            current_section = 'key_npc_1'
+            current_content = []
+        elif '### Equipment Needed' in line:
+            current_section = 'equipment_needed'
+            current_content = []
+        elif '### Party Roles & Strategy' in line:
+            current_section = 'party_roles'
+            current_content = []
+        # Stop collecting when we hit another major section or end marker
+        elif line.startswith('###') and current_section and line not in ['### Quest Hook', '### Main Objective', '### Starting Location', '### Equipment Needed', '### Party Roles & Strategy']:
+            # Hit a different section (like Key NPCs or Notes)
+            if current_section and current_content:
+                sections[current_section] = '\n'.join(current_content).strip()
+            current_section = None
+            current_content = []
+        elif line.startswith('---') or line.startswith('## 📝'):
+            # End of relevant sections
+            if current_section and current_content:
+                sections[current_section] = '\n'.join(current_content).strip()
+            break
+        elif current_section:
+            # Collect content for current section
+            current_content.append(line)
+    
+    # Save any remaining content
+    if current_section and current_content:
+        sections[current_section] = '\n'.join(current_content).strip()
+    
+    return sections
+
+
 def build_story_context(campaign_name: str) -> Dict:
     """
     Build complete context for AI prompts.
@@ -98,7 +171,8 @@ def build_story_context(campaign_name: str) -> Dict:
         {
             'characters': list,
             'campaign': dict,
-            'preparations': str,
+            'preparations': dict (parsed sections),
+            'preparations_full': str (full text),
             'session_notes': str
         }
     """
@@ -107,10 +181,13 @@ def build_story_context(campaign_name: str) -> Dict:
     
     # Load preparations markdown if it exists
     prep_path = Path(__file__).parent.parent / "campaigns" / campaign_name / "preparations.md"
-    preparations = ""
+    preparations_full = ""
+    preparations_parsed = {}
+    
     if prep_path.exists():
-        with open(prep_path, 'r') as f:
-            preparations = f.read()
+        with open(prep_path, 'r', encoding='utf-8') as f:
+            preparations_full = f.read()
+            preparations_parsed = parse_preparations(preparations_full)
     
     # Build character summaries
     characters = []
@@ -139,16 +216,16 @@ def build_story_context(campaign_name: str) -> Dict:
             })
     
     return {
-    'characters': characters,
-    'campaign': {
-        'name': context['campaign']['name'],        
-        'description': context['campaign']['description'],
-        'session_number': context['campaign']['session_number']
-    },
-    'preparations': preparations,
-    'session_notes': context.get('session_notes', '')
-}
-
+        'characters': characters,
+        'campaign': {
+            'name': context['campaign']['name'],        
+            'description': context['campaign']['description'],
+            'session_number': context['campaign']['session_number']
+        },
+        'preparations': preparations_parsed,  # Structured sections
+        'preparations_full': preparations_full,  # Full text if needed
+        'session_notes': context.get('session_notes', '')
+    }
 
 def call_claude_api(prompt: str, max_tokens: int = 1000) -> str:
     """
