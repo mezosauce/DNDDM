@@ -379,18 +379,18 @@ class StoryPackageFlow:
                                   "It should be more challenging and consequential.")
         
         elif prompt_template == 'pre_combat':
-            prompt_parts.append(pre_combat_prompt)
             
             # Add monster index for combat steps
             if context_data.get('monster_index'):
                 prompt_parts.append("\n=== AVAILABLE MONSTERS ===")
-                prompt_parts.append("Choose an appropriate monster from this index based on party level and story context:")
                 prompt_parts.append("\n" + context_data['monster_index'])
                 prompt_parts.append("\nIMPORTANT: Select a monster with appropriate Challenge Rating (CR) for the party.")
+
                 prompt_parts.append("For level 1-2 parties, use CR 0.25 - 1 monsters.")
                 prompt_parts.append("For level 3-4 parties, use CR 1 - 3 monsters.")
                 prompt_parts.append("For level 5+ parties, use CR 3+ monsters.")
                 prompt_parts.append("")
+                prompt_parts.append(pre_combat_prompt)
             if step_num == 6:
                 prompt_parts.append("\nThis is the first combat encounter. "
                                   "Choose an appropriate monster from INDEX.md "
