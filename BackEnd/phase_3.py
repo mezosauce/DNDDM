@@ -673,25 +673,77 @@ def register_story_package_routes(app):
             characters = manager.get_characters(campaign_name)
             character = characters[0] if characters else None
             
+            if not character:
+                return "No character found in campaign", 400
+            
+            # Prepare template data
+            from BackEnd.component.GameState.dice_state import DiceType, RollType, DifficultyLevel
+            
+            # Build difficulty levels dict
+            difficulty_levels = {
+                'Trivial': DifficultyLevel.TRIVIAL.value,
+                'Easy': DifficultyLevel.EASY.value,
+                'Medium': DifficultyLevel.MEDIUM.value,
+                'Hard': DifficultyLevel.HARD.value,
+                'Very Hard': DifficultyLevel.VERY_HARD.value,
+                'Nearly Impossible': DifficultyLevel.NEARLY_IMPOSSIBLE.value
+            }
+            
+            # Build dice types list
+            dice_types = [dt.name for dt in DiceType]
+            
+            # Build roll types list
+            roll_types = [rt.value for rt in RollType]
+            
+            # Build player stats dict
+            player_stats = {
+                'strength': character.stats.get('strength', 10),
+                'dexterity': character.stats.get('dexterity', 10),
+                'constitution': character.stats.get('constitution', 10),
+                'intelligence': character.stats.get('intelligence', 10),
+                'wisdom': character.stats.get('wisdom', 10),
+                'charisma': character.stats.get('charisma', 10),
+                'proficiency_bonus': 2,  # Could calculate from level
+                'equipment_bonus': 0,
+                'temporary_bonus': 0,
+                'proficient_skills': []  # Could get from character
+            }
+            
             context_data = {
                 'campaign_name': campaign_name,
                 'tracker': tracker.to_dict(),
                 'story_state': story_state.to_dict(),
                 'dice_situation': dice_situation,
-                'character': asdict(character) if character else {},
+                'character': asdict(character),
                 'roll_type': 'normal',
                 'dc': dice_situation.get('dc', 15),
                 'stat': dice_situation.get('stat', 'strength'),
-                'skill': dice_situation.get('skill', None)
+                'skill': dice_situation.get('skill', None),
+                # Template-required variables
+                'difficulty_levels': difficulty_levels,
+                'dice_types': dice_types,
+                'roll_types': roll_types,
+                'player_stats': player_stats,
+                'statistics': {
+                    'total_rolls': 0,
+                    'critical_successes': 0,
+                    'successes': 0,
+                    'failures': 0,
+                    'critical_failures': 0,
+                    'success_rate': 0,
+                    'average_roll': 0,
+                    'current_active': False
+                },
+                'roll_history': []
             }
             
             return render_template('HTML/dice_roll_state.html', **context_data)
             
         except Exception as e:
             print(f"Error in dice_state_page: {e}")
+            import traceback
+            traceback.print_exc()
             return f"Error: {str(e)}", 500
-    
-    
     # ========================================================================
     # 8. DICE ROLL EXECUTE
     # ========================================================================
