@@ -309,7 +309,7 @@ def extract_monster_info_from_response(ai_response: str, monster_index: str = No
     import re
     
     # Look for patterns like "3 goblins" or "1 dragon"
-    pattern = r'(\d+)\s+([a-zA-Z\s]+?)(?:s|es)?\s*(?:appear|attack|emerge|step|block)'
+    pattern = r'(\d+)\s+([a-zA-Z\s]+?)(?:s|es)?\s*(?:appear|attack|emerge|step|block|rise)'
     matches = re.findall(pattern, ai_response.lower())
     
     if matches:
@@ -317,6 +317,7 @@ def extract_monster_info_from_response(ai_response: str, monster_index: str = No
         monster_name = monster_name.strip()
         
         # Validate against index if provided
+        validated_name = None
         if monster_index:
             validated_name = validate_monster_choice(ai_response, monster_index)
             if validated_name:
@@ -331,15 +332,59 @@ def extract_monster_info_from_response(ai_response: str, monster_index: str = No
             if path_match:
                 file_path = path_match.group(1)
         
-        return {
-            'count': int(count),
-            'name': monster_name,
-            'description': ai_response[:200],
-            'file_path': file_path  # Path to monster markdown file
-        }
+        # Parse monster from markdown file
+        from component.Class.monsters.monster_parser import MonsterParser
+        
+        parser = MonsterParser()
+        monster = None
+        
+        if file_path:
+            # Load from specific file
+            monster = parser.parse_monster_file(file_path)
+        else:
+            # Try to find by name
+            monster = parser.find_monster_by_name(monster_name)
+        
+        if monster:
+            return {
+                'count': int(count),
+                'name': monster.name,
+                'description': ai_response[:200],
+                'file_path': file_path,
+                'monster_data': monster.to_dict()  # Full monster stats
+            }
+        else:
+            # Fallback if monster not found in SRD
+            print(f"[WARNING] Monster {monster_name} not found in SRD, using defaults")
+            return {
+                'count': int(count),
+                'name': monster_name,
+                'description': ai_response[:200],
+                'file_path': file_path,
+                'monster_data': {
+                    'name': monster_name,
+                    'monster_type': 'unknown',
+                    'size': 'Medium',
+                    'alignment': 'unaligned',
+                    'challenge_rating': 1.0,
+                    'hp': 20,
+                    'ac': 12,
+                    'stats': {
+                        'strength': 10,
+                        'dexterity': 10,
+                        'constitution': 10,
+                        'intelligence': 10,
+                        'wisdom': 10,
+                        'charisma': 10
+                    },
+                    'abilities': [],
+                    'actions': ['Slam. Melee Weapon Attack: +2 to hit, reach 5 ft. Hit: 1d6+0 damage.'],
+                    'legendary_actions': [],
+                    'lair_actions': []
+                }
+            }
     
     return None
-
 
 def extract_dice_situation_from_response(ai_response: str) -> Optional[Dict]:
     """
@@ -944,13 +989,29 @@ def register_story_package_routes(app):
             manager = CampaignManager()
             characters = manager.get_characters(campaign_name)
             
-            # Create combat using DM description method
-            dm_description = f"You encounter {monster_info['count']} {monster_info['name']}"
+            # Get full monster data
+            monster_data = monster_info.get('monster_data')
+            if not monster_data:
+                return jsonify({'error': 'Monster data not loaded properly'}), 400
             
-            combat_state = CombatState.from_dm_description(
-                dm_text=dm_description,
+            # Create Monster instance from data
+            from component.Class.monsters.monster import Monster
+            monster = Monster.from_dict(monster_data)
+            
+            # Create multiple monsters if count > 1
+            monsters = []
+            for i in range(monster_info['count']):
+                # Create a copy with unique name
+                monster_copy = Monster.from_dict(monster_data)
+                if monster_info['count'] > 1:
+                    monster_copy.name = f"{monster_copy.name} #{i+1}"
+                monsters.append(monster_copy)
+            
+            # Create combat state
+            combat_state = CombatState.from_monsters_and_characters(
+                monsters=monsters,
                 characters=characters,
-                dice_state=None
+                encounter_name=f"Battle vs {monster.name}"
             )
             
             # Roll initiative
@@ -974,8 +1035,7 @@ def register_story_package_routes(app):
             import traceback
             traceback.print_exc()
             return jsonify({'error': str(e)}), 500
-    
-    
+        
     # ========================================================================
     # 11. COMBAT STATE ACTION
     # ========================================================================

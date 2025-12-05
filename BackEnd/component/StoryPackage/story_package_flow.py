@@ -13,7 +13,7 @@ The 15-step pattern cycles through 4 game states:
 """
 
 from dataclasses import dataclass
-from typing import Dict, Optional, Any, Tuple
+from typing import Dict, Optional, Any, Tuple, List
 from pathlib import Path
 import sys
 
@@ -275,8 +275,89 @@ class StoryPackageFlow:
     
     # ========================================================================
     # AI PROMPT GENERATION
-    # ========================================================================
-    
+    # ========================================================================\
+
+    def _format_character_combat_stats(self, characters: List[Dict]) -> str:
+        """
+        Format character stats for combat encounter balancing.
+        
+        Args:
+            characters: List of character dictionaries
+        
+        Returns:
+            Formatted string with character combat statistics
+        """
+        if not characters:
+            return "No characters in party."
+        
+        lines = ["=== PARTY COMPOSITION & COMBAT STATS ==="]
+        lines.append(f"Party Size: {len(characters)} character(s)\n")
+        
+        for char in characters:
+            stats = char.get('stats', {})
+            
+            # Calculate derived stats
+            level = char.get('level', 1)
+            proficiency = 2 if level < 5 else (3 if level < 9 else (4 if level < 13 else (5 if level < 17 else 6)))
+            
+            # Calculate modifiers
+            str_mod = (stats.get('strength', 10) - 10) // 2
+            dex_mod = (stats.get('dexterity', 10) - 10) // 2
+            con_mod = (stats.get('constitution', 10) - 10) // 2
+            
+            lines.append(f"Character: {char.get('name', 'Unknown')}")
+            lines.append(f"  Class: {char.get('class', 'Unknown')} (Level {level})")
+            lines.append(f"  HP: {char.get('hp', 0)}/{char.get('max_hp', 0)}")
+            lines.append(f"  AC: {char.get('ac', 10)}")
+            lines.append(f"  Proficiency Bonus: +{proficiency}")
+            lines.append(f"  Stats:")
+            lines.append(f"    STR: {stats.get('strength', 10)} (mod: {str_mod:+d})")
+            lines.append(f"    DEX: {stats.get('dexterity', 10)} (mod: {dex_mod:+d})")
+            lines.append(f"    CON: {stats.get('constitution', 10)} (mod: {con_mod:+d})")
+            lines.append(f"    INT: {stats.get('intelligence', 10)} (mod: {(stats.get('intelligence', 10) - 10) // 2:+d})")
+            lines.append(f"    WIS: {stats.get('wisdom', 10)} (mod: {(stats.get('wisdom', 10) - 10) // 2:+d})")
+            lines.append(f"    CHA: {stats.get('charisma', 10)} (mod: {(stats.get('charisma', 10) - 10) // 2:+d})")
+            
+            # Estimate attack bonus (STR + proficiency for melee)
+            attack_bonus = str_mod + proficiency
+            lines.append(f"  Estimated Attack Bonus: +{attack_bonus}")
+            
+            # Estimate average damage per round (rough estimate)
+            avg_weapon_damage = 4.5  # Average of 1d8
+            avg_damage = avg_weapon_damage + str_mod
+            lines.append(f"  Estimated Avg Damage/Round: {avg_damage:.1f}")
+            lines.append("")
+        
+        # Calculate party averages
+        avg_level = sum(c.get('level', 1) for c in characters) / len(characters)
+        avg_hp = sum(c.get('hp', 0) for c in characters) / len(characters)
+        avg_ac = sum(c.get('ac', 10) for c in characters) / len(characters)
+        
+        lines.append("=== PARTY AVERAGES ===")
+        lines.append(f"Average Level: {avg_level:.1f}")
+        lines.append(f"Average HP: {avg_hp:.1f}")
+        lines.append(f"Average AC: {avg_ac:.1f}")
+        lines.append("")
+        
+        # Add CR recommendations
+        lines.append("=== MONSTER CR RECOMMENDATIONS ===")
+        if avg_level <= 1:
+            lines.append("Recommended CR Range: 0.125 - 0.5 (Deadly: 1)")
+        elif avg_level <= 2:
+            lines.append("Recommended CR Range: 0.25 - 1 (Deadly: 2)")
+        elif avg_level <= 3:
+            lines.append("Recommended CR Range: 0.5 - 2 (Deadly: 3)")
+        elif avg_level <= 4:
+            lines.append("Recommended CR Range: 1 - 3 (Deadly: 4)")
+        else:
+            lines.append(f"Recommended CR Range: {int(avg_level - 2)} - {int(avg_level + 1)} (Deadly: {int(avg_level + 2)})")
+        
+        lines.append("\nMultiple monsters: Divide party level by number of monsters for individual CR.")
+        lines.append("Example: Level 3 party vs 3 monsters → Use CR 1 monsters")
+        
+        return "\n".join(lines)
+
+
     def generate_ai_prompt_for_step(
         self, 
         step: Optional[int] = None,
@@ -379,18 +460,25 @@ class StoryPackageFlow:
                                   "It should be more challenging and consequential.")
         
         elif prompt_template == 'pre_combat':
+
+            # Add detailed character combat stats
+            if context_data.get('characters'):
+                prompt_parts.append("\n" + self._format_character_combat_stats(context_data['characters']))
+                prompt_parts.append("")
             
             # Add monster index for combat steps
             if context_data.get('monster_index'):
                 prompt_parts.append("\n=== AVAILABLE MONSTERS ===")
                 prompt_parts.append("\n" + context_data['monster_index'])
-                prompt_parts.append("\nIMPORTANT: Select a monster with appropriate Challenge Rating (CR) for the party.")
+                prompt_parts.append("\n")
 
                 prompt_parts.append("For level 1-2 parties, use CR 0.25 - 1 monsters.")
                 prompt_parts.append("For level 3-4 parties, use CR 1 - 3 monsters.")
                 prompt_parts.append("For level 5+ parties, use CR 3+ monsters.")
                 prompt_parts.append("")
                 prompt_parts.append(pre_combat_prompt)
+
+
             if step_num == 6:
                 prompt_parts.append("\nThis is the first combat encounter. "
                                   "Choose an appropriate monster from INDEX.md "

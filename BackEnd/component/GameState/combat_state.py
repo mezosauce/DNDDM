@@ -81,6 +81,19 @@ class CombatParticipant:
         """Check if participant is alive"""
         return self.get_current_hp() > 0
 
+    @classmethod
+    def from_monster(cls, monster) -> 'CombatParticipant':
+        """Create participant from Monster instance"""
+        from component.Class.monsters.monster import Monster
+        
+        participant_id = f"mon_{monster.name.lower().replace(' ', '_')}"
+        
+        return cls(
+            participant_id=participant_id,
+            name=monster.name,
+            entity=monster,
+            participant_type=ParticipantType.MONSTER
+        )
 
 @dataclass
 class CombatState:
@@ -382,6 +395,38 @@ class CombatState:
         return combat
 
 
+
+    @classmethod
+    def from_monsters_and_characters(
+        cls,
+        monsters: List,  # List of Monster instances
+        characters: List,  # List of Character instances
+        encounter_name: str = "Combat Encounter"
+    ) -> 'CombatState':
+        """
+        Create combat from Monster and Character instances
+        
+        Args:
+            monsters: List of Monster instances
+            characters: List of Character instances
+            encounter_name: Name for this encounter
+        
+        Returns:
+            Initialized CombatState
+        """
+        combat = cls(encounter_name=encounter_name)
+        
+        # Add characters
+        for char in characters:
+            participant = CombatParticipant.from_character(char)
+            combat.participants.append(participant)
+        
+        # Add monsters
+        for monster in monsters:
+            participant = CombatParticipant.from_monster(monster)
+            combat.participants.append(participant)
+        
+        return combat
     @staticmethod
     def _load_monster_index(index_path: str) -> Dict[str, str]:
         """Load monster names and file paths from INDEX.md

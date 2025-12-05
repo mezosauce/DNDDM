@@ -11,17 +11,10 @@ You are setting up a combat encounter. Your task is to:
    - Explain how the monsters appear
    - Build tension before combat begins
    
-3. **Specify monster details**
-   - State the exact monster name from INDEX.md
-   - State how many monsters appear (1-4 typically)
-   - Briefly mention what makes them dangerous
-   
 
+**Format your response like this:
+** [Monster(s) Chosen from INDEX.MD] **: 
 
-**Format your response like this:**
-Monster(s) Chosen from INDEX.MD: 
-
-[Monsters]
 
 "As you enter the [location], you encounter [NUMBER] [MONSTER NAME from INDEX.md]!
 [Atmospheric description of their appearance and behavior]
