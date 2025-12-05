@@ -953,3 +953,308 @@ body {
         opacity: 1;
     }
 }
+
+/* ============================================
+   COMBAT LOG ENHANCEMENTS
+   Enhanced styles for CombatLog.js
+   ============================================ */
+
+.log-entry {
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    border-radius: 4px;
+    background: rgba(15, 52, 96, 0.3);
+    border-left: 3px solid var(--accent-blue);
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+}
+
+.log-entry.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.log-entry.damage {
+    border-left-color: #ff6b6b;
+}
+
+.log-entry.healing {
+    border-left-color: #51cf66;
+}
+
+.log-entry.buff {
+    border-left-color: #4dabf7;
+}
+
+.log-entry.debuff {
+    border-left-color: #ffa94d;
+}
+
+.log-entry.miss {
+    border-left-color: #adb5bd;
+    opacity: 0.7;
+}
+
+.log-entry.system {
+    border-left-color: #ffd93d;
+    font-weight: bold;
+}
+
+.log-entry.turn {
+    border-left-color: #a78bfa;
+    text-align: center;
+    font-weight: bold;
+    background: rgba(167, 139, 250, 0.1);
+}
+
+.log-entry.round {
+    border-left-color: #f59f00;
+    text-align: center;
+    font-weight: bold;
+    background: rgba(245, 159, 0, 0.1);
+    font-size: 1.1em;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.log-entry.info {
+    border-left-color: #e9ecef;
+}
+
+.log-timestamp {
+    color: var(--text-secondary);
+    font-size: 0.85em;
+    margin-right: 8px;
+    opacity: 0.8;
+}
+
+.log-message {
+    color: var(--text-primary);
+}
+
+.log-details {
+    color: var(--text-secondary);
+    font-size: 0.85em;
+    margin-top: 4px;
+    padding-left: 20px;
+    font-style: italic;
+}
+
+/* ============================================
+   ACTION MENU ENHANCEMENTS
+   Additional styles for ActionMenu.js
+   ============================================ */
+
+.no-skills {
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--text-secondary);
+    font-style: italic;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.skill-btn {
+    background: var(--bg-light);
+    border: 2px solid var(--accent-blue);
+    border-radius: 8px;
+    padding: 12px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    text-align: left;
+    width: 100%;
+}
+
+.skill-btn:hover:not(:disabled) {
+    border-color: var(--accent-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
+}
+
+.skill-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    filter: grayscale(50%);
+}
+
+.skill-name {
+    font-weight: bold;
+    color: var(--accent-gold);
+    margin-bottom: 5px;
+    font-size: 1em;
+}
+
+.skill-description {
+    font-size: 0.85em;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+    line-height: 1.4;
+}
+
+.skill-cost {
+    font-size: 0.8em;
+    color: var(--accent-blue);
+    font-weight: 500;
+}
+
+.skill-cost.unavailable {
+    color: var(--accent-red);
+    font-weight: bold;
+}
+
+/* ============================================
+   ANIMATION EFFECTS
+   Additional animations for CombatAnimations.js
+   ============================================ */
+
+.attack-projectile,
+.spell-projectile {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    animation: projectileFade 0.4s ease-out;
+}
+
+@keyframes projectileFade {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.5);
+    }
+}
+
+.spell-cast-effect {
+    position: fixed;
+    font-size: 3rem;
+    pointer-events: none;
+    z-index: 9999;
+    animation: spellCastPulse 0.5s ease-out;
+}
+
+@keyframes spellCastPulse {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+
+/* Status effect animations */
+.effect-animation.rage {
+    color: #ff6b6b;
+}
+
+.effect-animation.inspiration {
+    color: #9b59b6;
+}
+
+.effect-animation.heal {
+    color: #51cf66;
+}
+
+.effect-animation.buff {
+    color: #4dabf7;
+}
+
+.effect-animation.debuff {
+    color: #ffa94d;
+}
+
+.effect-animation.wild_shape {
+    color: #8bc34a;
+}
+
+.effect-animation.channel_divinity {
+    color: #ffd93d;
+}
+
+.effect-animation.defend {
+    color: #95a5a6;
+}
+
+/* ============================================
+   TARGETING MODE ENHANCEMENTS
+   ============================================ */
+
+.targeting-hint {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.95);
+    color: var(--accent-gold);
+    padding: 20px 40px;
+    border-radius: 10px;
+    border: 2px solid var(--accent-gold);
+    font-size: 1.5rem;
+    font-weight: bold;
+    z-index: 1000;
+    pointer-events: none;
+    animation: hintPulse 2s infinite;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+@keyframes hintPulse {
+    0%, 100% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.05);
+    }
+}
+
+.hint-icon {
+    margin-right: 10px;
+    font-size: 2rem;
+    display: inline-block;
+    animation: hintIconSpin 2s linear infinite;
+}
+
+@keyframes hintIconSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.hint-text {
+    display: inline-block;
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+    .log-entry {
+        font-size: 0.8em;
+        padding: 6px 10px;
+    }
+    
+    .skill-btn {
+        padding: 10px;
+    }
+    
+    .skill-name {
+        font-size: 0.9em;
+    }
+    
+    .targeting-hint {
+        font-size: 1.2rem;
+        padding: 15px 30px;
+    }
+}
