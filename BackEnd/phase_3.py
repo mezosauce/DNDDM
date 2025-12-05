@@ -13,6 +13,7 @@ from typing import Tuple, Dict, Optional, Any
 import json
 import requests
 from pathlib import Path
+from urllib.parse import unquote
 
 # Import backend components
 from component.campaign_manager import CampaignManager
@@ -28,6 +29,9 @@ from component.Class import character_from_dict
 # ============================================================================
 # HELPER FUNCTIONS
 # ============================================================================
+def decode_campaign_name(campaign_name: str) -> str:
+    """Decode URL-encoded campaign name."""
+    return unquote(campaign_name)
 
 def load_story_package_data(campaign_name: str) -> Tuple[Any, StoryPackageTracker, StoryState, StoryPackageFlow]:
     """
@@ -619,6 +623,8 @@ def register_story_package_routes(app):
     def question_state_submit(campaign_name):
         """Process player's Accept/Decline response"""
         try:
+            campaign_name = decode_campaign_name(campaign_name)
+            
             data = request.json
             answer = data.get('answer', '').lower()
             
@@ -744,6 +750,7 @@ def register_story_package_routes(app):
             import traceback
             traceback.print_exc()
             return f"Error: {str(e)}", 500
+    
     # ========================================================================
     # 8. DICE ROLL EXECUTE
     # ========================================================================
