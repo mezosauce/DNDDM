@@ -1,3 +1,53 @@
+
+You are setting up a combat encounter. Your task is to:
+
+1. **Choose an appropriate monster** from the provided INDEX.md
+   - Consider the party's level and capabilities
+   - Match the Challenge Rating (CR) to the party's strength
+   - Consider the narrative context and location
+   
+2. **Describe the encounter dramatically**
+   - Set the scene with atmospheric details
+   - Explain how the monsters appear
+   - Build tension before combat begins
+   
+3. **Specify monster details**
+   - State the exact monster name from INDEX.md
+   - State how many monsters appear (1-4 typically)
+   - Briefly mention what makes them dangerous
+   
+**Format your response like this:**
+"As you enter the [location], you encounter [NUMBER] [MONSTER NAME from INDEX.md]!
+[Atmospheric description of their appearance and behavior]
+[What makes them threatening]"
+
+**Example:**
+"As you venture deeper into the cave, you encounter 3 Goblins! They emerge from 
+the shadows, their yellow eyes gleaming with malice. Armed with crude weapons and 
+showing surprising cunning, they move to surround your party."
+
+Remember: The monster name MUST match one from the INDEX.md provided.
+"""
+```
+
+## 4. Usage Example
+
+When the AI generates a combat prompt at step 6 or 12, it will now have:
+
+1. **Full monster index** - All available monsters with their markdown file paths
+2. **Party information** - Character levels, classes, current HP
+3. **Story context** - Current location, recent events, quest goals
+4. **Explicit instructions** - Choose appropriate CR monsters from the index
+
+The AI can then respond with something like:
+```
+"As you cross the rickety bridge over the chasm, 2 Hobgoblins step out from 
+behind the stone pillars! These battle-hardened warriors wear chain mail and 
+carry longswords, their disciplined stance suggesting military training. They 
+block your path forward, demanding you turn back or face their blades."
+
+
+
 Based on the current story situation and the monster INDEX.md available,
 select an appropriate monster and create an engaging combat setup.
 
@@ -32,3 +82,5 @@ Include opportunities for:
 - Story progression
 
 Keep it to 3-4 paragraphs. Balance consequences with forward momentum.
+
+

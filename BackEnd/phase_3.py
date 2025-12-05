@@ -29,6 +29,30 @@ from component.Class import character_from_dict
 # ============================================================================
 # HELPER FUNCTIONS
 # ============================================================================
+
+def validate_monster_choice(ai_response: str, monster_index: str) -> Optional[str]:
+        """
+        Validate that the AI chose a monster from the index.
+        
+        Returns:
+            Monster name if valid, None if not found
+        """
+        import re
+        
+        # Extract monster names from index
+        pattern = r'\* \[([^\]]+)\]'
+        available_monsters = re.findall(pattern, monster_index)
+        available_monsters_lower = [m.lower() for m in available_monsters]
+        
+        # Check if AI's response mentions any valid monster
+        ai_response_lower = ai_response.lower()
+        
+        for i, monster_name in enumerate(available_monsters_lower):
+            if monster_name in ai_response_lower:
+                return available_monsters[i]  # Return original case
+        
+        return None
+
 def decode_campaign_name(campaign_name: str) -> str:
     """Decode URL-encoded campaign name."""
     return unquote(campaign_name)
@@ -177,7 +201,8 @@ def build_story_context(campaign_name: str) -> Dict:
             'campaign': dict,
             'preparations': dict (parsed sections),
             'preparations_full': str (full text),
-            'session_notes': str
+            'session_notes': str,
+            'monster_index': str (INDEX.md content)
         }
     """
     manager = CampaignManager()
@@ -192,6 +217,16 @@ def build_story_context(campaign_name: str) -> Dict:
         with open(prep_path, 'r', encoding='utf-8') as f:
             preparations_full = f.read()
             preparations_parsed = parse_preparations(preparations_full)
+    
+    # Load monster INDEX.md for combat encounters
+    monster_index_path = Path(__file__).parent.parent / "srd_story_cycle" / "08_monsters_and_npcs" / "INDEX.md"
+    monster_index = ""
+    
+    if monster_index_path.exists():
+        with open(monster_index_path, 'r', encoding='utf-8') as f:
+            monster_index = f.read()
+    else:
+        print(f"Warning: Monster INDEX.md not found at {monster_index_path}")
     
     # Build character summaries
     characters = []
@@ -226,10 +261,12 @@ def build_story_context(campaign_name: str) -> Dict:
             'description': context['campaign']['description'],
             'session_number': context['campaign']['session_number']
         },
-        'preparations': preparations_parsed,  # Structured sections
-        'preparations_full': preparations_full,  # Full text if needed
-        'session_notes': context.get('session_notes', '')
+        'preparations': preparations_parsed,
+        'preparations_full': preparations_full,
+        'session_notes': context.get('session_notes', ''),
+        'monster_index': monster_index  # Add monster index
     }
+
 
 def call_claude_api(prompt: str, max_tokens: int = 1000) -> str:
     """
@@ -263,23 +300,42 @@ def call_claude_api(prompt: str, max_tokens: int = 1000) -> str:
         raise
 
 
-def extract_monster_info_from_response(ai_response: str) -> Optional[Dict]:
+def extract_monster_info_from_response(ai_response: str, monster_index: str = None) -> Optional[Dict]:
     """
-    Parse AI response for monster information.
+    Parse AI response for monster information with validation.
     
     Returns monster data dict if found, None otherwise.
     """
-    # Look for patterns like "3 goblins" or "1 dragon"
     import re
-    pattern = r'(\d+)\s+([a-zA-Z\s]+?)(?:s|es)?\s*(?:appear|attack|emerge)'
+    
+    # Look for patterns like "3 goblins" or "1 dragon"
+    pattern = r'(\d+)\s+([a-zA-Z\s]+?)(?:s|es)?\s*(?:appear|attack|emerge|step|block)'
     matches = re.findall(pattern, ai_response.lower())
     
     if matches:
         count, monster_name = matches[0]
+        monster_name = monster_name.strip()
+        
+        # Validate against index if provided
+        if monster_index:
+            validated_name = validate_monster_choice(ai_response, monster_index)
+            if validated_name:
+                monster_name = validated_name
+        
+        # Extract file path from index
+        file_path = None
+        if monster_index:
+            # Find the markdown file path for this monster
+            pattern = rf'\[{re.escape(monster_name)}\]\(([^\)]+)\)'
+            path_match = re.search(pattern, monster_index, re.IGNORECASE)
+            if path_match:
+                file_path = path_match.group(1)
+        
         return {
             'count': int(count),
-            'name': monster_name.strip(),
-            'description': ai_response[:200]
+            'name': monster_name,
+            'description': ai_response[:200],
+            'file_path': file_path  # Path to monster markdown file
         }
     
     return None
@@ -1475,6 +1531,8 @@ def register_combat_routes(app):
     # ========================================================================
     # HELPER FUNCTIONS
     # ========================================================================
+
+    
     
     def resolve_attack(attacker, target) -> dict:
         """Resolve a basic attack action"""
