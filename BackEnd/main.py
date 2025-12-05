@@ -18,6 +18,7 @@ from component.Class.Character import Character
 from component.campaign_manager import get_campaign_manager
 from LLM_Comp.prompt_templates import PromptTemplates, create_full_prompt
 from FAISS.search_engine import SRDSearchEngine, create_search_api, FAISS_AVAILABLE, EMBEDDINGS_AVAILABLE
+from combat_api_routes import register_combat_routes
 
 #from combat_test_route import register_combat_test_routes
 
@@ -116,7 +117,8 @@ else:
 # ============================================================================
 # TESTERS  
 # ============================================================================
-#register_combat_test_routes(app)
+register_combat_routes(app)
+print("INIT COMBAT")
 #print("✓ Combat test routes registered")
 # ============================================================================
 # MAIN ROUTES
