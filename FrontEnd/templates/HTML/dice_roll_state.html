@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dice Roll - {{ campaign_name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dice_state.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dice_roll_state.css') }}">
 </head>
 <body>
     <div class="container">
@@ -13,6 +13,9 @@
         <div class="header">
             <h1>🎲 {{ campaign_name }}</h1>
             <p class="progress-text">Story Package {{ tracker.current_package }} - Step {{ tracker.current_step }} of 15</p>
+            <div class="phase-indicator">
+                <span class="phase-label">Dice Roll Challenge</span>
+            </div>
         </div>
 
         <!-- Main Content Grid -->
@@ -25,7 +28,7 @@
                 </div>
 
                 <div class="challenge-info">
-                    <div class="challenge-item">
+                    <div class="challenge-item dc-highlight">
                         <span class="label">Difficulty Class (DC)</span>
                         <span class="value dc-value">{{ dice_situation.dc }}</span>
                     </div>
@@ -39,12 +42,16 @@
                         <span class="value">{{ dice_situation.skill|capitalize }}</span>
                     </div>
                     {% endif %}
+                    <div class="challenge-item">
+                        <span class="label">Roll Type</span>
+                        <span class="value">d20 + Modifiers</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Center Panel: Dice Roll -->
             <div class="panel dice-panel">
-                <h2>🎲 Roll the Dice</h2>
+                <h2>🎲 Make Your Roll</h2>
                 
                 <!-- Dice Animation Container -->
                 <div class="dice-container">
@@ -85,17 +92,22 @@
                     </div>
                 </div>
 
-                <!-- Roll Result Display -->
-                <div id="result-display" class="result-hidden">
-                    <div class="roll-number" id="roll-number">20</div>
-                    <div class="total-score" id="total-score">Total: 23</div>
-                </div>
-
                 <!-- Roll Button -->
                 <button class="roll-btn" id="roll-btn" onclick="rollDice()">
                     <span class="btn-icon">🎲</span>
                     <span class="btn-text">Roll the Dice!</span>
                 </button>
+
+                <!-- Roll Result Display -->
+                <div id="result-display" class="result-hidden">
+                    <div class="result-badge" id="result-badge">
+                        <span class="badge-icon">🎲</span>
+                        <span class="badge-text">Rolling...</span>
+                    </div>
+                    <div class="roll-number" id="roll-number">20</div>
+                    <div class="total-score" id="total-score">Total: 23 (DC 15)</div>
+                    <div class="success-indicator" id="success-indicator"></div>
+                </div>
 
                 <!-- Narrative Result -->
                 <div id="narrative-result" class="narrative-result hidden"></div>
@@ -105,34 +117,35 @@
             <div class="panel stats-panel">
                 <h2>⚔️ Your Character</h2>
                 <div class="character-name">{{ character.name }}</div>
+                <div class="character-class">{{ character.race }} {{ character.char_class }}</div>
                 
                 <div class="stats-grid">
-                    <div class="stat-box">
+                    <div class="stat-box" data-stat="strength">
                         <div class="stat-label">STR</div>
                         <div class="stat-value">{{ character.stats.strength }}</div>
                         <div class="stat-modifier">{{ ((character.stats.strength - 10) // 2)|int|string|replace('-', '−') if ((character.stats.strength - 10) // 2) < 0 else '+' + (((character.stats.strength - 10) // 2)|int|string) }}</div>
                     </div>
-                    <div class="stat-box">
+                    <div class="stat-box" data-stat="dexterity">
                         <div class="stat-label">DEX</div>
                         <div class="stat-value">{{ character.stats.dexterity }}</div>
                         <div class="stat-modifier">{{ ((character.stats.dexterity - 10) // 2)|int|string|replace('-', '−') if ((character.stats.dexterity - 10) // 2) < 0 else '+' + (((character.stats.dexterity - 10) // 2)|int|string) }}</div>
                     </div>
-                    <div class="stat-box">
+                    <div class="stat-box" data-stat="constitution">
                         <div class="stat-label">CON</div>
                         <div class="stat-value">{{ character.stats.constitution }}</div>
                         <div class="stat-modifier">{{ ((character.stats.constitution - 10) // 2)|int|string|replace('-', '−') if ((character.stats.constitution - 10) // 2) < 0 else '+' + (((character.stats.constitution - 10) // 2)|int|string) }}</div>
                     </div>
-                    <div class="stat-box">
+                    <div class="stat-box" data-stat="intelligence">
                         <div class="stat-label">INT</div>
                         <div class="stat-value">{{ character.stats.intelligence }}</div>
                         <div class="stat-modifier">{{ ((character.stats.intelligence - 10) // 2)|int|string|replace('-', '−') if ((character.stats.intelligence - 10) // 2) < 0 else '+' + (((character.stats.intelligence - 10) // 2)|int|string) }}</div>
                     </div>
-                    <div class="stat-box">
+                    <div class="stat-box" data-stat="wisdom">
                         <div class="stat-label">WIS</div>
                         <div class="stat-value">{{ character.stats.wisdom }}</div>
                         <div class="stat-modifier">{{ ((character.stats.wisdom - 10) // 2)|int|string|replace('-', '−') if ((character.stats.wisdom - 10) // 2) < 0 else '+' + (((character.stats.wisdom - 10) // 2)|int|string) }}</div>
                     </div>
-                    <div class="stat-box">
+                    <div class="stat-box" data-stat="charisma">
                         <div class="stat-label">CHA</div>
                         <div class="stat-value">{{ character.stats.charisma }}</div>
                         <div class="stat-modifier">{{ ((character.stats.charisma - 10) // 2)|int|string|replace('-', '−') if ((character.stats.charisma - 10) // 2) < 0 else '+' + (((character.stats.charisma - 10) // 2)|int|string) }}</div>
@@ -140,13 +153,13 @@
                 </div>
 
                 <div class="stat-breakdown" id="stat-breakdown">
-                    <h3>Roll Modifiers</h3>
+                    <h3>Roll Calculation</h3>
                     <div class="modifier-list">
                         <div class="modifier-item">
-                            <span>Base Roll (d20)</span>
+                            <span>d20 Base Roll</span>
                             <span class="modifier-value">1-20</span>
                         </div>
-                        <div class="modifier-item">
+                        <div class="modifier-item modifier-highlight">
                             <span>{{ dice_situation.stat|capitalize }} Modifier</span>
                             <span class="modifier-value" id="stat-mod">+?</span>
                         </div>
@@ -156,12 +169,35 @@
                             <span class="modifier-value">+2</span>
                         </div>
                         {% endif %}
+                        <div class="modifier-item total-modifier">
+                            <span><strong>Must Beat DC</strong></span>
+                            <span class="modifier-value dc-target">{{ dice_situation.dc }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="character-status">
+                    <div class="status-item">
+                        <span class="status-label">HP</span>
+                        <span class="status-value">{{ character.hp }}/{{ character.max_hp }}</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Level</span>
+                        <span class="status-value">{{ character.level }}</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/dice_state.js') }}"></script>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Rolling dice...</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/dice_roll_state.js') }}"></script>
 </body>
 </html>
