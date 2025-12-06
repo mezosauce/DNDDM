@@ -99,6 +99,13 @@ class CombatViewController {
         this.combatState = data.summary;
         console.log('[Combat] ✓ State loaded:', this.combatState);
         
+        console.log('[Combat] Participants:', this.combatState.participants.map(p => ({
+            id: p.id,
+            participant_id: p.participant_id,
+            name: p.name,
+            type: p.type
+        })));
+
         // Initialize class feature managers for player characters
         this.initializeFeatureManagers();
     }

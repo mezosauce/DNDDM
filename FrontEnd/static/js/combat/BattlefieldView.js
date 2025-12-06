@@ -49,6 +49,8 @@ class BattlefieldView {
         party.forEach(participant => {
             const card = this.createCombatantCard(participant, 'party');
             this.partyArea.appendChild(card);
+            
+            const participantId = participant.participant_id || participant.id
             this.combatantElements.set(participant.participant_id, card);
         });
         
@@ -86,7 +88,9 @@ class BattlefieldView {
     createCombatantCard(participant, side) {
         const card = document.createElement('div');
         card.className = `combatant-card ${side}`;
-        card.dataset.participantId = participant.participant_id;
+
+        const participantId = participant.participant_id || participant.id;
+        card.dataset.participantId = participantId;
         card.dataset.participantType = participant.type;
         
         // Add defeated class if HP is 0
