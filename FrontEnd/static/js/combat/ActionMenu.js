@@ -62,16 +62,30 @@ class ActionMenu {
      */
     show(character) {
         console.log('[ActionMenu] Showing menu for:', character.name);
-        
-        this.activeCharacter = character;
-        this.menuContainer.style.display = 'block';
-        
-        // Show main menu by default
-        this.showMainMenu();
-        
-        // Update button states based on character resources
-        this.updateMainMenuStates();
-    }
+        const participantId = character.participant_id || character.id;
+            console.log('[ActionMenu] Looking for participant ID:', participantId);
+            
+            const allParticipants = this.combatController.getParticipants();
+            console.log('[ActionMenu] All participants:', allParticipants.map(p => ({
+                id: p.id,
+                participant_id: p.participant_id,
+                name: p.name,
+                type: p.type
+            })));
+            
+            const fullParticipant = allParticipants.find(
+                p => {
+                    const pId = p.participant_id || p.id;
+                    console.log('[ActionMenu] Comparing:', pId, 'with', participantId);
+                    return pId === participantId;
+                }
+            );
+            
+            console.log('[ActionMenu] Full participant found:', fullParticipant);
+            
+            this.activeCharacter = fullParticipant || character;
+            console.log('[ActionMenu] Active character set to:', this.activeCharacter);
+        }
     
     /**
      * Hide action menu (enemy turn)
@@ -260,10 +274,18 @@ class ActionMenu {
             return;
         }
         
+        
         skillsList.innerHTML = '';
         
+        if (!this.activeCharacter || !this.activeCharacter.class) {
+            console.error('[ActionMenu] Active character missing class:', this.activeCharacter);
+            skillsList.innerHTML = '<div class="no-skills">Character data not loaded</div>';
+            return;
+        }
+
         // Get feature manager for this character
-        const featureManager = this.combatController.getFeatureManager(this.activeCharacter.id);
+        const characterId = this.activeCharacter.participant_id || this.activeCharacter.id;
+        const featureManager = this.combatController.getFeatureManager(characterId);
         
         // Get class-specific skills
         const skills = this.getClassSkills(this.activeCharacter.class, featureManager);
@@ -581,8 +603,14 @@ class ActionMenu {
      * Update main menu button states
      */
     updateMainMenuStates() {
+
+        if (!this.activeCharacter || !this.activeCharacter.class) {
+            console.warn('[ActionMenu] Cannot update menu states - character data missing');
+            return;
+        }
         // Check if character has usable skills
-        const featureManager = this.combatController.getFeatureManager(this.activeCharacter.id);
+        const characterId = this.activeCharacter.participant_id || this.activeCharacter.id;
+        const featureManager = this.combatController.getFeatureManager(characterId);
         const skills = this.getClassSkills(this.activeCharacter.class, featureManager);
         const hasUsableSkills = skills.some(s => s.available);
         

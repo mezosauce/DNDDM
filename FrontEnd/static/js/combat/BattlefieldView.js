@@ -454,7 +454,9 @@ class BattlefieldView {
             console.log('[BattlefieldView] Invalid target clicked');
             return;
         }
-        
+        console.log('[BattlefieldView] Valid targets:', this.validTargets);
+        console.log('[BattlefieldView] Clicked ID type:', typeof participantId, 'Value:', participantId);
+    
         // Select this target
         this.selectedTargetId = participantId;
         

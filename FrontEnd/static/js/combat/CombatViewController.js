@@ -103,9 +103,12 @@ class CombatViewController {
             id: p.id,
             participant_id: p.participant_id,
             name: p.name,
-            type: p.type
+            type: p.type,
+            class: p.class,
+            level: p.level
         })));
-
+        
+        console.log('[Combat] Current turn:', this.combatState.current_turn);
         // Initialize class feature managers for player characters
         this.initializeFeatureManagers();
     }
