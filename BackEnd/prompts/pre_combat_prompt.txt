@@ -4,7 +4,7 @@ You are setting up a combat encounter. Your task is to:
 1. **Choose an appropriate monster** from the provided INDEX.md
    - Consider the party's level and capabilities
    - Match the Challenge Rating (CR) to the party's strength
-   - Consider the narrative context and location
+   - Consider the narrative context and location   
    
 2. **Describe the encounter dramatically**
    - Set the scene with atmospheric details
@@ -12,8 +12,9 @@ You are setting up a combat encounter. Your task is to:
    - Build tension before combat begins
    
 
-**Format your response like this:
-** [Monster(s) Chosen from INDEX.MD] **: 
+**FORMAT YOUR RESPONSE AS BELOW:
+
+**[Number] [Monster(s) Chosen from INDEX.MD]**: 
 
 
 "As you enter the [location], you encounter [NUMBER] [MONSTER NAME from INDEX.md]!

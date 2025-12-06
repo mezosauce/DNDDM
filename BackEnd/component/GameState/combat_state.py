@@ -95,6 +95,23 @@ class CombatParticipant:
             participant_type=ParticipantType.MONSTER
         )
 
+    @classmethod
+    def from_character(cls, character) -> 'CombatParticipant':
+        """Create participant from Character instance"""
+        participant_id = f"char_{character.name.lower().replace(' ', '_')}"
+        
+        # Calculate initiative bonus from dexterity
+        dex = character.stats.get('dexterity', 10) if hasattr(character, 'stats') else 10
+        init_bonus = (dex - 10) // 2
+        
+        return cls(
+            participant_id=participant_id,
+            name=character.name,
+            entity=character,
+            participant_type=ParticipantType.CHARACTER,
+            initiative_bonus=init_bonus
+        )
+    
 @dataclass
 class CombatState:
     """Manages the state of combat encounters"""

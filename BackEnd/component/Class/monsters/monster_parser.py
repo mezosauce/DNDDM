@@ -4,18 +4,28 @@ Monster Markdown Parser
 Parses SRD monster markdown files and creates Monster instances
 """
 
+
+from BackEnd.component.Class.monsters.monster import Monster
+
 import re
 from pathlib import Path
 from typing import Dict, Optional
-from .monster import Monster
 
 
 class MonsterParser:
     """Parse monster data from SRD markdown files"""
     
-    def __init__(self, srd_base_path: str = "../../../../srd_story_cycle"):
-        self.srd_base_path = Path(srd_base_path)
-        self.monsters_path = self.srd_base_path / "08_monsters_and_npcs"
+    def __init__(self, srd_base_path: Optional[str] = None):
+        if srd_base_path is None:
+            # Default: calculate path relative to this file's location
+            # monster_parser.py is in BackEnd/component/Class/monsters/
+            # srd_story_cycle is at the project root
+            script_dir = Path(__file__).parent  # BackEnd/component/Class/monsters/
+            self.srd_base_path = script_dir.parent.parent.parent.parent / "srd_story_cycle"
+        else:
+            self.srd_base_path = Path(srd_base_path)
+        
+        self.monsters_path = self.srd_base_path / "08_monsters_and_npcs" / "monster_basics" / "monsters"
     
     def parse_monster_file(self, file_path: str) -> Optional[Monster]:
         """
@@ -210,21 +220,24 @@ class MonsterParser:
         """
         # Convert name to expected filename format
         filename = monster_name.lower().replace(' ', '_').replace('-', '_') + '.md'
-        
+
+        print(f"looking for: {filename}" )
         # Search in monsters directory
         monster_file = self.monsters_path / filename
-        
+
+        print(f"[MonsterParser] Searching in: {self.monsters_path}")
+        print(f"[MonsterParser] Path exists: {self.monsters_path.exists()}")        
+
         if monster_file.exists():
-            return self.parse_monster_file(f"08_monsters_and_npcs/{filename}")
+            return self.parse_monster_file(f"08_monsters_and_npcs/monster_basics/monsters/{filename}")
         
         # Try searching for partial matches
         for file in self.monsters_path.glob('*.md'):
             if monster_name.lower() in file.stem.lower():
-                return self.parse_monster_file(f"08_monsters_and_npcs/{file.name}")
+                return self.parse_monster_file(f"08_monsters_and_npcs/monster_basics/monsters/{file.name}")
         
         print(f"[MonsterParser] Monster not found: {monster_name}")
         return None
-
 
 # Example usage
 if __name__ == "__main__":
@@ -235,8 +248,7 @@ if __name__ == "__main__":
     # Add parent directory to path
     sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
     
-    from BackEnd.component.Class.monsters.monster import Monster
-    from BackEnd.component.Class.monsters.monster_parser import MonsterParser
+    from monster import Monster
     
     parser = MonsterParser()
     tarrasque = parser.find_monster_by_name("Tarrasque")

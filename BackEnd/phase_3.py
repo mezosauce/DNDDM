@@ -308,88 +308,105 @@ def extract_monster_info_from_response(ai_response: str, monster_index: str = No
     """
     import re
     
-
     print(f"[DEBUG] Extracting monster from response: {ai_response[:100]}...")
     print(f"[DEBUG] Monster index provided: {monster_index is not None}")
     
-    # Look for patterns like "3 goblins" or "1 dragon"
-    pattern = r'(\d+)\s+([a-zA-Z\s]+?)(?:s|es)?\s*(?:appear|attack|emerge|step|block|rise)'
-    matches = re.findall(pattern, ai_response.lower())
-    
-    if matches:
-        count, monster_name = matches[0]
-        monster_name = monster_name.strip()
-        
-        # Validate against index if provided
-        validated_name = None
-        if monster_index:
-            validated_name = validate_monster_choice(ai_response, monster_index)
-            if validated_name:
-                monster_name = validated_name
-        
-        # Extract file path from index
-        file_path = None
-        if monster_index:
-            # Find the markdown file path for this monster
-            pattern = rf'\[{re.escape(monster_name)}\]\(([^\)]+)\)'
-            path_match = re.search(pattern, monster_index, re.IGNORECASE)
-            if path_match:
-                file_path = path_match.group(1)
-        
-        # Parse monster from markdown file
-        from component.Class.monsters.monster_parser import MonsterParser
-        
-        parser = MonsterParser()
-        monster = None
-        
-        if file_path:
-            # Load from specific file
-            monster = parser.parse_monster_file(file_path)
-        else:
-            # Try to find by name
-            monster = parser.find_monster_by_name(monster_name)
-        
-        if monster:
-            return {
-                'count': int(count),
-                'name': monster.name,
-                'description': ai_response[:200],
-                'file_path': file_path,
-                'monster_data': monster.to_dict()  # Full monster stats
-            }
-        else:
-            # Fallback if monster not found in SRD
-            print(f"[WARNING] Monster {monster_name} not found in SRD, using defaults")
-            return {
-                'count': int(count),
-                'name': monster_name,
-                'description': ai_response[:200],
-                'file_path': file_path,
-                'monster_data': {
-                    'name': monster_name,
-                    'monster_type': 'unknown',
-                    'size': 'Medium',
-                    'alignment': 'unaligned',
-                    'challenge_rating': 1.0,
-                    'hp': 20,
-                    'ac': 12,
-                    'stats': {
-                        'strength': 10,
-                        'dexterity': 10,
-                        'constitution': 10,
-                        'intelligence': 10,
-                        'wisdom': 10,
-                        'charisma': 10
-                    },
-                    'abilities': [],
-                    'actions': ['Slam. Melee Weapon Attack: +2 to hit, reach 5 ft. Hit: 1d6+0 damage.'],
-                    'legendary_actions': [],
-                    'lair_actions': []
-                }
-            }
-    
-    return None
+    # First, try to extract monster name from **Monster Name**: format
+    bold_pattern = r'\*\*(?:(\d+)\s+)?([a-zA-Z\s]+)\*\*:'
+    bold_match = re.search(bold_pattern, ai_response)
 
+    monster_name = None
+    count = 1  # Default to 1 monster
+
+    if bold_match:
+        count_str = bold_match.group(1)  # Might be None
+        monster_name = bold_match.group(2).strip()
+        
+        # Get count if it was in the bold text
+        if count_str:
+            count = int(count_str)
+        
+        # Remove plural 's' or 'es' from monster name if count > 1
+        if count > 1:
+            if monster_name.endswith('ies'):
+                # e.g., "Harpies" -> "Harpy"
+                monster_name = monster_name[:-3] + 'y'
+            elif monster_name.endswith('es'):
+                # e.g., "Wolves" -> "Wolf" (but watch for "Horses" -> "Horse")
+                if monster_name.endswith('ves'):
+                    # e.g., "Wolves" -> "Wolf"
+                    monster_name = monster_name[:-3] + 'f'
+                elif not monster_name.endswith(('shes', 'ches', 'xes', 'ses', 'zes')):
+                    # Not a natural 'es' ending, remove it
+                    monster_name = monster_name[:-2]
+                else:
+                    # Natural 'es' ending like "Horses"
+                    monster_name = monster_name[:-2]
+            elif monster_name.endswith('s') and not monster_name.endswith('ss'):
+                # e.g., "Rats" -> "Rat", but "Brass" stays "Brass"
+                monster_name = monster_name[:-1]
+        
+        print(f"[DEBUG] Found monster in bold: {monster_name} (count: {count})")
+        
+    else:
+        # Fallback: Look for patterns like "3 goblins attack" or "1 dragon appears"
+        pattern = r'(\d+)\s+([a-zA-Z\s]+?)(?:s|es)?\s*(?:appear|attack|emerge|step|block|rise)'
+        matches = re.findall(pattern, ai_response.lower())
+        
+        if matches:
+            count, monster_name = matches[0]
+            monster_name = monster_name.strip()
+            count = int(count)
+    
+    if not monster_name:
+        print("[WARNING] No monster name found in response")
+        return None
+    
+    from component.Class.monsters.monster_parser import MonsterParser
+
+    parser = MonsterParser()
+    print(f"[DEBUG] Searching for monster: '{monster_name}'")
+    monster = parser.find_monster_by_name(monster_name)
+
+    if monster:
+        return {
+            'count': count,
+            'name': monster.name,
+            'description': ai_response[:200],
+            
+            'monster_data': monster.to_dict()  # Full monster stats
+        }
+    else:
+        # Fallback if monster not found in SRD
+        print(f"[WARNING] Monster {monster_name} not found in SRD, using defaults")
+        return {
+            'count': count,
+            'name': monster_name,
+            'description': ai_response[:200],
+            
+            'monster_data': {
+                'name': monster_name,
+                'monster_type': 'unknown',
+                'size': 'Medium',
+                'alignment': 'unaligned',
+                'challenge_rating': 1.0,
+                'hp': 20,
+                'ac': 12,
+                'stats': {
+                    'strength': 10,
+                    'dexterity': 10,
+                    'constitution': 10,
+                    'intelligence': 10,
+                    'wisdom': 10,
+                    'charisma': 10
+                },
+                'abilities': [],
+                'actions': ['Slam. Melee Weapon Attack: +2 to hit, reach 5 ft. Hit: 1d6+0 damage.'],
+                'legendary_actions': [],
+                'lair_actions': []
+            }
+        }
+    
 def extract_dice_situation_from_response(ai_response: str) -> Optional[Dict]:
     """
     Parse AI response for dice roll requirements.
@@ -950,12 +967,27 @@ def register_story_package_routes(app):
         try:
             campaign, tracker, story_state, flow = load_story_package_data(campaign_name)
             
-            # Get active combat from session
-            combat_data = session.get('active_combat', None)
+            import uuid
+            combat_id = session.get('current_combat_id')
+            if not combat_id:
+                combat_id = str(uuid.uuid4())
+                session['current_combat_id'] = combat_id
             
-            if not combat_data:
-                # Initialize combat directly
-                print(f"[Combat] No active combat found, initializing...")
+            # Try to get existing combat using the correct key format
+            session_key = f'combat_{combat_id}'
+            combat_state = None
+            
+            if session_key in session:
+                try:
+                    combat_state = deserialize_combat(session[session_key])
+                    print(f"[Combat] Loaded existing combat from session")
+                except Exception as e:
+                    print(f"[Combat] Error deserializing combat: {e}")
+                    combat_state = None
+            
+            if not combat_state:
+                # Initialize new combat
+                print(f"[Combat] Initializing new combat with ID: {combat_id}")
                 
                 # Get monster info from story_state
                 monster_info = story_state.pending_monster
@@ -970,16 +1002,14 @@ def register_story_package_routes(app):
                 # Get full monster data
                 monster_data = monster_info.get('monster_data')
                 if not monster_data:
-                    return "Monster data not loaded properly. Please restart from story state.", 400
+                    return "Monster data not loaded properly.", 400
                 
-                # Create Monster instance from data
+                # Create Monster instances
                 from component.Class.monsters.monster import Monster
                 monster = Monster.from_dict(monster_data)
                 
-                # Create multiple monsters if count > 1
                 monsters = []
                 for i in range(monster_info['count']):
-                    # Create a copy with unique name
                     monster_copy = Monster.from_dict(monster_data)
                     if monster_info['count'] > 1:
                         monster_copy.name = f"{monster_copy.name} #{i+1}"
@@ -993,26 +1023,21 @@ def register_story_package_routes(app):
                     encounter_name=f"Battle vs {monster.name}"
                 )
                 
-                # Roll initiative
+                # Initialize combat
                 combat_state.roll_initiative()
                 combat_state.determine_turn_order()
                 combat_state.init_combat()
                 
-                # Get summary
-                combat_data = combat_state.get_combat_summary()
-                
-                # Store in session
-                session['active_combat'] = combat_data
-                
-                print(f"[Combat] Combat initialized successfully")
+                # Save using the proper serialization function
+                save_combat_to_session(combat_id, combat_state)
+                print(f"[Combat] Combat initialized and saved with ID: {combat_id}")
             
-            # Generate combat ID
-            import uuid
-            combat_id = str(uuid.uuid4())
+            # Get summary for template
+            combat_data = combat_state.get_combat_summary()
             
             context_data = {
                 'campaign_name': campaign_name,
-                'combat_id': combat_id,
+                'combat_id': combat_id,  # Use persistent combat_id
                 'tracker': tracker.to_dict(),
                 'story_state': story_state.to_dict(),
                 'combat_state': combat_data,
