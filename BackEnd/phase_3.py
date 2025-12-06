@@ -1185,6 +1185,47 @@ def register_story_package_routes(app):
     
     print("✓ Story package routes registered")
 
+    # Serilization
+    import pickle
+    import base64
+
+    def serialize_combat(combat: CombatState) -> str:
+        """Serialize combat state to string for session storage"""
+        try:
+            # Use pickle to serialize
+            pickled = pickle.dumps(combat)
+            # Encode to base64 string
+            return base64.b64encode(pickled).decode('utf-8')
+        except Exception as e:
+            print(f"Error serializing combat: {e}")
+            raise
+
+    def deserialize_combat(combat_str: str) -> CombatState:
+        """Deserialize combat state from session string"""
+        try:
+            # Decode from base64
+            pickled = base64.b64decode(combat_str.encode('utf-8'))
+            # Unpickle
+            return pickle.loads(pickled)
+        except Exception as e:
+            print(f"Error deserializing combat: {e}")
+            raise
+
+    # Update the helper functions:
+
+
+    def save_combat_to_session(combat_id: str, combat: CombatState):
+        """Save combat to session with proper serialization"""
+        session_key = f'combat_{combat_id}'
+        
+        try:
+            combat_str = serialize_combat(combat)
+            session[session_key] = combat_str
+            session.modified = True
+        except Exception as e:
+            print(f"Error saving combat to session: {e}")
+            raise
+
     # ========================================================================
     # GAME LOGIC
     # ========================================================================
@@ -2014,56 +2055,17 @@ def register_story_package_routes(app):
         
         print("[Combat API] Routes registered successfully")
 
-        # Serilization
-        import pickle
-        import base64
-
-        def serialize_combat(combat: CombatState) -> str:
-            """Serialize combat state to string for session storage"""
-            try:
-                # Use pickle to serialize
-                pickled = pickle.dumps(combat)
-                # Encode to base64 string
-                return base64.b64encode(pickled).decode('utf-8')
-            except Exception as e:
-                print(f"Error serializing combat: {e}")
-                raise
-
-        def deserialize_combat(combat_str: str) -> CombatState:
-            """Deserialize combat state from session string"""
-            try:
-                # Decode from base64
-                pickled = base64.b64decode(combat_str.encode('utf-8'))
-                # Unpickle
-                return pickle.loads(pickled)
-            except Exception as e:
-                print(f"Error deserializing combat: {e}")
-                raise
-
-        # Update the helper functions:
-
-        def get_combat_from_session(combat_id: str) -> Optional[CombatState]:
-            """Load combat from session with proper deserialization"""
-            session_key = f'combat_{combat_id}'
-            
-            if session_key not in session:
-                return None
-            
-            try:
-                combat_str = session[session_key]
-                return deserialize_combat(combat_str)
-            except Exception as e:
-                print(f"Error loading combat from session: {e}")
-                return None
-
-        def save_combat_to_session(combat_id: str, combat: CombatState):
-            """Save combat to session with proper serialization"""
-            session_key = f'combat_{combat_id}'
-            
-            try:
-                combat_str = serialize_combat(combat)
-                session[session_key] = combat_str
-                session.modified = True
-            except Exception as e:
-                print(f"Error saving combat to session: {e}")
-                raise
+        
+    def get_combat_from_session(combat_id: str) -> Optional[CombatState]:
+        """Load combat from session with proper deserialization"""
+        session_key = f'combat_{combat_id}'
+        
+        if session_key not in session:
+            return None
+        
+        try:
+            combat_str = session[session_key]
+            return deserialize_combat(combat_str)
+        except Exception as e:
+            print(f"Error loading combat from session: {e}")
+            return None

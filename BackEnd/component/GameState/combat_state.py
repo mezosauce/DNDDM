@@ -431,19 +431,14 @@ class CombatState:
         Returns:
             Initialized CombatState
         """
-        combat = cls(encounter_name=encounter_name)
-        
-        # Add characters
-        for char in characters:
-            participant = CombatParticipant.from_character(char)
-            combat.participants.append(participant)
-        
-        # Add monsters
-        for monster in monsters:
-            participant = CombatParticipant.from_monster(monster)
-            combat.participants.append(participant)
+        combat = cls(
+            encounter_name=encounter_name,
+            characters=characters,
+            monsters=monsters
+        )
         
         return combat
+
     @staticmethod
     def _load_monster_index(index_path: str) -> Dict[str, str]:
         """Load monster names and file paths from INDEX.md
