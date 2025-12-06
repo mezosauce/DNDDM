@@ -484,7 +484,13 @@ class BattlefieldView {
             <span class="hint-text">Select a ${targetType === 'ally' ? 'party member' : 'target'}</span>
         `;
         
-        document.querySelector('.combat-container').appendChild(hint);
+        const container = document.querySelector('#combat-container');
+        if (container) {
+            container.appendChild(hint);
+        } else {
+            console.warn('[BattlefieldView] Combat container not found for targeting hint');
+            document.body.appendChild(hint);
+        }    
     }
     
     /**

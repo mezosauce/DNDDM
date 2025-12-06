@@ -146,7 +146,8 @@ class ActionMenu {
         
         // Enter targeting mode on battlefield
         const targetType = action.target_type || 'enemy';
-        const validIds = validTargets.map(t => t.id);
+
+        const validIds = validTargets.map(t => t.participant_id || t.id);
         
         this.combatController.battlefieldView.enterTargetingMode(validIds, targetType);
         
