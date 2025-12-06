@@ -13,7 +13,7 @@ from .monster import Monster
 class MonsterParser:
     """Parse monster data from SRD markdown files"""
     
-    def __init__(self, srd_base_path: str = "srd_story_cycle"):
+    def __init__(self, srd_base_path: str = "../../../../srd_story_cycle"):
         self.srd_base_path = Path(srd_base_path)
         self.monsters_path = self.srd_base_path / "08_monsters_and_npcs"
     
@@ -228,9 +228,17 @@ class MonsterParser:
 
 # Example usage
 if __name__ == "__main__":
-    parser = MonsterParser()
     
-    # Test with Tarrasque
+    import sys
+    from pathlib import Path
+    
+    # Add parent directory to path
+    sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
+    
+    from BackEnd.component.Class.monsters.monster import Monster
+    from BackEnd.component.Class.monsters.monster_parser import MonsterParser
+    
+    parser = MonsterParser()
     tarrasque = parser.find_monster_by_name("Tarrasque")
     if tarrasque:
         print(tarrasque.full_description())
