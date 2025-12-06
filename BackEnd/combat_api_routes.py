@@ -12,6 +12,27 @@ from component.GameState.combat_state import CombatState, CombatParticipant
 from component.GameState.combat_ai import CombatAI, CombatActionResolver
 from component.campaign_manager import CampaignManager
 
+import pickle
+import base64
+
+def serialize_combat(combat) -> str:
+    """Serialize combat state to string for session storage"""
+    try:
+        pickled = pickle.dumps(combat)
+        return base64.b64encode(pickled).decode('utf-8')
+    except Exception as e:
+        print(f"Error serializing combat: {e}")
+        raise
+
+def deserialize_combat(combat_str: str):
+    """Deserialize combat state from session string"""
+    try:
+        pickled = base64.b64decode(combat_str.encode('utf-8'))
+        return pickle.loads(pickled)
+    except Exception as e:
+        print(f"Error deserializing combat: {e}")
+        raise
+
 
 def register_combat_routes(app):
     """Register all combat-related API routes"""
@@ -34,14 +55,26 @@ def register_combat_routes(app):
             - combat log
         """
         try:
-            # Get combat from session
-            combat = get_combat_from_session(combat_id)
+            # Get combat from session with deserialization
+            session_key = f'combat_{combat_id}'
             
-            if not combat:
+            if session_key not in session:
                 return jsonify({
                     'success': False,
-                    'error': 'Combat not found'
+                    'error': 'Combat not found in session'
                 }), 404
+            
+            # Deserialize combat state
+            try:
+                combat = deserialize_combat(session[session_key])
+            except Exception as e:
+                print(f"[API] Error deserializing combat: {e}")
+                import traceback
+                traceback.print_exc()
+                return jsonify({
+                    'success': False,
+                    'error': f'Combat deserialization failed: {str(e)}'
+                }), 500
             
             # Get summary
             summary = combat.get_combat_summary()
@@ -413,29 +446,32 @@ def register_combat_routes(app):
     
     def get_combat_from_session(combat_id: str) -> Optional[CombatState]:
         """
-        Load combat from session
-        
-        Note: In production, you'd want to store this in a database
-        For now, we use Flask session
+        Load combat from session with deserialization
         """
         session_key = f'combat_{combat_id}'
         
         if session_key not in session:
             return None
         
-        # Deserialize combat state
-        combat_data = session[session_key]
-        
-        # For now, return the stored object
-        # In production, you'd reconstruct from JSON
-        return combat_data
+        try:
+            combat_str = session[session_key]
+            return deserialize_combat(combat_str)
+        except Exception as e:
+            print(f"Error loading combat from session: {e}")
+            return None
     
     def save_combat_to_session(combat_id: str, combat: CombatState):
         """
-        Save combat to session
+        Save combat to session with serialization
         """
         session_key = f'combat_{combat_id}'
-        session[combat_key] = combat
-        session.modified = True
+        
+        try:
+            combat_str = serialize_combat(combat)
+            session[session_key] = combat_str
+            session.modified = True
+        except Exception as e:
+            print(f"Error saving combat to session: {e}")
+            raise
     
     print("[Combat API] Routes registered")

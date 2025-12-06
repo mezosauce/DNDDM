@@ -218,7 +218,7 @@ class CombatViewController {
         }
         
         // Update visual indicator on combatant cards
-        this.battlefieldView.highlightCurrentTurn(currentTurn.name);
+        this.battlefieldView.updateTurnIndicator(currentTurn.participant_id)
     }
 
     updateActionMenu() {

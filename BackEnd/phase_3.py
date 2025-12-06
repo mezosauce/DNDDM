@@ -1029,8 +1029,15 @@ def register_story_package_routes(app):
                 combat_state.init_combat()
                 
                 # Save using the proper serialization function
-                save_combat_to_session(combat_id, combat_state)
-                print(f"[Combat] Combat initialized and saved with ID: {combat_id}")
+                try:
+                    combat_str = serialize_combat(combat_state)
+                    session[session_key] = combat_str
+                    session.modified = True
+                    print(f"[Combat] Combat initialized and saved with ID: {combat_id}")
+                except Exception as e:
+                    print(f"[Combat] Error saving combat: {e}")
+                    import traceback
+                    traceback.print_exc()
             
             # Get summary for template
             combat_data = combat_state.get_combat_summary()
@@ -1239,24 +1246,39 @@ def register_story_package_routes(app):
         @app.route('/api/combat/<combat_id>/summary', methods=['GET'])
         def get_combat_summary(combat_id):
             """Get current combat state"""
+
             try:
-                # Get combat from session
-                combat = get_combat_from_session(combat_id)
+                # Get combat from session with deserialization
+                session_key = f'combat_{combat_id}'
                 
-                if not combat:
+                if session_key not in session:
                     return jsonify({
                         'success': False,
-                        'error': 'Combat not found'
+                        'error': 'Combat not found in session'
                     }), 404
+                
+                # Deserialize combat state
+                try:
+                    combat = deserialize_combat(session[session_key])
+                except Exception as e:
+                    print(f"[API] Error deserializing combat: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    return jsonify({
+                        'success': False,
+                        'error': f'Combat deserialization failed: {str(e)}'
+                    }), 500
+                
                 
                 # Build participant data
                 participants = []
                 for p in combat.participants:
                     participant_data = {
                         'participant_id': p.participant_id,
+                        'id': p.participant_id,
                         'name': p.name,
                         'type': p.participant_type.value,
-                        'initiative': p.initiative,
+                        'initiative': p.initiative_total,
                         'hp': p.get_current_hp(),
                         'max_hp': p.get_max_hp(),
                         'ac': p.get_ac(),
@@ -1317,7 +1339,7 @@ def register_story_package_routes(app):
                     'combat_id': combat_id,
                     'encounter_name': combat.encounter_name,
                     'participants': participants,
-                    'initiative_order': [p.participant_id for p in combat.initiative_order],
+                    'initiative_order': [{'id': pid, 'initiative': init} for pid, init in combat.initiative_order],
                     'current_turn': current_turn,
                     'current_turn_index': combat.current_turn_index,
                     'round': combat.current_round,
@@ -2039,19 +2061,34 @@ def register_story_package_routes(app):
             return max(1, damage)
         
         def get_combat_from_session(combat_id: str):
-            """Load combat from session"""
+            """Load combat from session with deserialization"""
             session_key = f'combat_{combat_id}'
             
             if session_key not in session:
                 return None
             
-            return session[session_key]
+            try:
+                combat_str = session[session_key]
+                return deserialize_combat(combat_str)
+            except Exception as e:
+                print(f"[Combat API] Error deserializing combat: {e}")
+                import traceback
+                traceback.print_exc()
+                return None
         
         def save_combat_to_session(combat_id: str, combat):
-            """Save combat to session"""
+            """Save combat to session with serialization"""
             session_key = f'combat_{combat_id}'
-            session[session_key] = combat
-            session.modified = True
+            
+            try:
+                combat_str = serialize_combat(combat)
+                session[session_key] = combat_str
+                session.modified = True
+            except Exception as e:
+                print(f"[Combat API] Error serializing combat: {e}")
+                import traceback
+                traceback.print_exc()
+                raise
         
         print("[Combat API] Routes registered successfully")
 
