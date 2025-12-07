@@ -8,11 +8,16 @@ class ClassFeatureManager {
         this.className = className;
         this.level = 1;
         this.features = {};
+        this.characterName = '';
     }
 
     setLevel(level) {
         this.level = parseInt(level) || 1;
         this.updateFeatureDisplay();
+    }
+
+    setCharacterName(name) {
+        this.characterName = name;
     }
 
     updateFeatureDisplay() {

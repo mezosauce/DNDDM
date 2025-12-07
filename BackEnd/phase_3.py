@@ -998,7 +998,18 @@ def register_story_package_routes(app):
                 # Load characters
                 manager = CampaignManager()
                 characters = manager.get_characters(campaign_name)
-                
+                # Debug: Print character data
+                print(f"[Combat Init] Loaded {len(characters)} characters")
+                for char in characters:
+                    print(f"[Combat Init] Character: {char.name}")
+                    print(f"  - Type: {type(char)}")
+                    print(f"  - Has char_class: {hasattr(char, 'char_class')}")
+                    print(f"  - char_class value: {getattr(char, 'char_class', 'NOT FOUND')}")
+                    print(f"  - Has class: {hasattr(char, 'class')}")
+                    print(f"  - Has level: {hasattr(char, 'level')}")
+                    print(f"  - level value: {getattr(char, 'level', 'NOT FOUND')}")
+                    print(f"  - All attributes: {dir(char)}")
+
                 # Get full monster data
                 monster_data = monster_info.get('monster_data')
                 if not monster_data:
@@ -1232,6 +1243,48 @@ def register_story_package_routes(app):
         except Exception as e:
             print(f"Error saving combat to session: {e}")
             raise
+
+        @app.route('/api/campaign/<campaign_name>/characters', methods=['GET'])
+        def get_campaign_characters(campaign_name):
+            """Get full character data for a campaign"""
+            try:
+                manager = CampaignManager()
+                characters = manager.get_characters(campaign_name)
+                
+                # Convert to dicts
+                char_dicts = []
+                for char in characters:
+                    if hasattr(char, '__dict__'):
+                        char_dict = {
+                            'name': char.name,
+                            'char_class': getattr(char, 'char_class', 'Unknown'),
+                            'class': getattr(char, 'char_class', 'Unknown'),
+                            'level': getattr(char, 'level', 1),
+                            'race': getattr(char, 'race', 'Unknown'),
+                            'background': getattr(char, 'background', ''),
+                            'stats': getattr(char, 'stats', {}),
+                            'hp': getattr(char, 'hp', 0),
+                            'max_hp': getattr(char, 'max_hp', 0)
+                        }
+                    else:
+                        char_dict = char
+                    
+                    char_dicts.append(char_dict)
+                
+                return jsonify({
+                    'success': True,
+                    'characters': char_dicts
+                })
+                
+            except Exception as e:
+                print(f"[API] Error getting characters: {e}")
+                import traceback
+                traceback.print_exc()
+                return jsonify({
+                    'success': False,
+                    'error': str(e)
+                }), 500
+        
 
     # ========================================================================
     # GAME LOGIC
@@ -1470,7 +1523,7 @@ def register_story_package_routes(app):
         def process_enemy_action(combat_id):
             """AI decides and executes enemy action"""
             try:
-                data = request.json
+                data = request.json or {}
                 
                 # Get combat from session
                 combat = get_combat_from_session(combat_id)
@@ -1490,6 +1543,8 @@ def register_story_package_routes(app):
                     }), 400
                 
                 enemy_id = data.get('enemy_id', current_turn.participant_id)
+
+                print(f"[Combat API] Processing enemy action for: {enemy_id}")
                 
                 # Get enemy
                 enemy = combat.get_participant_by_id(enemy_id)
@@ -1746,6 +1801,10 @@ def register_story_package_routes(app):
         
         def resolve_attack(attacker, target) -> dict:
             """Resolve a basic attack action"""
+            import random
+            
+            print(f"[Combat] Resolving attack: {attacker.name} -> {target.name}")
+            
             # Calculate attack roll (1d20 + modifiers)
             attack_roll = random.randint(1, 20)
             attack_bonus = get_attack_bonus(attacker)
@@ -1758,6 +1817,8 @@ def register_story_package_routes(app):
             is_critical = attack_roll == 20
             is_miss = attack_roll == 1 or (total_attack < target_ac and not is_critical)
             
+            print(f"[Combat] Attack roll: {attack_roll} + {attack_bonus} = {total_attack} vs AC {target_ac}")
+            
             if is_miss:
                 return {
                     'success': True,
@@ -1765,7 +1826,7 @@ def register_story_package_routes(app):
                     'message': f"{attacker.name} attacks {target.name} but misses! (Rolled {attack_roll}+{attack_bonus}={total_attack} vs AC {target_ac})",
                     'type': 'attack',
                     'attacker': attacker.name,
-                    'target': target.name,
+                    'target': target.participant_id,  # Use participant_id instead of name
                     'damage': 0,
                     'new_hp': target.get_current_hp(),
                     'max_hp': target.get_max_hp(),
@@ -1786,6 +1847,8 @@ def register_story_package_routes(app):
             target_defeated = new_hp <= 0
             crit_text = " CRITICAL HIT!" if is_critical else ""
             
+            print(f"[Combat] Damage dealt: {damage}, new HP: {new_hp}/{target.get_max_hp()}")
+            
             return {
                 'success': True,
                 'hit': True,
@@ -1793,7 +1856,7 @@ def register_story_package_routes(app):
                 'message': f"{attacker.name} attacks {target.name} for {damage} damage!{crit_text}",
                 'type': 'attack',
                 'attacker': attacker.name,
-                'target': target.name,
+                'target': target.participant_id, 
                 'damage': damage,
                 'new_hp': new_hp,
                 'max_hp': target.get_max_hp(),
@@ -1804,6 +1867,7 @@ def register_story_package_routes(app):
                 'target_ac': target_ac
             }
         
+
         def resolve_defend(character) -> dict:
             """Resolve a defend action"""
             return {

@@ -22,7 +22,8 @@ class CombatViewController {
         this.selectedAction = null;
         this.selectedTarget = null;
         this.isProcessingAction = false;
-        
+        this.combatEnded = false;
+
         // Components (will be initialized)
         this.battlefieldView = null;
         this.actionMenu = null;
@@ -52,9 +53,11 @@ class CombatViewController {
             // Load combat state from backend
             await this.loadCombatState();
             
-            // Setup event listeners
+            await this.loadFullCharacterData();
+
+            /// Setup event listeners
             this.setupEventListeners();
-            
+
             // Render initial state
             this.render();
             
@@ -113,26 +116,107 @@ class CombatViewController {
         this.initializeFeatureManagers();
     }
 
+    async loadFullCharacterData() {
+        console.log('[Combat] Loading full character data...');
+        
+        try {
+            // Fetch full character data from the campaign
+            const response = await fetch(
+                `${this.API_BASE}/api/campaign/${this.campaignName}/characters`,
+                { method: 'GET' }
+            );
+            
+            if (!response.ok) {
+                console.warn('[Combat] Could not load full character data');
+                return;
+            }
+            
+            const data = await response.json();
+            
+            if (data.success && data.characters) {
+                // Merge full character data into combat participants
+                this.combatState.participants.forEach(participant => {
+                    if (participant.type === 'character') {
+                        const fullChar = data.characters.find(c => c.name === participant.name);
+                        if (fullChar) {
+                            // Add missing fields
+                            participant.class = fullChar.char_class || fullChar.class;
+                            participant.level = fullChar.level || 1;
+                            participant.stats = fullChar.stats || {};
+                            participant.race = fullChar.race;
+                            participant.background = fullChar.background;
+                            
+                            console.log(`[Combat] Loaded full data for ${participant.name}:`, {
+                                class: participant.class,
+                                level: participant.level
+                            });
+                        }
+                    }
+                });
+            }
+        } catch (error) {
+            console.warn('[Combat] Error loading full character data:', error);
+        }
+    }
+
     initializeFeatureManagers() {
+        console.log('[Combat] Initializing feature managers...');
+        
         // Create feature managers for each player character
         this.combatState.participants.forEach(participant => {
             if (participant.type === 'character') {
-                const charClass = participant.class || 'Character';
+                const charClass = participant.class || participant.char_class;
+                
+                if (!charClass) {
+                    console.warn(`[Combat] Character ${participant.name} has no class, skipping feature manager`);
+                    return;
+                }
+                
+                console.log(`[Combat] Creating feature manager for ${participant.name} (${charClass})`);
                 
                 // Map to feature manager classes
                 const managerClass = this.getFeatureManagerClass(charClass);
                 
                 if (managerClass) {
-                    const manager = new managerClass();
-                    manager.initialize(participant.level, participant.stats);
-                    manager.setCharacterName(participant.name);
-                    
-                    this.featureManagers[participant.id] = manager;
-                    
-                    console.log(`[Combat] ✓ Feature manager initialized: ${participant.name} (${charClass})`);
+                    try {
+                        const manager = new managerClass();
+                        
+                        // Initialize with level and stats
+                        const level = participant.level || 1;
+                        const stats = participant.stats || {
+                            strength: 10,
+                            dexterity: 10,
+                            constitution: 10,
+                            intelligence: 10,
+                            wisdom: 10,
+                            charisma: 10
+                        };
+                        
+                        manager.initialize(level, stats);
+                        
+                        // Set character name if method exists (optional)
+                        if (typeof manager.setCharacterName === 'function') {
+                            manager.setCharacterName(participant.name);
+                        } else {
+                            // Manually set the name property
+                            manager.characterName = participant.name;
+                        }
+                        
+                        // Store manager
+                        const participantId = participant.participant_id || participant.id;
+                        this.featureManagers[participantId] = manager;
+                        
+                        console.log(`[Combat] ✓ Feature manager initialized: ${participant.name} (${charClass})`);
+                    } catch (error) {
+                        console.error(`[Combat] Failed to initialize feature manager for ${participant.name}:`, error);
+                    }
+                } else {
+                    console.warn(`[Combat] No feature manager class found for: ${charClass}`);
                 }
             }
         });
+        
+        console.log(`[Combat] Feature managers initialized: ${Object.keys(this.featureManagers).length}`);
     }
 
     getFeatureManagerClass(charClass) {
@@ -291,53 +375,78 @@ class CombatViewController {
         try {
             const currentEnemy = this.combatState.current_turn;
             
+            if (!currentEnemy || !currentEnemy.participant_id) {
+                throw new Error('Invalid enemy turn data');
+            }
+            
             // Add to combat log
-            this.combatLog.addEntry('system', `${currentEnemy.name}'s turn...`);
+            this.combatLog.addEntry('turn', `${currentEnemy.name}'s turn...`);
             
             // Wait a moment for dramatic effect
             await this.delay(1000 / this.ANIMATION_SPEED);
             
             // Request AI action from backend
+            console.log('[Combat] Requesting enemy action for:', currentEnemy.participant_id);
+            
             const response = await fetch(
                 `${this.API_BASE}/api/combat/${this.combatId}/enemy-action`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        enemy_id: currentEnemy.id
+                        enemy_id: currentEnemy.participant_id || currentEnemy.id
                     })
                 }
             );
             
             const data = await response.json();
             
-            if (data.success) {
-                // Display action result
-                await this.displayActionResult(data.result);
-                
-                // Advance to next turn
-                await this.advanceTurn();
-            } else {
-                throw new Error(data.error || 'Enemy action failed');
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
             }
+            
+            // Display action result
+            await this.displayActionResult(data);
+            
+            // Reload combat state
+            await this.loadCombatState();
+            
+            // Check for combat end
+            await this.checkCombatEnd();
+            
+            // If combat didn't end, advance turn
+            if (!this.combatEnded) {
+                await this.advanceTurn();
+            }
+            
         } catch (error) {
             console.error('[Combat] Enemy turn error:', error);
             this.combatLog.addEntry('system', `Error: ${error.message}`);
             
-            // Try to advance turn anyway
+            // Try to advance turn anyway to prevent getting stuck
             await this.advanceTurn();
         } finally {
             this.isProcessingAction = false;
         }
     }
 
-    async processPlayerAction(action, target = null) {
+    async processPlayerAction(action, target) {
         console.log('[Combat] Processing player action:', action, target);
         
         this.isProcessingAction = true;
         
         try {
             const currentPlayer = this.combatState.current_turn;
+            
+            // Get the target participant ID (handle both formats)
+            const targetId = target.participant_id || target.id;
+            
+            console.log('[Combat] Sending action to API:', {
+                character_id: currentPlayer.participant_id || currentPlayer.id,
+                action_type: action.type,
+                action_name: action.name,
+                target_id: targetId
+            });
             
             // Send action to backend
             const response = await fetch(
@@ -346,10 +455,10 @@ class CombatViewController {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        character_id: currentPlayer.id,
+                        character_id: currentPlayer.participant_id || currentPlayer.id,
                         action_type: action.type,
                         action_name: action.name,
-                        target_id: target ? target.id : null,
+                        target_id: targetId,
                         action_data: action.data || {}
                     })
                 }
@@ -357,18 +466,24 @@ class CombatViewController {
             
             const data = await response.json();
             
-            if (data.success) {
-                // Display action result with animations
-                await this.displayActionResult(data.result);
-                
-                // Update character resources if needed
-                this.updateCharacterResources(currentPlayer.id, data.resource_changes);
-                
-                // Advance to next turn
-                await this.advanceTurn();
-            } else {
-                throw new Error(data.error || 'Action failed');
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
             }
+            
+            // Display action result with animations
+            await this.displayActionResult(data);
+            
+            // Reload combat state to get updated HP/resources
+            await this.loadCombatState();
+            
+            // Check for combat end
+            await this.checkCombatEnd();
+            
+            // If combat didn't end, advance to next turn
+            if (!this.combatEnded) {
+                await this.advanceTurn();
+            }
+            
         } catch (error) {
             console.error('[Combat] Player action error:', error);
             this.showError('Action failed: ' + error.message);
@@ -378,45 +493,92 @@ class CombatViewController {
         }
     }
 
-    async displayActionResult(result) {
-        console.log('[Combat] Displaying action result:', result);
+
+    async displayActionResult(data) {
+        console.log('[Combat] Displaying action result:', data);
+        
+        const result = data;
         
         // Add to combat log
-        this.combatLog.addEntry(result.type || 'damage', result.message);
+        this.combatLog.addEntry(
+            result.hit === false ? 'miss' : (result.critical ? 'damage' : result.type || 'system'),
+            result.message || 'Action performed'
+        );
         
-        // Show animations
-        if (result.damage) {
-            await this.animator.showDamage(
-                result.target,
-                result.damage,
-                result.critical || false
-            );
+        // Get target participant ID
+        const targetId = result.target;
+        
+        // Show animations based on result type
+        if (result.hit === false) {
+            // Miss
+            if (targetId) {
+                await this.animator.showMiss(targetId);
+            }
+        } else if (result.damage && result.damage > 0) {
+            // Damage
+            if (targetId) {
+                await this.animator.showDamage(
+                    targetId,
+                    result.damage,
+                    result.critical || false
+                );
+                
+                // Shake the target card
+                this.battlefieldView.shakeCard(targetId);
+            }
         }
         
-        if (result.healing) {
-            await this.animator.showHealing(
-                result.target,
-                result.healing
-            );
+        if (result.healing && result.healing > 0) {
+            // Healing
+            if (targetId) {
+                await this.animator.showHealing(
+                    targetId,
+                    result.healing
+                );
+            }
         }
         
-        // Update HP bars
-        if (result.target && result.new_hp !== undefined) {
-            this.battlefieldView.updateParticipantHP(
-                result.target,
-                result.new_hp,
-                result.max_hp
-            );
+        // Show buff/debuff effects
+        if (result.effect) {
+            const effectTargetId = result.character || result.attacker;
+            if (effectTargetId) {
+                await this.animator.showEffect(
+                    effectTargetId,
+                    result.effect
+                );
+            }
         }
         
-        // Check if target died
-        if (result.target_defeated) {
-            this.combatLog.addEntry('system', `${result.target} has been defeated!`);
-            this.battlefieldView.markAsDead(result.target);
+        // Update HP bars if HP changed
+        if (targetId && result.new_hp !== undefined) {
+            this.battlefieldView.updateCombatant(targetId, {
+                hp: result.new_hp,
+                max_hp: result.max_hp
+            });
+        }
+        
+        // Update resource displays if resources changed
+        if (result.resource_changes) {
+            const characterId = result.character || this.combatState.current_turn.participant_id;
+            this.updateCharacterResources(characterId, result.resource_changes);
             
-            // Check for combat end
-            await this.checkCombatEnd();
+            // Update the battlefield display
+            this.battlefieldView.updateCombatant(characterId, result.resource_changes);
         }
+        
+        // Check if target was defeated
+        if (result.target_defeated && targetId) {
+            this.combatLog.addEntry('system', `${result.target} has been defeated!`);
+            
+            // Mark as defeated on battlefield
+            this.battlefieldView.updateCombatant(targetId, { 
+                hp: 0, 
+                is_alive: false 
+            });
+        }
+        
+        // Add a delay for visual feedback
+        await this.delay(800);
     }
 
     async advanceTurn() {
@@ -648,7 +810,7 @@ class CombatViewController {
     }
 
     showSettings() {
-        // TODO: Implement settings modal
+        
         alert('Settings coming soon!\n\n- Animation speed\n- Auto-enemy turns\n- Combat log settings');
     }
 
@@ -677,16 +839,6 @@ class CombatViewController {
     onActionSelected(action) {
         console.log('[Combat] Action selected:', action);
         this.selectedAction = action;
-    }
-
-    onTargetSelected(target) {
-        console.log('[Combat] Target selected:', target);
-        this.selectedTarget = target;
-        
-        // Execute the action
-        if (this.selectedAction && this.selectedTarget) {
-            this.processPlayerAction(this.selectedAction, this.selectedTarget);
-        }
     }
 
     getCurrentTurnParticipant() {

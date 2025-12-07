@@ -430,6 +430,10 @@ class ClericFeatureManager extends ClassFeatureManager {
         this.deity = deity;
         this.render();
     }
+    setCharacterName(name) {
+        this.characterName = name;
+    }
+
 }
 
 // Export for global use

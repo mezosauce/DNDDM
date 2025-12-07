@@ -79,11 +79,97 @@ def register_combat_routes(app):
             # Get summary
             summary = combat.get_combat_summary()
             
-            return jsonify({
+            
+            # Build participant data
+            
+            participants = []
+            for p in combat.participants:
+                participant_data = {
+                    'participant_id': p.participant_id,
+                    'id': p.participant_id,
+                    'name': p.name,
+                    'type': p.participant_type.value,
+                    'initiative': p.initiative_total,
+                    'hp': p.get_current_hp(),
+                    'max_hp': p.get_max_hp(),
+                    'ac': p.get_ac(),
+                    'is_alive': p.is_alive(),
+                    'conditions': list(p.conditions) if hasattr(p, 'conditions') else []
+                }
+                
+                # Add character-specific data
+                if p.participant_type.value == 'character':
+                    entity = p.entity
+                    
+                    # Extract class - try multiple attribute names
+                    char_class = (getattr(entity, 'char_class', None) or 
+                                getattr(entity, 'class', None) or 
+                                getattr(entity, 'character_class', None))
+                    
+                    # Extract level
+                    level = getattr(entity, 'level', 1)
+                    
+                    # Extract stats
+                    stats = getattr(entity, 'stats', {})
+                    if not isinstance(stats, dict):
+                        # If stats is an object, try to convert it
+                        stats = {
+                            'strength': getattr(stats, 'strength', 10),
+                            'dexterity': getattr(stats, 'dexterity', 10),
+                            'constitution': getattr(stats, 'constitution', 10),
+                            'intelligence': getattr(stats, 'intelligence', 10),
+                            'wisdom': getattr(stats, 'wisdom', 10),
+                            'charisma': getattr(stats, 'charisma', 10)
+                        }
+                    
+                    participant_data['class'] = char_class
+                    participant_data['char_class'] = char_class  # Compatibility
+                    participant_data['level'] = level
+                    participant_data['stats'] = stats
+                    participant_data['race'] = getattr(entity, 'race', 'Unknown')
+                    participant_data['background'] = getattr(entity, 'background', '')
+                    
+                    # Debug logging
+                    print(f"[Combat API] Character {p.name}: class={char_class}, level={level}, stats={stats}")
+                    
+                    # Add resources based on class
+                    if hasattr(entity, 'currently_raging'):
+                        participant_data['rage'] = {
+                            'active': entity.currently_raging,
+                            'uses_remaining': entity.rages_per_day - entity.rages_used
+                        }
+                    
+                    if hasattr(entity, 'bardic_inspiration_remaining'):
+                        participant_data['bardic_inspiration'] = {
+                            'remaining': entity.bardic_inspiration_remaining,
+                            'die': entity.bardic_inspiration_die
+                        }
+                    
+                    if hasattr(entity, 'spell_slots_used'):
+                        participant_data['spell_slots'] = {
+                            'used': entity.spell_slots_used,
+                            'max': entity.spell_slots
+                        }
+                    
+                    if hasattr(entity, 'wild_shape_uses_remaining'):
+                        participant_data['wild_shape'] = {
+                            'remaining': entity.wild_shape_uses_remaining,
+                            'active': entity.currently_wild_shaped,
+                            'beast': entity.wild_shape_beast if entity.currently_wild_shaped else None
+                        }
+                    
+                    if hasattr(entity, 'channel_divinity_used'):
+                        max_uses = 1 if entity.level < 6 else (2 if entity.level < 18 else 3)
+                        participant_data['channel_divinity'] = {
+                            'remaining': max_uses - entity.channel_divinity_used
+                        }
+                
+                participants.append(participant_data)
+                
+                return jsonify({
                 'success': True,
                 'summary': summary
             })
-            
         except Exception as e:
             print(f"[API] Error getting combat summary: {e}")
             import traceback

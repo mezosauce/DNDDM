@@ -637,7 +637,7 @@ class CombatState:
             'hp': participant.get_current_hp(),
             'timestamp': datetime.now().isoformat()
         })
-    
+        
     def get_combat_summary(self) -> Dict:
         """Get current combat state summary for UI/LLM"""
         summary = {
@@ -653,12 +653,13 @@ class CombatState:
             'current_turn': None,
             'defeated_count': len(self.defeated_participants),
             
-            'log': self.log[-10:] if len(self.log) > 10 else self.log
+            'combat_log': self.log[-20:] if len(self.log) > 20 else self.log
         }
         
-        # Add participant data
+        # Add participant data with full character information
         for participant in self.participants:
-            summary['participants'].append({
+            participant_data = {
+                'participant_id': participant.participant_id,
                 'id': participant.participant_id,
                 'name': participant.name,
                 'type': participant.participant_type.value,
@@ -668,13 +669,80 @@ class CombatState:
                 'is_alive': participant.is_alive(),
                 'conditions': participant.conditions,
                 'initiative': participant.initiative_total
-            })
+            }
+            
+            # Add character-specific data
+            if participant.participant_type.value == 'character':
+                entity = participant.entity
+                
+                # Extract class - try multiple attribute names
+                char_class = (getattr(entity, 'char_class', None) or 
+                            getattr(entity, 'class', None) or 
+                            getattr(entity, 'character_class', None))
+                
+                # Extract level
+                level = getattr(entity, 'level', 1)
+                
+                # Extract stats
+                stats = getattr(entity, 'stats', {})
+                if not isinstance(stats, dict):
+                    # If stats is an object, try to convert it
+                    stats = {
+                        'strength': getattr(stats, 'strength', 10),
+                        'dexterity': getattr(stats, 'dexterity', 10),
+                        'constitution': getattr(stats, 'constitution', 10),
+                        'intelligence': getattr(stats, 'intelligence', 10),
+                        'wisdom': getattr(stats, 'wisdom', 10),
+                        'charisma': getattr(stats, 'charisma', 10)
+                    }
+                
+                participant_data['class'] = char_class
+                participant_data['char_class'] = char_class
+                participant_data['level'] = level
+                participant_data['stats'] = stats
+                participant_data['race'] = getattr(entity, 'race', 'Unknown')
+                participant_data['background'] = getattr(entity, 'background', '')
+                
+                # Add resources based on class
+                if hasattr(entity, 'currently_raging'):
+                    participant_data['rage'] = {
+                        'active': entity.currently_raging,
+                        'uses_remaining': getattr(entity, 'rages_per_day', 0) - getattr(entity, 'rages_used', 0)
+                    }
+                
+                if hasattr(entity, 'bardic_inspiration_remaining'):
+                    participant_data['bardic_inspiration'] = {
+                        'remaining': entity.bardic_inspiration_remaining,
+                        'die': getattr(entity, 'bardic_inspiration_die', 'd6')
+                    }
+                
+                if hasattr(entity, 'spell_slots_used'):
+                    participant_data['spell_slots'] = {
+                        'used': entity.spell_slots_used,
+                        'max': getattr(entity, 'spell_slots', {})
+                    }
+                
+                if hasattr(entity, 'wild_shape_uses_remaining'):
+                    participant_data['wild_shape'] = {
+                        'remaining': entity.wild_shape_uses_remaining,
+                        'active': getattr(entity, 'currently_wild_shaped', False),
+                        'beast': getattr(entity, 'wild_shape_beast', None) if getattr(entity, 'currently_wild_shaped', False) else None
+                    }
+                
+                if hasattr(entity, 'channel_divinity_used'):
+                    max_uses = 1 if level < 6 else (2 if level < 18 else 3)
+                    participant_data['channel_divinity'] = {
+                        'remaining': max_uses - entity.channel_divinity_used
+                    }
+            
+            summary['participants'].append(participant_data)
         
         # Add initiative order
         for participant_id, init_total in self.initiative_order:
             participant = self.get_participant_by_id(participant_id)
             if participant:
                 summary['initiative_order'].append({
+                    'id': participant_id,
                     'name': participant.name,
                     'initiative': init_total,
                     'is_current': self.initiative_order[self.current_turn_index][0] == participant_id
@@ -684,6 +752,7 @@ class CombatState:
         current = self.get_current_participant()
         if current:
             summary['current_turn'] = {
+                'participant_id': current.participant_id,
                 'name': current.name,
                 'type': current.participant_type.value,
                 'hp': current.get_current_hp(),
@@ -692,3 +761,4 @@ class CombatState:
             }
         
         return summary
+    

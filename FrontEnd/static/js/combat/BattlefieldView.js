@@ -452,7 +452,6 @@ class BattlefieldView {
         if (!this.targetingMode) return;
         
         const clickedId = String(participantId);
-        const validTargetStrings = this.validTargets.map(id => String(id));
 
         // Check if this is a valid target
         if (!this.validTargets.includes(participantId)) {
@@ -477,10 +476,14 @@ class BattlefieldView {
         
         console.log('[BattlefieldView] Target selected:', participantId);
         
+        this.exitTargetingMode();
+    
+        
         // Notify controller
         if (this.combatController.onTargetSelected) {
             this.combatController.onTargetSelected(participantId);
         }
+        
     }
     
     /**

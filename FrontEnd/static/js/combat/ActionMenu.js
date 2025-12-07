@@ -34,6 +34,24 @@ class ActionMenu {
     // ========================================================================
     // INITIALIZATION
     // ========================================================================
+    /**
+     * Load character class metadata from JSON
+     */
+    async loadCharacterClassMetadata() {
+        if (this._classMetadata) {
+            return this._classMetadata;
+        }
+        
+        try {
+            const response = await fetch('/static/data/class_metadata.json');
+            this._classMetadata = await response.json();
+            console.log('[ActionMenu] Loaded class metadata:', Object.keys(this._classMetadata));
+            return this._classMetadata;
+        } catch (error) {
+            console.error('[ActionMenu] Failed to load class metadata:', error);
+            return {};
+        }
+    }
     
     setupEventListeners() {
         // Main menu buttons
@@ -61,6 +79,17 @@ class ActionMenu {
      * Show action menu for current character's turn
      */
     show(character) {
+        console.log('[ActionMenu] Showing menu for:', character.name);
+        console.log('[ActionMenu] Character data:', {
+            name: character.name,
+            class: character.class,
+            char_class: character.char_class,
+            level: character.level,
+            type: character.type,
+            participant_id: character.participant_id,
+            id: character.id
+        });
+
         console.log('[ActionMenu] Showing menu for:', character.name);
         const participantId = character.participant_id || character.id;
             console.log('[ActionMenu] Looking for participant ID:', participantId);
@@ -189,6 +218,8 @@ class ActionMenu {
     /**
      * Handle main menu button click
      */
+
+    
     handleMainMenuClick(actionType) {
         console.log('[ActionMenu] Main menu action:', actionType);
         
@@ -266,7 +297,7 @@ class ActionMenu {
      * Populate skills menu based on character class
      */
     populateSkillsMenu() {
-        console.log('[ActionMenu] Populating skills for:', this.activeCharacter.class);
+        console.log('[ActionMenu] Populating skills for:', this.activeCharacter);
         
         const skillsList = document.getElementById('skills-list');
         if (!skillsList) {
@@ -274,21 +305,47 @@ class ActionMenu {
             return;
         }
         
-        
         skillsList.innerHTML = '';
         
-        if (!this.activeCharacter || !this.activeCharacter.class) {
-            console.error('[ActionMenu] Active character missing class:', this.activeCharacter);
+        if (!this.activeCharacter) {
+            console.error('[ActionMenu] No active character');
             skillsList.innerHTML = '<div class="no-skills">Character data not loaded</div>';
             return;
         }
-
+        
+        // Try to get class from multiple possible locations
+        const charClass = this.activeCharacter.class || 
+                        this.activeCharacter.char_class ||
+                        this.activeCharacter.character_class;
+        
+        if (!charClass) {
+            console.error('[ActionMenu] Active character missing class:', this.activeCharacter);
+            skillsList.innerHTML = `
+                <div class="no-skills">
+                    <p>Unable to load class data for ${this.activeCharacter.name}</p>
+                    <p style="font-size: 12px; color: #888;">Class information not available</p>
+                </div>
+            `;
+            return;
+        }
+        
+        console.log('[ActionMenu] Character class:', charClass, 'Level:', this.activeCharacter.level);
+        
         // Get feature manager for this character
         const characterId = this.activeCharacter.participant_id || this.activeCharacter.id;
         const featureManager = this.combatController.getFeatureManager(characterId);
         
+        if (!featureManager) {
+            console.warn('[ActionMenu] No feature manager found, creating one...');
+            // Create a temporary feature manager
+            const manager = this.createFeatureManager(charClass);
+            if (manager) {
+                manager.initialize(this.activeCharacter.level || 1, this.activeCharacter.stats || {});
+            }
+        }
+        
         // Get class-specific skills
-        const skills = this.getClassSkills(this.activeCharacter.class, featureManager);
+        const skills = this.getClassSkills(charClass, featureManager);
         
         if (skills.length === 0) {
             skillsList.innerHTML = '<div class="no-skills">No skills available</div>';
@@ -303,29 +360,104 @@ class ActionMenu {
     }
     
     /**
+    * Create a feature manager for a class
+    */
+    createFeatureManager(charClass) {
+        const managerClasses = {
+            'Barbarian': window.BarbarianFeatureManager,
+            'Bard': window.BardFeatureManager,
+            'Cleric': window.ClericFeatureManager,
+            'Druid': window.DruidFeatureManager
+        };
+        
+        const ManagerClass = managerClasses[charClass];
+        
+        if (!ManagerClass) {
+            console.warn('[ActionMenu] No feature manager class for:', charClass);
+            return null;
+        }
+        
+        console.log('[ActionMenu] Creating temporary feature manager for:', charClass);
+        return new ManagerClass();
+    }
+    /**
      * Get available skills for character class
      */
     getClassSkills(charClass, featureManager) {
-        const skills = [];
+    console.log('[ActionMenu] Getting skills for class:', charClass, 'Manager:', !!featureManager);
+    
+    if (!charClass) {
+        console.error('[ActionMenu] No class provided to getClassSkills');
+        return [];
+    }
+    
+    const skills = [];
+    
+    // If no feature manager, create a temporary one
+    let manager = featureManager;
+    if (!manager) {
+        console.log('[ActionMenu] No feature manager, creating temporary one');
+        manager = this.createTemporaryManager(charClass);
+    }
+    
+    switch (charClass) {
+        case 'Barbarian':
+            skills.push(...this.getBarbarianSkills(manager));
+            break;
+        case 'Bard':
+            skills.push(...this.getBardSkills(manager));
+            break;
+        case 'Cleric':
+            skills.push(...this.getClericSkills(manager));
+            break;
+        case 'Druid':
+            skills.push(...this.getDruidSkills(manager));
+            break;
+        default:
+            console.warn('[ActionMenu] Unknown class:', charClass);
+    }
+    
+    console.log('[ActionMenu] Found', skills.length, 'skills for', charClass);
+    return skills;
+}
+
+    /**
+     * Create a temporary feature manager for a class
+     */
+    createTemporaryManager(charClass) {
+        console.log('[ActionMenu] Creating temporary manager for:', charClass);
         
-        switch (charClass) {
-            case 'Barbarian':
-                skills.push(...this.getBarbarianSkills(featureManager));
-                break;
-            case 'Bard':
-                skills.push(...this.getBardSkills(featureManager));
-                break;
-            case 'Cleric':
-                skills.push(...this.getClericSkills(featureManager));
-                break;
-            case 'Druid':
-                skills.push(...this.getDruidSkills(featureManager));
-                break;
-            default:
-                console.warn('[ActionMenu] Unknown class:', charClass);
+        const managerClasses = {
+            'Barbarian': window.BarbarianFeatureManager,
+            'Bard': window.BardFeatureManager,
+            'Cleric': window.ClericFeatureManager,
+            'Druid': window.DruidFeatureManager
+        };
+        
+        const ManagerClass = managerClasses[charClass];
+        
+        if (!ManagerClass) {
+            console.error('[ActionMenu] No manager class found for:', charClass);
+            return null;
         }
         
-        return skills;
+        const manager = new ManagerClass();
+        
+        // Initialize with character data
+        const level = this.activeCharacter.level || 1;
+        const stats = this.activeCharacter.stats || {
+            strength: 10,
+            dexterity: 10,
+            constitution: 10,
+            intelligence: 10,
+            wisdom: 10,
+            charisma: 10
+        };
+        
+        console.log('[ActionMenu] Initializing manager with level:', level, 'stats:', stats);
+        manager.initialize(level, stats);
+        
+        return manager;
     }
     
     /**
@@ -579,11 +711,46 @@ class ActionMenu {
                 return [];
         }
     }
+
     
     /**
      * Handle target selection
      */
  
+    /**
+ * Handle target selection
+ */
+    handleTargetSelected(targetId) {
+        console.log('[ActionMenu] Target selected:', targetId);
+        console.log('[ActionMenu] Selected Action:', this.selectedAction);
+        
+        if (!this.selectedAction) {
+            console.error('[ActionMenu] No action selected!');
+            return;
+        }
+        
+        // Get the full target participant object
+        const target = this.combatController.getParticipants().find(
+            p => (p.participant_id || p.id) === targetId
+        );
+        
+        if (!target) {
+            console.error('[ActionMenu] Target not found:', targetId);
+            this.combatController.showError('Invalid target selected');
+            return;
+        }
+        
+        console.log('[ActionMenu] Found target:', target.name);
+        console.log('[ActionMenu] Executing action:', this.selectedAction.name, 'on', target.name);
+        
+        // Execute the action through the combat controller
+        this.combatController.processPlayerAction(this.selectedAction, target);
+        
+        // Reset menu
+        this.selectedAction = null;
+        this.showMainMenu();
+    }
+
     // ========================================================================
     // STATE UPDATES
     // ========================================================================

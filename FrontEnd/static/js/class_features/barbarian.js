@@ -266,6 +266,9 @@ class BarbarianFeatureManager extends ClassFeatureManager {
         }
     }
 
+    setCharacterName(name) {
+        this.characterName = name;
+    }
 
     setCharacterName(name) {
         this.characterName = name;
