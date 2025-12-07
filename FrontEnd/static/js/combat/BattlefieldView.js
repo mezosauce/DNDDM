@@ -51,14 +51,16 @@ class BattlefieldView {
             this.partyArea.appendChild(card);
             
             const participantId = participant.participant_id || participant.id
-            this.combatantElements.set(participant.participant_id, card);
+            this.combatantElements.set(participantId, card);
         });
         
         // Render enemies
         enemies.forEach(participant => {
             const card = this.createCombatantCard(participant, 'enemy');
             this.enemyArea.appendChild(card);
-            this.combatantElements.set(participant.participant_id, card);
+
+            const participantId = participant.participant_id || participant.id;
+            this.combatantElements.set(participantId, card);
         });
         
         // Highlight current turn
@@ -144,7 +146,7 @@ class BattlefieldView {
         `;
         
         // Add click handler for targeting
-        card.addEventListener('click', (e) => this.handleCardClick(participant.participant_id, e));
+        card.addEventListener('click', (e) => this.handleCardClick(participantId, e));
         
         return card;
     }
@@ -405,7 +407,7 @@ class BattlefieldView {
         console.log('[BattlefieldView] Entering targeting mode', validTargetIds);
         
         this.targetingMode = true;
-        this.validTargets = validTargetIds;
+        this.validTargets = validTargetIds.map(id => String(id));
         this.selectedTargetId = null;
         
         // Highlight valid targets
@@ -449,6 +451,9 @@ class BattlefieldView {
     handleCardClick(participantId, event) {
         if (!this.targetingMode) return;
         
+        const clickedId = String(participantId);
+        const validTargetStrings = this.validTargets.map(id => String(id));
+
         // Check if this is a valid target
         if (!this.validTargets.includes(participantId)) {
             console.log('[BattlefieldView] Invalid target clicked');

@@ -583,18 +583,7 @@ class ActionMenu {
     /**
      * Handle target selection
      */
-    handleTargetSelected(target) {
-        console.log('[ActionMenu] Target selected:', target.name);
-        
-        if (!this.selectedAction) {
-            console.error('[ActionMenu] No action selected!');
-            return;
-        }
-        
-        // Notify controller to process the action
-        this.combatController.processPlayerAction(this.selectedAction, target);
-    }
-    
+ 
     // ========================================================================
     // STATE UPDATES
     // ========================================================================
