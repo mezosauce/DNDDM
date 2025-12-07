@@ -617,16 +617,33 @@ class ActionMenu {
             
             const used = manager.spellSlotsUsed[level] || 0;
             const remaining = total - used;
-            
             skills.push({
-                name: `Cast Level ${level} Spell`,
-                description: `Cast a ${this.getSpellLevelName(level)} spell`,
-                cost: `${remaining}/${total} slots`,
-                available: remaining > 0,
-                type: 'spell',
-                target_type: 'enemy', // Most spells target enemies, could be made dynamic
-                data: { spell_level: level }
-            });
+            name: `Healing Spell (Lv ${level})`,
+            description: `Cast a ${this.getSpellLevelName(level)} healing spell`,
+            cost: `${remaining}/${total} slots`,
+            available: remaining > 0,
+            type: 'spell',
+            target_type: 'ally', 
+            data: { 
+                spell_level: level,
+                spell_type: 'healing',
+                spell_name: `Cure Wounds` 
+            }
+        });
+        
+        skills.push({
+            name: `Damage Spell (Lv ${level})`,
+            description: `Cast a ${this.getSpellLevelName(level)} damage spell`,
+            cost: `${remaining}/${total} slots`,
+            available: remaining > 0,
+            type: 'spell',
+            target_type: 'enemy', 
+            data: { 
+                spell_level: level,
+                spell_type: 'damage',
+                spell_name: `Magic Missile`
+            }
+        });
         }
     }
     
@@ -748,7 +765,7 @@ class ActionMenu {
         
         // Reset menu
         this.selectedAction = null;
-        this.showMainMenu();
+
     }
 
     // ========================================================================

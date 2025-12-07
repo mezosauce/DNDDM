@@ -433,6 +433,11 @@ class CombatViewController {
     async processPlayerAction(action, target) {
         console.log('[Combat] Processing player action:', action, target);
         
+        const actionMenu = document.getElementById('action-menu');
+        if (actionMenu) {
+            actionMenu.style.opacity = '0.5';
+            actionMenu.style.pointerEvents = 'none';
+        }
         this.isProcessingAction = true;
         
         try {
@@ -467,6 +472,14 @@ class CombatViewController {
             const data = await response.json();
             
             if (!response.ok || !data.success) {
+                console.error('[Combat] Action failed:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    error: data.error,
+                    action_type: action.type,
+                    action_name: action.name
+                });
+                
                 throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
             }
             
@@ -489,8 +502,16 @@ class CombatViewController {
             this.showError('Action failed: ' + error.message);
         } finally {
             this.isProcessingAction = false;
-            this.actionMenu.resetToMainMenu();
+            const actionMenu = document.getElementById('action-menu');
+            if (actionMenu) {
+                actionMenu.style.opacity = '1';
+                actionMenu.style.pointerEvents = 'auto';
+            }
+
         }
+
+        this.battlefieldView.exitTargetingMode();
+        this.actionMenu.resetToMainMenu();
     }
 
 
@@ -535,6 +556,16 @@ class CombatViewController {
                     targetId,
                     result.healing
                 );
+            }
+        }
+
+        if (result.type === 'spell' || result.message?.includes('casts')) {
+            const casterId = this.combatState.current_turn.participant_id;
+            const isHealing = result.healing && result.healing > 0;
+            const spellLevel = result.spell_level || 1;
+            
+            if (casterId && targetId) {
+                await this.animator.showSpellCast(casterId, targetId, spellLevel, isHealing);
             }
         }
         
@@ -859,6 +890,20 @@ class CombatViewController {
 
     getFeatureManager(characterId) {
         return this.featureManagers[characterId];
+    }
+
+    /**
+     * Callback when target is selected on battlefield
+     */
+    onTargetSelected(targetId) {
+        console.log('[Combat] Target selected callback:', targetId);
+        
+        // Pass to action menu to complete the action
+        if (this.actionMenu) {
+            this.actionMenu.handleTargetSelected(targetId);
+        } else {
+            console.error('[Combat] Action menu not available!');
+        }
     }
 }
 

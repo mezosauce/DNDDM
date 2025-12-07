@@ -15,6 +15,53 @@ from component.campaign_manager import CampaignManager
 import pickle
 import base64
 
+def initialize_character_resources(character):
+    """Initialize resource tracking attributes for a character"""
+    # Get character level
+    level = getattr(character, 'level', 1)
+    char_class = getattr(character, 'char_class', None)
+    
+    # Initialize spell slots based on class and level
+    if char_class in ['Cleric', 'Druid', 'Bard']:
+        if not hasattr(character, 'spell_slots_used'):
+            character.spell_slots_used = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0}
+        
+        if not hasattr(character, 'spell_slots'):
+            # Basic spell slot table (simplified)
+            spell_slots_by_level = {
+                1: {1: 2},
+                2: {1: 3},
+                3: {1: 4, 2: 2},
+                4: {1: 4, 2: 3},
+                5: {1: 4, 2: 3, 3: 2}
+                # Add more levels as needed
+            }
+            character.spell_slots = spell_slots_by_level.get(level, {1: 2})
+    
+    # Initialize class-specific resources
+    if char_class == 'Barbarian':
+        if not hasattr(character, 'rages_used'):
+            character.rages_used = 0
+        if not hasattr(character, 'currently_raging'):
+            character.currently_raging = False
+    
+    elif char_class == 'Bard':
+        if not hasattr(character, 'bardic_inspiration_remaining'):
+            cha_mod = (character.stats.get('charisma', 10) - 10) // 2 if hasattr(character, 'stats') else 2
+            character.bardic_inspiration_remaining = max(1, cha_mod)
+        if not hasattr(character, 'bardic_inspiration_die'):
+            character.bardic_inspiration_die = 'd6'
+    
+    elif char_class == 'Cleric':
+        if not hasattr(character, 'channel_divinity_used'):
+            character.channel_divinity_used = 0
+    
+    elif char_class == 'Druid':
+        if not hasattr(character, 'wild_shape_uses_remaining'):
+            character.wild_shape_uses_remaining = 2
+        if not hasattr(character, 'currently_wild_shaped'):
+            character.currently_wild_shaped = False
+            
 def serialize_combat(combat) -> str:
     """Serialize combat state to string for session storage"""
     try:
@@ -32,6 +79,16 @@ def deserialize_combat(combat_str: str):
     except Exception as e:
         print(f"Error deserializing combat: {e}")
         raise
+
+
+def get_spell_modifier(entity) -> int:
+    """Get spellcasting modifier"""
+    if hasattr(entity, 'stats') and isinstance(entity.stats, dict):
+        # Use wisdom for clerics/druids, charisma for bards
+        stat = 'wisdom' if getattr(entity, 'char_class') in ['Cleric', 'Druid'] else 'charisma'
+        score = entity.stats.get(stat, 10)
+        return (score - 10) // 2
+    return 0
 
 
 def register_combat_routes(app):
@@ -165,7 +222,7 @@ def register_combat_routes(app):
                         }
                 
                 participants.append(participant_data)
-                
+
                 return jsonify({
                 'success': True,
                 'summary': summary
@@ -236,6 +293,8 @@ def register_combat_routes(app):
                     'success': False,
                     'error': f'Character {character_id} not found'
                 }), 400
+            
+            initialize_character_resources(character.entity)
             
             # Resolve action
             result = resolve_action(
@@ -507,27 +566,106 @@ def register_combat_routes(app):
             if not target:
                 return {'success': False, 'error': 'No target selected'}
             return CombatActionResolver.resolve_attack(character, target, action_data)
-        
-        elif action_type == 'defend':
-            return CombatActionResolver.resolve_defend(character)
-        
-        elif action_type == 'skill':
+   
+        elif action_type == 'skill' or action_type == 'spell':     
             if not target:
                 # Some skills don't need a target (Rage, Wild Shape)
                 target = character
-            return CombatActionResolver.resolve_skill(character, action_name, target, action_data)
-        
-        elif action_type == 'item':
-            # TODO: Implement item usage
-            return {
-                'success': False,
-                'error': 'Item usage not yet implemented'
-            }
-        
+
+            if action_type == 'spell':
+                spell_level = action_data.get('spell_level', 1)
+                # Generate spell name if not provided
+                if not action_name or action_name.startswith('Cast Level'):
+                    action_name = f'Spell:Level {spell_level}'
+                elif not action_name.startswith('Spell:'):
+                    action_name = f'Spell:{action_name}'
+            
+            return CombatActionResolver.resolve_skill(character, action_name, target, action_data) 
+ 
         else:
             return {
                 'success': False,
                 'error': f'Unknown action type: {action_type}'
+            }
+        
+    def resolve_spell(caster_entity, character, skill_name, target, skill_data):
+        """Resolve spell casting"""
+        import random
+        
+        # Extract spell name and level
+        spell_name = skill_name.replace('Spell:', '').strip()
+        spell_level = skill_data.get('spell_level', 1)
+        
+        # Check spell slots
+        if not hasattr(caster_entity, 'spell_slots_used'):
+            caster_entity.spell_slots_used = {}
+        if not hasattr(caster_entity, 'spell_slots'):
+            caster_entity.spell_slots = {1: 2, 2: 0, 3: 0, 4: 0, 5: 0}
+        
+        used = caster_entity.spell_slots_used.get(spell_level, 0)
+        max_slots = caster_entity.spell_slots.get(spell_level, 0)
+        
+        if used >= max_slots:
+            return {'success': False, 'error': f'No level {spell_level} spell slots remaining!'}
+        
+        # Use spell slot
+        caster_entity.spell_slots_used[spell_level] = used + 1
+        
+        # Determine spell type from skill_data or spell_name
+        spell_type = skill_data.get('spell_type', 'damage')
+        is_healing = spell_type == 'healing' or any(word in spell_name.lower() for word in ['heal', 'cure', 'restore'])
+        
+        if is_healing:
+            # Healing spell
+            healing = random.randint(1, 8) * spell_level + get_spell_modifier(caster_entity)
+            
+            # Cleric life domain bonus
+            if hasattr(caster_entity, 'disciple_of_life') and caster_entity.disciple_of_life:
+                healing += 2 + spell_level
+            
+            # Apply healing
+            old_hp = target.entity.hp
+            target.entity.hp = min(target.entity.hp + healing, target.get_max_hp())
+            actual_healing = target.entity.hp - old_hp
+            
+            return {
+                'success': True,
+                'message': f"{character.name} casts {spell_name} (Level {spell_level}) on {target.name}, healing {actual_healing} HP!",
+                'type': 'healing',
+                'character': character.name,
+                'target': target.participant_id or target.id,
+                'healing': actual_healing,
+                'new_hp': target.entity.hp,
+                'max_hp': target.get_max_hp(),
+                'resource_changes': {
+                    'spell_slots_used': caster_entity.spell_slots_used
+                }
+            }
+        else:
+            # Damage spell
+            # Base damage scales with spell level
+            num_dice = spell_level
+            damage = sum(random.randint(1, 8) for _ in range(num_dice))
+            damage += get_spell_modifier(caster_entity)
+            
+            # Apply damage
+            old_hp = target.entity.hp
+            target.entity.hp = max(0, target.entity.hp - damage)
+            actual_damage = old_hp - target.entity.hp
+            
+            return {
+                'success': True,
+                'message': f"{character.name} casts {spell_name} (Level {spell_level}) on {target.name} for {actual_damage} damage!",
+                'type': 'damage',
+                'character': character.name,
+                'target': target.participant_id or target.id,
+                'damage': actual_damage,
+                'new_hp': target.entity.hp,
+                'max_hp': target.get_max_hp(),
+                'target_defeated': target.entity.hp <= 0,
+                'resource_changes': {
+                    'spell_slots_used': caster_entity.spell_slots_used
+                }
             }
     
     def get_combat_from_session(combat_id: str) -> Optional[CombatState]:

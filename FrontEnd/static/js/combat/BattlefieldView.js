@@ -458,6 +458,7 @@ class BattlefieldView {
             console.log('[BattlefieldView] Invalid target clicked');
             return;
         }
+
         console.log('[BattlefieldView] Valid targets:', this.validTargets);
         console.log('[BattlefieldView] Clicked ID type:', typeof participantId, 'Value:', participantId);
     
@@ -476,14 +477,12 @@ class BattlefieldView {
         
         console.log('[BattlefieldView] Target selected:', participantId);
         
-        this.exitTargetingMode();
-    
-        
+  
         // Notify controller
         if (this.combatController.onTargetSelected) {
             this.combatController.onTargetSelected(participantId);
         }
-        
+   
     }
     
     /**

@@ -24,6 +24,7 @@ class Cleric(Character):
     # Spellcasting
     cantrips_known: int = 3
     spell_slots: Dict[int, int] = field(default_factory=dict)  # {1: 2, 2: 0, ...}
+    spell_slots_used: Dict[int, int] = field(default_factory=dict)
     spells_prepared: List[str] = field(default_factory=list)
     domain_spells: List[str] = field(default_factory=list)  # Always prepared
     
@@ -90,6 +91,9 @@ class Cleric(Character):
         if not self.spell_slots:
             self.spell_slots = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0}
         
+        if not self.spell_slots_used:
+            self.spell_slots_used = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0}
+
         # Apply level-based features
         self.apply_level_features()
     
@@ -133,6 +137,10 @@ class Cleric(Character):
         
         if self.level in spell_slot_progression:
             self.spell_slots = spell_slot_progression[self.level].copy()
+
+            for level in self.spell_slots.keys():
+                if level not in self.spell_slots_used:
+                    self.spell_slots_used[level] = 0
         
         # Channel Divinity uses
         if self.level >= 2:

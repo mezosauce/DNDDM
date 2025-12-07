@@ -325,12 +325,28 @@ class CombatActionResolver:
         """Resolve Cleric abilities"""
         cleric = character.entity
         
+        # Ensure spell tracking attributes exist
+        if not hasattr(cleric, 'spell_slots_used'):
+            cleric.spell_slots_used = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0}
+        
+        if not hasattr(cleric, 'spell_slots'):
+            # Default spell slots for level 1 cleric
+            cleric.spell_slots = {1: 2, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0}
+        
+        if not hasattr(cleric, 'channel_divinity_used'):
+            cleric.channel_divinity_used = 0
+        
         if skill_name == 'Channel Divinity: Turn Undead':
-            if cleric.use_channel_divinity():
+            # Calculate max uses based on level
+            level = getattr(cleric, 'level', 1)
+            max_uses = 1 if level < 6 else (2 if level < 18 else 3)
+            
+            if cleric.channel_divinity_used < max_uses:
+                cleric.channel_divinity_used += 1
                 return {
                     'success': True,
-                    'message': f"{character.name} turns undead!",
-                    'type': 'system',
+                    'message': f"{character.name} channels divinity to turn undead!",
+                    'type': 'effect',
                     'character': character.name,
                     'effect': 'turn_undead',
                     'resource_changes': {
@@ -342,63 +358,100 @@ class CombatActionResolver:
         
         elif skill_name.startswith('Spell:'):
             spell_name = skill_name.replace('Spell:', '').strip()
-            spell_level = skill_data.get('level', 1)
+            spell_level = skill_data.get('spell_level', skill_data.get('level', 1))
             
-            # Check if spell slot available (simplified)
+            # Check if spell slot available
             used = cleric.spell_slots_used.get(spell_level, 0)
             max_slots = cleric.spell_slots.get(spell_level, 0)
             
-            if used < max_slots:
-                cleric.spell_slots_used[spell_level] = used + 1
-                
-                # Healing spell
-                if 'heal' in spell_name.lower() or 'cure' in spell_name.lower():
-                    healing = random.randint(1, 8) + cleric._get_modifier('wisdom') + (2 + spell_level if cleric.disciple_of_life else 0)
-                    target.entity.hp = min(target.entity.hp + healing, target.get_max_hp())
-                    
-                    return {
-                        'success': True,
-                        'message': f"{character.name} casts {spell_name} on {target.name} for {healing} HP!",
-                        'type': 'healing',
-                        'character': character.name,
-                        'target': target.name,
-                        'healing': healing,
-                        'new_hp': target.entity.hp,
-                        'max_hp': target.get_max_hp(),
-                        'resource_changes': {
-                            'spell_slots_used': cleric.spell_slots_used
-                        }
-                    }
-                
-                # Damage spell
-                else:
-                    damage = random.randint(2, 8) * spell_level
-                    target.entity.hp = max(0, target.entity.hp - damage)
-                    
-                    return {
-                        'success': True,
-                        'message': f"{character.name} casts {spell_name} on {target.name} for {damage} damage!",
-                        'type': 'damage',
-                        'character': character.name,
-                        'target': target.name,
-                        'damage': damage,
-                        'new_hp': target.entity.hp,
-                        'max_hp': target.get_max_hp(),
-                        'target_defeated': target.entity.hp <= 0,
-                        'resource_changes': {
-                            'spell_slots_used': cleric.spell_slots_used
-                        }
-                    }
-            else:
+            if used >= max_slots:
                 return {'success': False, 'error': f'No level {spell_level} spell slots remaining!'}
+            
+            # Use spell slot
+            cleric.spell_slots_used[spell_level] = used + 1
+            
+            # Get spell modifier (Wisdom for Clerics)
+            wis_mod = 0
+            if hasattr(cleric, 'stats') and isinstance(cleric.stats, dict):
+                wis_score = cleric.stats.get('wisdom', 10)
+                wis_mod = (wis_score - 10) // 2
+            
+            # Determine if healing or damage spell
+            spell_type = skill_data.get('spell_type', 'damage')
+            is_healing = spell_type == 'healing' or any(word in spell_name.lower() for word in ['heal', 'cure', 'restore'])
+            
+            if is_healing:
+                # Healing spell
+                import random
+                healing = random.randint(1, 8) * spell_level + wis_mod
+                
+                # Disciple of Life bonus (Life domain feature)
+                if hasattr(cleric, 'disciple_of_life') and cleric.disciple_of_life:
+                    healing += 2 + spell_level
+                
+                old_hp = target.entity.hp
+                target.entity.hp = min(target.entity.hp + healing, target.get_max_hp())
+                actual_healing = target.entity.hp - old_hp
+                
+                return {
+                    'success': True,
+                    'message': f"{character.name} casts {spell_name} (Level {spell_level}) on {target.name}, healing {actual_healing} HP!",
+                    'type': 'healing',
+                    'character': character.name,
+                    'target': target.participant_id or target.id,
+                    'healing': actual_healing,
+                    'new_hp': target.entity.hp,
+                    'max_hp': target.get_max_hp(),
+                    'spell_level': spell_level,
+                    'resource_changes': {
+                        'spell_slots_used': cleric.spell_slots_used
+                    }
+                }
+            else:
+                # Damage spell
+                import random
+                damage = sum(random.randint(1, 8) for _ in range(spell_level)) + wis_mod
+                
+                old_hp = target.entity.hp
+                target.entity.hp = max(0, target.entity.hp - damage)
+                actual_damage = old_hp - target.entity.hp
+                
+                return {
+                    'success': True,
+                    'message': f"{character.name} casts {spell_name} (Level {spell_level}) on {target.name} for {actual_damage} damage!",
+                    'type': 'damage',
+                    'character': character.name,
+                    'target': target.participant_id or target.id,
+                    'damage': actual_damage,
+                    'new_hp': target.entity.hp,
+                    'max_hp': target.get_max_hp(),
+                    'target_defeated': target.entity.hp <= 0,
+                    'spell_level': spell_level,
+                    'resource_changes': {
+                        'spell_slots_used': cleric.spell_slots_used
+                    }
+                }
         
         return {'success': False, 'error': f'Unknown Cleric skill: {skill_name}'}
-    
+
     @staticmethod
     def _resolve_druid_skill(character, skill_name, target, skill_data):
         """Resolve Druid abilities"""
         druid = character.entity
         
+
+        if not hasattr(druid, 'spell_slots_used'):
+            druid.spell_slots_used = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0}
+        
+        if not hasattr(druid, 'spell_slots'):
+            druid.spell_slots = {1: 2, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0}
+        
+        if not hasattr(druid, 'wild_shape_uses_remaining'):
+            druid.wild_shape_uses_remaining = 2
+        
+        if not hasattr(druid, 'currently_wild_shaped'):
+            druid.currently_wild_shaped = False
+            
         if skill_name == 'Wild Shape':
             beast_name = skill_data.get('beast_name', 'Wolf')
             beast_hp = skill_data.get('beast_hp', 15)

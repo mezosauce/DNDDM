@@ -62,6 +62,7 @@ class Character:
                 "wisdom": 10,
                 "charisma": 10
             }
+    
 
 def character_to_dict(character: Character) -> Dict:
     """Convert Character to dict with class type metadata for serialization"""

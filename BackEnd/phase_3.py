@@ -308,100 +308,154 @@ def extract_monster_info_from_response(ai_response: str, monster_index: str = No
     """
     import re
     
-    print(f"[DEBUG] Extracting monster from response: {ai_response[:100]}...")
+    print(f"[DEBUG] Extracting monster from response: {ai_response[:200]}...")
     print(f"[DEBUG] Monster index provided: {monster_index is not None}")
     
-    # First, try to extract monster name from **Monster Name**: format
-    bold_pattern = r'\*\*(?:(\d+)\s+)?([a-zA-Z\s]+)\*\*:'
-    bold_match = re.search(bold_pattern, ai_response)
-
     monster_name = None
-    count = 1  # Default to 1 monster
-
-    if bold_match:
-        count_str = bold_match.group(1)  # Might be None
-        monster_name = bold_match.group(2).strip()
+    count = 1
+    
+    # Try multiple patterns to extract monster information
+    patterns = [
+        # Pattern 1: **2 Goblins**: or **Goblin**:
+        r'\*\*(?:(\d+)\s+)?([a-zA-Z\s\-]+?)\*\*\s*:',
         
-        # Get count if it was in the bold text
-        if count_str:
-            count = int(count_str)
+        # Pattern 2: encounter 2 goblins, face 3 wolves, etc.
+        r'(?:encounter|face|fight|battle|confront)\s+(?:(\d+)\s+)?([a-zA-Z\s\-]+?)(?:\s|,|\.|!)',
         
-        # Remove plural 's' or 'es' from monster name if count > 1
-        if count > 1:
-            if monster_name.endswith('ies'):
-                # e.g., "Harpies" -> "Harpy"
-                monster_name = monster_name[:-3] + 'y'
-            elif monster_name.endswith('es'):
-                # e.g., "Wolves" -> "Wolf" (but watch for "Horses" -> "Horse")
-                if monster_name.endswith('ves'):
-                    # e.g., "Wolves" -> "Wolf"
-                    monster_name = monster_name[:-3] + 'f'
-                elif not monster_name.endswith(('shes', 'ches', 'xes', 'ses', 'zes')):
-                    # Not a natural 'es' ending, remove it
-                    monster_name = monster_name[:-2]
+        # Pattern 3: 3 goblins appear/attack/emerge
+        r'(\d+)\s+([a-zA-Z\s\-]+?)\s+(?:appear|attack|emerge|step|block|rise|charge)',
+        
+        # Pattern 4: A goblin appears, The dragon attacks
+        r'(?:a|an|the)\s+([a-zA-Z\s\-]+?)\s+(?:appear|attack|emerge|step|block|rise|charge)',
+        
+        # Pattern 5: Goblin(s) in the area
+        r'([a-zA-Z\s\-]+?)(?:\(s\))?\s+(?:in the area|nearby|ahead)',
+    ]
+    
+    for i, pattern in enumerate(patterns):
+        match = re.search(pattern, ai_response, re.IGNORECASE)
+        if match:
+            print(f"[DEBUG] Pattern {i+1} matched: {match.group(0)}")
+            
+            if len(match.groups()) == 2:
+                # Pattern with count
+                count_str, monster_name = match.groups()
+                if count_str and count_str.isdigit():
+                    count = int(count_str)
                 else:
-                    # Natural 'es' ending like "Horses"
-                    monster_name = monster_name[:-2]
-            elif monster_name.endswith('s') and not monster_name.endswith('ss'):
-                # e.g., "Rats" -> "Rat", but "Brass" stays "Brass"
-                monster_name = monster_name[:-1]
-        
-        print(f"[DEBUG] Found monster in bold: {monster_name} (count: {count})")
-        
-    else:
-        # Fallback: Look for patterns like "3 goblins attack" or "1 dragon appears"
-        pattern = r'(\d+)\s+([a-zA-Z\s]+?)(?:s|es)?\s*(?:appear|attack|emerge|step|block|rise)'
-        matches = re.findall(pattern, ai_response.lower())
-        
-        if matches:
-            count, monster_name = matches[0]
+                    count = 1
+            else:
+                # Pattern without count
+                monster_name = match.group(1)
+                count = 1
+            
             monster_name = monster_name.strip()
-            count = int(count)
+            break
     
     if not monster_name:
-        print("[WARNING] No monster name found in response")
+        print("[WARNING] No monster name found in response using patterns")
+        
+        # Last resort: look for common monster names directly in text
+        from component.Class.monsters.monster_parser import MonsterParser
+        parser = MonsterParser()
+        
+        # Try to find any monster name mentioned in the response
+        response_lower = ai_response.lower()
+        for potential_monster in ['goblin', 'orc', 'wolf', 'skeleton', 'zombie', 'kobold', 'bandit']:
+            if potential_monster in response_lower:
+                monster_name = potential_monster
+                # Try to extract count
+                count_pattern = rf'(\d+)\s+{potential_monster}'
+                count_match = re.search(count_pattern, response_lower)
+                if count_match:
+                    count = int(count_match.group(1))
+                print(f"[DEBUG] Found common monster name: {monster_name} (count: {count})")
+                break
+    
+    if not monster_name:
+        print("[ERROR] Could not extract monster name from response")
         return None
     
+    # Clean up monster name - remove plurals
+    monster_name = monster_name.title()  # Capitalize properly
+    
+    if count > 1:
+        # Remove plural endings
+        if monster_name.endswith('ies'):
+            monster_name = monster_name[:-3] + 'y'
+        elif monster_name.endswith('ves'):
+            monster_name = monster_name[:-3] + 'f'
+        elif monster_name.endswith('es') and not monster_name.endswith(('shes', 'ches', 'xes', 'ses', 'zes', 'sses')):
+            monster_name = monster_name[:-2]
+        elif monster_name.endswith('s') and not monster_name.endswith('ss'):
+            monster_name = monster_name[:-1]
+    
+    print(f"[DEBUG] Final monster name: '{monster_name}' (count: {count})")
+    
+    # Try to find monster in SRD
     from component.Class.monsters.monster_parser import MonsterParser
-
     parser = MonsterParser()
-    print(f"[DEBUG] Searching for monster: '{monster_name}'")
     monster = parser.find_monster_by_name(monster_name)
-
+    
     if monster:
+        print(f"[DEBUG] Found monster in SRD: {monster.name}")
         return {
             'count': count,
             'name': monster.name,
             'description': ai_response[:200],
-            
-            'monster_data': monster.to_dict()  # Full monster stats
+            'monster_data': monster.to_dict()
         }
     else:
-        # Fallback if monster not found in SRD
-        print(f"[WARNING] Monster {monster_name} not found in SRD, using defaults")
+        # Try alternative spellings or partial matches
+        print(f"[WARNING] Monster '{monster_name}' not found in SRD, trying alternatives...")
+        
+        # Try removing spaces
+        monster_name_nospace = monster_name.replace(' ', '')
+        monster = parser.find_monster_by_name(monster_name_nospace)
+        
+        if not monster:
+            # Try first word only (e.g., "Giant Spider" -> "Spider")
+            words = monster_name.split()
+            if len(words) > 1:
+                monster = parser.find_monster_by_name(words[-1])
+        
+        if monster:
+            print(f"[DEBUG] Found alternative monster: {monster.name}")
+            return {
+                'count': count,
+                'name': monster.name,
+                'description': ai_response[:200],
+                'monster_data': monster.to_dict()
+            }
+        
+        # Complete fallback - use generic monster
+        print(f"[WARNING] Using fallback generic monster for: {monster_name}")
         return {
             'count': count,
             'name': monster_name,
             'description': ai_response[:200],
-            
             'monster_data': {
                 'name': monster_name,
-                'monster_type': 'unknown',
+                'monster_type': 'humanoid',
                 'size': 'Medium',
                 'alignment': 'unaligned',
-                'challenge_rating': 1.0,
-                'hp': 20,
+                'challenge_rating': 0.5,
+                'xp': 100,
+                'hp': 15,
                 'ac': 12,
+                'speed': {'walk': 30},
                 'stats': {
                     'strength': 10,
-                    'dexterity': 10,
+                    'dexterity': 12,
                     'constitution': 10,
-                    'intelligence': 10,
+                    'intelligence': 8,
                     'wisdom': 10,
-                    'charisma': 10
+                    'charisma': 8
                 },
                 'abilities': [],
-                'actions': ['Slam. Melee Weapon Attack: +2 to hit, reach 5 ft. Hit: 1d6+0 damage.'],
+                'actions': [
+                    'Slam. Melee Weapon Attack: +2 to hit, reach 5 ft., one target. Hit: 1d6 bludgeoning damage.'
+                ],
                 'legendary_actions': [],
                 'lair_actions': []
             }
@@ -968,27 +1022,21 @@ def register_story_package_routes(app):
             campaign, tracker, story_state, flow = load_story_package_data(campaign_name)
             
             import uuid
-            combat_id = session.get('current_combat_id')
-            if not combat_id:
-                combat_id = str(uuid.uuid4())
-                session['current_combat_id'] = combat_id
+            old_combat_id = session.get('current_combat_id')
+            if old_combat_id:
+                old_session_key = f'combat_{old_combat_id}'
+                session.pop(old_session_key, None)
+                print(f"[Combat] Cleared old combat data: {old_combat_id}")
             
-            # Try to get existing combat using the correct key format
-            session_key = f'combat_{combat_id}'
+            # Generate fresh combat ID
+            combat_id = str(uuid.uuid4())
+            session['current_combat_id'] = combat_id
+            print(f"[Combat] Generated new combat ID: {combat_id}")
+            
+            # Always initialize new combat (no loading from session)
             combat_state = None
             
-            if session_key in session:
-                try:
-                    combat_state = deserialize_combat(session[session_key])
-                    print(f"[Combat] Loaded existing combat from session")
-                except Exception as e:
-                    print(f"[Combat] Error deserializing combat: {e}")
-                    combat_state = None
-            
-            if not combat_state:
-                # Initialize new combat
-                print(f"[Combat] Initializing new combat with ID: {combat_id}")
-                
+            if True:
                 # Get monster info from story_state
                 monster_info = story_state.pending_monster
                 
@@ -1042,7 +1090,7 @@ def register_story_package_routes(app):
                 # Save using the proper serialization function
                 try:
                     combat_str = serialize_combat(combat_state)
-                    session[session_key] = combat_str
+                    session[session] = combat_str
                     session.modified = True
                     print(f"[Combat] Combat initialized and saved with ID: {combat_id}")
                 except Exception as e:
@@ -1055,7 +1103,7 @@ def register_story_package_routes(app):
             
             context_data = {
                 'campaign_name': campaign_name,
-                'combat_id': combat_id,  # Use persistent combat_id
+                'combat_id': combat_id,  
                 'tracker': tracker.to_dict(),
                 'story_state': story_state.to_dict(),
                 'combat_state': combat_data,
@@ -1244,47 +1292,47 @@ def register_story_package_routes(app):
             print(f"Error saving combat to session: {e}")
             raise
 
-        @app.route('/api/campaign/<campaign_name>/characters', methods=['GET'])
-        def get_campaign_characters(campaign_name):
-            """Get full character data for a campaign"""
-            try:
-                manager = CampaignManager()
-                characters = manager.get_characters(campaign_name)
+    @app.route('/api/campaign/<campaign_name>/characters', methods=['GET'])
+    def get_campaign_characters(campaign_name):
+        """Get full character data for a campaign"""
+        try:
+            manager = CampaignManager()
+            characters = manager.get_characters(campaign_name)
+            
+            # Convert to dicts
+            char_dicts = []
+            for char in characters:
+                if hasattr(char, '__dict__'):
+                    char_dict = {
+                        'name': char.name,
+                        'char_class': getattr(char, 'char_class', 'Unknown'),
+                        'class': getattr(char, 'char_class', 'Unknown'),
+                        'level': getattr(char, 'level', 1),
+                        'race': getattr(char, 'race', 'Unknown'),
+                        'background': getattr(char, 'background', ''),
+                        'stats': getattr(char, 'stats', {}),
+                        'hp': getattr(char, 'hp', 0),
+                        'max_hp': getattr(char, 'max_hp', 0)
+                    }
+                else:
+                    char_dict = char
                 
-                # Convert to dicts
-                char_dicts = []
-                for char in characters:
-                    if hasattr(char, '__dict__'):
-                        char_dict = {
-                            'name': char.name,
-                            'char_class': getattr(char, 'char_class', 'Unknown'),
-                            'class': getattr(char, 'char_class', 'Unknown'),
-                            'level': getattr(char, 'level', 1),
-                            'race': getattr(char, 'race', 'Unknown'),
-                            'background': getattr(char, 'background', ''),
-                            'stats': getattr(char, 'stats', {}),
-                            'hp': getattr(char, 'hp', 0),
-                            'max_hp': getattr(char, 'max_hp', 0)
-                        }
-                    else:
-                        char_dict = char
-                    
-                    char_dicts.append(char_dict)
-                
-                return jsonify({
-                    'success': True,
-                    'characters': char_dicts
-                })
-                
-            except Exception as e:
-                print(f"[API] Error getting characters: {e}")
-                import traceback
-                traceback.print_exc()
-                return jsonify({
-                    'success': False,
-                    'error': str(e)
-                }), 500
-        
+                char_dicts.append(char_dict)
+            
+            return jsonify({
+                'success': True,
+                'characters': char_dicts
+            })
+            
+        except Exception as e:
+            print(f"[API] Error getting characters: {e}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({
+                'success': False,
+                'error': str(e)
+            }), 500
+    
 
     # ========================================================================
     # GAME LOGIC

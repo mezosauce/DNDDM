@@ -272,20 +272,23 @@ class CombatAnimations {
     // ========================================================================
     // SPELL EFFECTS
     // ========================================================================
-    
+   
     /**
-     * Show spell cast effect
-     */
-    async showSpellCast(casterId, targetId = null, spellType = 'generic') {
-        console.log('[CombatAnimations] Showing spell cast:', casterId, spellType);
+    * Show spell cast animation
+    */
+    async showSpellCast(casterId, targetId, spellLevel, isHealing = false) {
+        console.log('[CombatAnimations] Showing spell cast:', casterId, '->', targetId);
         
         const caster = this.getElementByParticipantId(casterId);
-        if (!caster) return;
+        const target = this.getElementByParticipantId(targetId);
         
-        // Show casting effect on caster
+        if (!caster || !target) return;
+        
+        // Show casting aura on caster
         const castEffect = document.createElement('div');
-        castEffect.className = `spell-cast-effect ${spellType}`;
-        castEffect.innerHTML = '✨';
+        castEffect.className = 'spell-cast-effect';
+        castEffect.textContent = isHealing ? '✨' : '🔥';
+        castEffect.style.fontSize = `${1.5 + spellLevel * 0.3}rem`;
         
         this.positionAtElement(castEffect, caster);
         this.effectsContainer.appendChild(castEffect);
@@ -293,10 +296,33 @@ class CombatAnimations {
         await this.delay(500 / this.animationSpeed);
         castEffect.remove();
         
-        // If there's a target, show spell projectile
-        if (targetId) {
-            await this.animateSpellProjectile(casterId, targetId, spellType);
-        }
+        // Animate spell projectile to target
+        const projectile = document.createElement('div');
+        projectile.className = 'spell-projectile';
+        projectile.textContent = isHealing ? '💚' : '💥';
+        projectile.style.fontSize = `${2 + spellLevel * 0.3}rem`;
+        
+        const casterRect = caster.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        
+        projectile.style.position = 'fixed';
+        projectile.style.left = `${casterRect.left + casterRect.width / 2}px`;
+        projectile.style.top = `${casterRect.top + casterRect.height / 2}px`;
+        projectile.style.zIndex = '9999';
+        projectile.style.pointerEvents = 'none';
+        
+        document.body.appendChild(projectile);
+        
+        const duration = 400 / this.animationSpeed;
+        projectile.style.transition = `all ${duration}ms ease-in-out`;
+        
+        requestAnimationFrame(() => {
+            projectile.style.left = `${targetRect.left + targetRect.width / 2}px`;
+            projectile.style.top = `${targetRect.top + targetRect.height / 2}px`;
+        });
+        
+        await this.delay(duration);
+        projectile.remove();
     }
     
     /**
