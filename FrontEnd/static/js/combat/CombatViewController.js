@@ -273,7 +273,11 @@ class CombatViewController {
         // Combat end modal
         const continueBtn = document.getElementById('btn-continue');
         if (continueBtn) {
-            continueBtn.addEventListener('click', () => this.handleCombatEnd());
+            continueBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.handleCombatEnd();
+        });
+
         }
         
         console.log('[Combat] Event listeners attached');
@@ -812,12 +816,20 @@ class CombatViewController {
             modal.classList.remove('hidden');
         }
         
+        try{
         // Complete combat on backend (advances story package tracker)
         await this.completeCombat({
             result: 'victory',
             rounds: this.combatState.round,
             xp_gained: xpGained
         });
+        console.log('[Combat] Combat completion successful, redirect URL stored:', this.redirectUrl);
+        } catch (error) {
+            console.error('[Combat] Error in completeCombat:', error);
+            // Set fallback redirect
+            this.redirectUrl = `${this.API_BASE}/campaign/${this.campaignName}/story-package`;
+        }
+        
     }
 
     async handleDefeat() {

@@ -5,9 +5,12 @@ This is the init phase of the story so come up with a creativley inspired (from 
 Based on the campaign context provided, create a vivid scene organized as follows:
 
 
-[ATMOSPHERE]
+Format your Output like so:
+**INIT**
+
 Open with a focused paragraph that establishes the current location's mood, tone, and overall feeling. Set the emotional and environmental stage for what's to come.
 
+**INIT**
 
 === STYLE GUIDELINES ===
 - Write in second person ("you see...", "you hear...")

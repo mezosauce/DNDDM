@@ -193,8 +193,6 @@ if register_story_package_routes:
 else:
     print("⚠ Phase 3 routes not registered")
 
-
-
 # ============================================================================
 # SEARCH API INTEGRATION
 # ============================================================================

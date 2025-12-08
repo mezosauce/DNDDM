@@ -15,7 +15,7 @@
             <h1>📖 {{ campaign_name }}</h1>
             <p>Story Package {{ package_number }} - Step {{ current_step }} of 15</p>
             <div class="progress-bar">
-                <div class="progress-fill" style="width: {{ (current_step / 15 * 100)|int }}%">
+                <div class="progress-fill" style="width: {{ (current_step / 15 * 100)|int }}%">  
                     {{ (current_step / 15 * 100)|int }}%
                 </div>
             </div>
