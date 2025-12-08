@@ -349,19 +349,29 @@ class CombatViewController {
     }
 
     async processTurn() {
+        console.log('[Combat] processTurn() called, isProcessingAction:', this.isProcessingAction);
+        
         if (this.isProcessingAction) {
             console.log('[Combat] Already processing action, ignoring...');
             return;
         }
         
         const currentTurn = this.combatState.current_turn;
+        console.log('[Combat] Current turn participant:', currentTurn);
+        
+        if (!currentTurn) {
+            console.error('[Combat] No current turn data!');
+            return;
+        }
         
         if (currentTurn.type === 'character') {
             // Wait for player input (handled by action menu)
             console.log(`[Combat] Waiting for player input (${currentTurn.name})`);
         } else {
             // Process enemy turn automatically
+            console.log('[Combat] Enemy turn detected, AUTO_ENEMY_TURNS:', this.AUTO_ENEMY_TURNS);
             if (this.AUTO_ENEMY_TURNS) {
+                console.log('[Combat] Calling processEnemyTurn()...');
                 await this.processEnemyTurn();
             }
         }
@@ -414,6 +424,8 @@ class CombatViewController {
             // Check for combat end
             await this.checkCombatEnd();
             
+            this.isProcessingAction = false;
+
             // If combat didn't end, advance turn
             if (!this.combatEnded) {
                 await this.advanceTurn();
@@ -426,7 +438,9 @@ class CombatViewController {
             // Try to advance turn anyway to prevent getting stuck
             await this.advanceTurn();
         } finally {
-            this.isProcessingAction = false;
+            if (this.isProcessingAction) {
+                this.isProcessingAction = false;
+            }
         }
     }
 
@@ -614,6 +628,7 @@ class CombatViewController {
 
     async advanceTurn() {
         console.log('[Combat] Advancing to next turn...');
+        console.log('[Combat] isProcessingAction:', this.isProcessingAction);
         
         try {
             const response = await fetch(

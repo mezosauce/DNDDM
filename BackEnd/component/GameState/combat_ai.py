@@ -136,7 +136,7 @@ class CombatActionResolver:
                 'message': f"{attacker.name} attacks {target.name} but misses! (Rolled {attack_roll})",
                 'type': 'system',
                 'attacker': attacker.name,
-                'target': target.name,
+                'target': target.participant_id,
                 'damage': 0,
                 'new_hp': target.get_current_hp(),
                 'max_hp': target.get_max_hp(),
@@ -451,7 +451,7 @@ class CombatActionResolver:
         
         if not hasattr(druid, 'currently_wild_shaped'):
             druid.currently_wild_shaped = False
-            
+
         if skill_name == 'Wild Shape':
             beast_name = skill_data.get('beast_name', 'Wolf')
             beast_hp = skill_data.get('beast_hp', 15)

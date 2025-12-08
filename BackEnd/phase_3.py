@@ -361,7 +361,7 @@ def extract_monster_info_from_response(ai_response: str, monster_index: str = No
         
         # Try to find any monster name mentioned in the response
         response_lower = ai_response.lower()
-        for potential_monster in ['goblin', 'orc', 'wolf', 'skeleton', 'zombie', 'kobold', 'bandit']:
+        for potential_monster in ['goblin', 'orc', 'wolf', 'skeleton', 'zombie', 'kobold', 'bandit', 'swarm of bats']:
             if potential_monster in response_lower:
                 monster_name = potential_monster
                 # Try to extract count
@@ -390,34 +390,53 @@ def extract_monster_info_from_response(ai_response: str, monster_index: str = No
         elif monster_name.endswith('s') and not monster_name.endswith('ss'):
             monster_name = monster_name[:-1]
     
-    print(f"[DEBUG] Final monster name: '{monster_name}' (count: {count})")
+    # Store the display name (with spaces)
+    display_name = monster_name
+    
+    # Create lookup name (with underscores for file matching)
+    lookup_name = monster_name.lower().replace(' ', '_')
+    
+    print(f"[DEBUG] Display name: '{display_name}' | Lookup name: '{lookup_name}' (count: {count})")
     
     # Try to find monster in SRD
     from component.Class.monsters.monster_parser import MonsterParser
     parser = MonsterParser()
-    monster = parser.find_monster_by_name(monster_name)
+    
+    # Try lookup with underscored version first
+    monster = parser.find_monster_by_name(lookup_name)
+    
+    if not monster:
+        # Try with display name (title case with spaces)
+        monster = parser.find_monster_by_name(display_name)
     
     if monster:
         print(f"[DEBUG] Found monster in SRD: {monster.name}")
         return {
             'count': count,
-            'name': monster.name,
+            'name': monster.name,  # Use the official name from SRD
             'description': ai_response[:200],
             'monster_data': monster.to_dict()
         }
     else:
         # Try alternative spellings or partial matches
-        print(f"[WARNING] Monster '{monster_name}' not found in SRD, trying alternatives...")
+        print(f"[WARNING] Monster '{display_name}' (lookup: '{lookup_name}') not found in SRD, trying alternatives...")
         
-        # Try removing spaces
-        monster_name_nospace = monster_name.replace(' ', '')
-        monster = parser.find_monster_by_name(monster_name_nospace)
+        # Try removing all non-alphanumeric except underscores
+        lookup_clean = re.sub(r'[^a-z0-9_]', '', lookup_name)
+        if lookup_clean != lookup_name:
+            monster = parser.find_monster_by_name(lookup_clean)
         
         if not monster:
-            # Try first word only (e.g., "Giant Spider" -> "Spider")
-            words = monster_name.split()
+            # Try first word only (e.g., "Giant Spider" -> "spider")
+            words = lookup_name.split('_')
             if len(words) > 1:
                 monster = parser.find_monster_by_name(words[-1])
+        
+        if not monster:
+            # Try last word from display name
+            display_words = display_name.split()
+            if len(display_words) > 1:
+                monster = parser.find_monster_by_name(display_words[-1])
         
         if monster:
             print(f"[DEBUG] Found alternative monster: {monster.name}")
@@ -429,13 +448,13 @@ def extract_monster_info_from_response(ai_response: str, monster_index: str = No
             }
         
         # Complete fallback - use generic monster
-        print(f"[WARNING] Using fallback generic monster for: {monster_name}")
+        print(f"[WARNING] Using fallback generic monster for: {display_name}")
         return {
             'count': count,
-            'name': monster_name,
+            'name': display_name,  # Use display name for generic monsters
             'description': ai_response[:200],
             'monster_data': {
-                'name': monster_name,
+                'name': display_name,
                 'monster_type': 'humanoid',
                 'size': 'Medium',
                 'alignment': 'unaligned',
@@ -679,7 +698,7 @@ def register_story_package_routes(app):
             print(f"Error in story_state_advance: {e}")
             import traceback
             traceback.print_exc()
-            return jsonify({'error': str(e)}), 500
+            return jsonify({'error': str    (e)}), 500
     
     # ========================================================================
     # 4. STORY STATE AI GENERATE
@@ -1090,7 +1109,8 @@ def register_story_package_routes(app):
                 # Save using the proper serialization function
                 try:
                     combat_str = serialize_combat(combat_state)
-                    session[session] = combat_str
+                    session_key = f'combat_{combat_id}'
+                    session[session_key] = combat_str
                     session.modified = True
                     print(f"[Combat] Combat initialized and saved with ID: {combat_id}")
                 except Exception as e:
@@ -1688,7 +1708,8 @@ def register_story_package_routes(app):
                 
                 # Start the new turn
                 current_participant = combat.get_current_participant()
-                
+                summary = combat.get_combat_summary()
+
                 if current_participant:
                     # Handle start-of-turn effects
                     if hasattr(current_participant.entity, 'on_turn_start'):
@@ -1708,7 +1729,8 @@ def register_story_package_routes(app):
                         'participant_id': current_participant.participant_id if current_participant else None,
                         'name': current_participant.name if current_participant else None,
                         'type': current_participant.participant_type.value if current_participant else None
-                    }
+                    },
+                    'combat_state': summary
                 })
                 
             except Exception as e:
@@ -1988,7 +2010,7 @@ def register_story_package_routes(app):
                         'message': f"{character.name} grants Bardic Inspiration to {target.name}! ({bard.bardic_inspiration_die})",
                         'type': 'buff',
                         'character': character.name,
-                        'target': target.name,
+                        'target': target.participant_id,
                         'effect': 'inspiration',
                         'resource_changes': {
                             'bardic_inspiration_remaining': bard.bardic_inspiration_remaining
@@ -2090,7 +2112,7 @@ def register_story_package_routes(app):
                     'message': f"{character.name} casts {spell_name} on {target.name}, healing {healing} HP!",
                     'type': 'healing',
                     'character': character.name,
-                    'target': target.name,
+                    'target': target.participant_id,
                     'healing': healing,
                     'new_hp': target.entity.hp,
                     'max_hp': target.get_max_hp(),
@@ -2108,7 +2130,7 @@ def register_story_package_routes(app):
                     'message': f"{character.name} casts {spell_name} on {target.name} for {damage} damage!",
                     'type': 'damage',
                     'character': character.name,
-                    'target': target.name,
+                    'target': target.participant_id,
                     'damage': damage,
                     'new_hp': target.entity.hp,
                     'max_hp': target.get_max_hp(),
