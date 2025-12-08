@@ -114,6 +114,14 @@ class ActionMenu {
             
             this.activeCharacter = fullParticipant || character;
             console.log('[ActionMenu] Active character set to:', this.activeCharacter);
+    
+            this.menuContainer.style.display = 'block';
+            
+            // Make sure we're on the main menu
+            this.showMainMenu();
+            
+            // Update button states based on character resources
+            this.updateMainMenuStates();
         }
     
     /**

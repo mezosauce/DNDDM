@@ -328,6 +328,7 @@ class BattlefieldView {
     /**
      * Update health bar for a combatant
      */
+    
     updateHealthBar(participantId, newHp, maxHp) {
         const card = this.combatantElements.get(participantId);
         if (!card) return;
@@ -336,8 +337,19 @@ class BattlefieldView {
         const healthBarText = card.querySelector('.health-bar-text');
         
         if (healthBarFill && healthBarText) {
-            const percentage = maxHp > 0 ? (newHp / maxHp * 100) : 0;
+            // Safety: if maxHp is undefined or invalid, keep the current max HP
+            if (!maxHp || maxHp <= 0) {
+                const currentText = healthBarText.textContent;
+                const match = currentText.match(/\d+\s*\/\s*(\d+)/);
+                if (match) {
+                    maxHp = parseInt(match[1]);
+                }
+            }
             
+            // Ensure newHp doesn't exceed maxHp
+            newHp = Math.min(newHp, maxHp);
+            
+            const percentage = maxHp > 0 ? (newHp / maxHp * 100) : 0;
             // Animate the change
             healthBarFill.style.transition = 'width 0.5s ease-out';
             healthBarFill.style.width = `${percentage}%`;

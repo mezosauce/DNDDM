@@ -99,7 +99,24 @@ class CombatViewController {
             throw new Error(data.error || 'Failed to load combat state');
         }
         
+        // Preserve max_hp values from previous state if they exist
+        const oldState = this.combatState;
         this.combatState = data.summary;
+        
+        if (oldState && oldState.participants) {
+            this.combatState.participants.forEach(participant => {
+                const oldParticipant = oldState.participants.find(
+                    p => (p.participant_id || p.id) === (participant.participant_id || participant.id)
+                );
+                
+                // If max_hp seems corrupted (equal to or less than current hp), restore it
+                if (oldParticipant && participant.max_hp <= participant.hp && oldParticipant.max_hp > participant.hp) {
+                    console.warn(`[Combat] Restoring max_hp for ${participant.name}: ${participant.max_hp} -> ${oldParticipant.max_hp}`);
+                    participant.max_hp = oldParticipant.max_hp;
+                }
+            });
+        }
+        
         console.log('[Combat] ✓ State loaded:', this.combatState);
         
         console.log('[Combat] Participants:', this.combatState.participants.map(p => ({
@@ -415,12 +432,31 @@ class CombatViewController {
                 throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
             }
             
+
             // Display action result
             await this.displayActionResult(data);
             
-            // Reload combat state
-            await this.loadCombatState();
+            if (data.target && data.new_hp !== undefined) {
+                const participant = this.combatState.participants.find(
+                    p => (p.participant_id || p.id) === data.target
+                );
+                if (participant) {
+                    participant.hp = data.new_hp;
+                }
+            }
             
+            // Update resource changes in local state
+            if (data.resource_changes) {
+                const actorId = this.combatState.current_turn.participant_id;
+                const actor = this.combatState.participants.find(
+                    p => (p.participant_id || p.id) === actorId
+                );
+                if (actor) {
+                    Object.assign(actor, data.resource_changes);
+                }
+            }
+            
+
             // Check for combat end
             await this.checkCombatEnd();
             
@@ -437,11 +473,7 @@ class CombatViewController {
             
             // Try to advance turn anyway to prevent getting stuck
             await this.advanceTurn();
-        } finally {
-            if (this.isProcessingAction) {
-                this.isProcessingAction = false;
-            }
-        }
+        } 
     }
 
     async processPlayerAction(action, target) {
@@ -505,6 +537,8 @@ class CombatViewController {
             
             // Check for combat end
             await this.checkCombatEnd();
+            logToggle
+            this.isProcessingAction = false;
             
             // If combat didn't end, advance to next turn
             if (!this.combatEnded) {
@@ -596,9 +630,16 @@ class CombatViewController {
         
         // Update HP bars if HP changed
         if (targetId && result.new_hp !== undefined) {
+            // Get the participant's actual max HP from combat state
+            const participant = this.combatState.participants.find(
+                p => (p.participant_id || p.id) === targetId
+            );
+            
+            const maxHp = participant ? participant.max_hp : (result.max_hp || 100);
+            
             this.battlefieldView.updateCombatant(targetId, {
                 hp: result.new_hp,
-                max_hp: result.max_hp
+                max_hp: participant.max_hp
             });
         }
         
@@ -650,8 +691,8 @@ class CombatViewController {
                     this.combatLog.addEntry('system', `=== Round ${this.combatState.round} ===`);
                 }
                 
-                // Re-render
-                this.render();
+                this.updateTurnIndicator();
+                this.updateActionMenu();
                 
                 // Continue combat flow
                 await this.processTurn();
@@ -691,6 +732,8 @@ class CombatViewController {
         
         this.combatLog.addEntry('system', '=== VICTORY! ===');
         
+        this.combatEnded = true;
+
         // Show victory modal
         const modal = document.getElementById('combat-end-modal');
         const title = document.getElementById('combat-result-title');
@@ -720,7 +763,8 @@ class CombatViewController {
         console.log('[Combat] DEFEAT...');
         
         this.combatLog.addEntry('system', '=== DEFEAT ===');
-        
+        this.combatEnded = true;
+
         // Show defeat modal
         const modal = document.getElementById('combat-end-modal');
         const title = document.getElementById('combat-result-title');
