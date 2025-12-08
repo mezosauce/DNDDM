@@ -1863,6 +1863,64 @@ def register_story_package_routes(app):
                     'error': str(e)
                 }), 500
 
+
+        # ========================================================================
+        # POST COMBAT
+        # ========================================================================
+        @app.route('/campaign/<campaign_name>/combat-state/complete', methods=['POST'])
+        def combat_state_complete(campaign_name):
+            """Complete combat and advance story package tracker"""
+            try:
+                data = request.json
+                result = data.get('result', 'victory')  # 'victory', 'defeat', 'fled'
+                
+                campaign, tracker, story_state, flow = load_story_package_data(campaign_name)
+                
+                # Store combat result in story_state
+                combat_summary = {
+                    'result': result,
+                    'rounds': data.get('rounds', 0),
+                    'xp_gained': data.get('xp_gained', 0) if result == 'victory' else 0
+                }
+                
+                story_state.last_combat_result = combat_summary
+                
+                # Add story event
+                story_state.add_story_event(
+                    event_type="combat_complete",
+                    narrative_text=f"Combat ended in {result}",
+                    metadata=combat_summary
+                )
+                
+                # Clear pending monster
+                story_state.pending_monster = None
+                
+                # Clear session combat
+                combat_id = session.get('current_combat_id')
+                if combat_id:
+                    session_key = f'combat_{combat_id}'
+                    session.pop(session_key, None)
+                    session.pop('current_combat_id', None)
+                
+                # Advance tracker to next step
+                tracker.advance_step()
+                
+                # Save everything
+                save_story_package_data(campaign_name, tracker, story_state)
+                
+                return jsonify({
+                    'success': True,
+                    'result': result,
+                    'next_step': tracker.current_step,
+                    'redirect': url_for('story_package_hub', campaign_name=campaign_name)
+                })
+                
+            except Exception as e:
+                print(f"Error completing combat: {e}")
+                import traceback
+                traceback.print_exc()
+                return jsonify({'error': str(e)}), 500
+        
         # ========================================================================
         # HELPER FUNCTIONS
         # ========================================================================

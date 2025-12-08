@@ -406,6 +406,11 @@ class CombatViewController {
                 throw new Error('Invalid enemy turn data');
             }
             
+            if (currentEnemy.type !== 'monster') {
+                console.error('[Combat] processEnemyTurn called but current turn is not a monster!', currentEnemy);
+                throw new Error('Not an enemy turn');
+            }
+
             // Add to combat log
             this.combatLog.addEntry('turn', `${currentEnemy.name}'s turn...`);
             
@@ -479,11 +484,18 @@ class CombatViewController {
     async processPlayerAction(action, target) {
         console.log('[Combat] Processing player action:', action, target);
         
+        if (this.isProcessingAction) {
+            console.warn('[Combat] Already processing action, ignoring duplicate call');
+            return;
+        }
+        
+        // Disable action menu immediately
         const actionMenu = document.getElementById('action-menu');
         if (actionMenu) {
             actionMenu.style.opacity = '0.5';
             actionMenu.style.pointerEvents = 'none';
         }
+        
         this.isProcessingAction = true;
         
         try {
@@ -532,34 +544,63 @@ class CombatViewController {
             // Display action result with animations
             await this.displayActionResult(data);
             
-            // Reload combat state to get updated HP/resources
-            await this.loadCombatState();
+            // Update local state for HP changes
+            if (data.target && data.new_hp !== undefined) {
+                const participant = this.combatState.participants.find(
+                    p => (p.participant_id || p.id) === data.target
+                );
+                if (participant) {
+                    participant.hp = data.new_hp;
+                }
+            }
+            
+            // Update resource changes in local state
+            if (data.resource_changes) {
+                const actorId = this.combatState.current_turn.participant_id;
+                const actor = this.combatState.participants.find(
+                    p => (p.participant_id || p.id) === actorId
+                );
+                if (actor) {
+                    Object.assign(actor, data.resource_changes);
+                }
+            }
             
             // Check for combat end
             await this.checkCombatEnd();
-            logToggle
+            
+            // Clean up UI BEFORE advancing turn
+            this.battlefieldView.exitTargetingMode();
+            this.actionMenu.resetToMainMenu();
+            
+            // Re-enable action menu
+            if (actionMenu) {
+                actionMenu.style.opacity = '1';
+                actionMenu.style.pointerEvents = 'auto';
+            }
+            
+            // Mark action processing as complete BEFORE advancing
             this.isProcessingAction = false;
             
             // If combat didn't end, advance to next turn
             if (!this.combatEnded) {
+                console.log('[Combat] Player action complete, advancing turn...');
                 await this.advanceTurn();
             }
             
         } catch (error) {
             console.error('[Combat] Player action error:', error);
             this.showError('Action failed: ' + error.message);
-        } finally {
+            
+            // Clean up on error
             this.isProcessingAction = false;
-            const actionMenu = document.getElementById('action-menu');
+            this.battlefieldView.exitTargetingMode();
+            this.actionMenu.resetToMainMenu();
+            
             if (actionMenu) {
                 actionMenu.style.opacity = '1';
                 actionMenu.style.pointerEvents = 'auto';
             }
-
         }
-
-        this.battlefieldView.exitTargetingMode();
-        this.actionMenu.resetToMainMenu();
     }
 
 
@@ -683,19 +724,26 @@ class CombatViewController {
             const data = await response.json();
             
             if (data.success) {
-                // Update combat state
-                this.combatState = data.combat_state;
                 
                 // Check if new round started
                 if (data.new_round) {
                     this.combatLog.addEntry('system', `=== Round ${this.combatState.round} ===`);
                 }
-                
+                console.log('[Combat] Reloading combat state after turn advance...');
+                await this.loadCombatState();
+            
+                console.log('[Combat] Turn advanced to:', {
+                    name: this.combatState.current_turn?.name,
+                    type: this.combatState.current_turn?.type,
+                    participant_id: this.combatState.current_turn?.participant_id
+                });
+
                 this.updateTurnIndicator();
                 this.updateActionMenu();
                 
-                // Continue combat flow
+                console.log('[Combat] Calling processTurn()...');
                 await this.processTurn();
+                console.log('[Combat] processTurn() completed');
             } else {
                 throw new Error(data.error || 'Failed to advance turn');
             }
@@ -734,6 +782,14 @@ class CombatViewController {
         
         this.combatEnded = true;
 
+        // Calculate XP and other rewards
+        const xpGained = this.combatState.participants
+            .filter(p => p.type === 'monster' && p.hp <= 0)
+            .reduce((total, enemy) => {
+                // Rough XP calculation based on enemy HP/AC
+                return total + Math.floor((enemy.max_hp || 0) * 10 + (enemy.ac || 10) * 5);
+            }, 0);
+
         // Show victory modal
         const modal = document.getElementById('combat-end-modal');
         const title = document.getElementById('combat-result-title');
@@ -746,6 +802,7 @@ class CombatViewController {
             details.innerHTML = `
                 <p>All enemies have been defeated!</p>
                 <p>Combat lasted ${this.combatState.round} rounds.</p>
+                <p><strong>XP Gained:</strong> ${xpGained}</p>
                 <div style="margin-top: 20px;">
                     <strong>Survivors:</strong>
                     ${this.getSurvivorsList()}
@@ -755,8 +812,12 @@ class CombatViewController {
             modal.classList.remove('hidden');
         }
         
-        // Mark combat as ended in backend
-        await this.endCombat('victory');
+        // Complete combat on backend (advances story package tracker)
+        await this.completeCombat({
+            result: 'victory',
+            rounds: this.combatState.round,
+            xp_gained: xpGained
+        });
     }
 
     async handleDefeat() {
@@ -782,8 +843,12 @@ class CombatViewController {
             modal.classList.remove('hidden');
         }
         
-        // Mark combat as ended in backend
-        await this.endCombat('defeat');
+        // Complete combat on backend (advances story package tracker)
+        await this.completeCombat({
+            result: 'defeat',
+            rounds: this.combatState.round,
+            xp_gained: 0
+        });
     }
 
     getSurvivorsList() {
@@ -795,24 +860,43 @@ class CombatViewController {
         return survivors || 'None';
     }
 
-    async endCombat(result) {
+    async completeCombat(combatData) {
+        console.log('[Combat] Completing combat with data:', combatData);
+        
         try {
-            await fetch(
-                `${this.API_BASE}/api/combat/${this.combatId}/end`,
+            const response = await fetch(
+                `${this.API_BASE}/campaign/${this.campaignName}/combat-state/complete`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ result: result })
+                    body: JSON.stringify(combatData)
                 }
             );
+            
+            const data = await response.json();
+            
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || 'Failed to complete combat');
+            }
+            
+            console.log('[Combat] Combat completed successfully, next step:', data.next_step);
+            
+            // Store redirect URL for the continue button
+            this.redirectUrl = data.redirect;
+            
         } catch (error) {
-            console.error('[Combat] Error ending combat:', error);
+            console.error('[Combat] Error completing combat:', error);
+            // Still allow the user to continue even if the backend call fails
+            this.redirectUrl = `${this.API_BASE}/campaign/${this.campaignName}/story-package`;
         }
     }
 
     handleCombatEnd() {
-        // Redirect back to story state
-        window.location.href = `${this.API_BASE}/campaign/${this.campaignName}/story-package`;
+        console.log('[Combat] Handling combat end, redirecting...');
+        // Use the stored redirect URL from completeCombat
+        const redirectUrl = this.redirectUrl || `${this.API_BASE}/campaign/${this.campaignName}/story-package`;
+        
+        window.location.href = redirectUrl;
     }
 
     // ========================================================================
@@ -884,14 +968,23 @@ class CombatViewController {
             
             const data = await response.json();
             
-            if (data.success) {
-                this.combatLog.addEntry('system', 'Fled from combat!');
+            if (data.success && data.fled) {
+                this.combatLog.addEntry('system', 'Successfully fled from combat!');
+                this.combatEnded = true;
+                
+                // Complete combat with fled result
+                await this.completeCombat({
+                    result: 'fled',
+                    rounds: this.combatState.round,
+                    xp_gained: 0
+                });
                 
                 // Wait a moment then redirect
                 await this.delay(1500);
                 this.handleCombatEnd();
             } else {
-                this.showError(data.error || 'Failed to flee!');
+                this.combatLog.addEntry('system', 'Failed to flee!');
+                this.showError('Failed to flee - enemies get attacks of opportunity!');
             }
         } catch (error) {
             console.error('[Combat] Flee error:', error);
