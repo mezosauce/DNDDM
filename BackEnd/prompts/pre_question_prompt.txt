@@ -1,21 +1,97 @@
-In the beggining of the Questioning. Declare the following line above 
+=== QUESTIONING STATE: BINARY CHOICE PRESENTATION ===
 
+You are presenting the party with a critical decision point in their adventure.
 
-Based on the current narrative situation, present the party with a meaningful
-binary choice that will affect the story direction.
+**YOUR TASK:**
+Generate a narrative setup followed by a clear binary question that the party must answer with either "Accept" or "Decline".
 
-The question should:
-1. Be clear and unambiguous (Accept or Decline)
-2. Have meaningful consequences either way
-3. Connect to the current story situation
-4. Feel impactful to the characters
-5. Be answerable with "Accept" or "Decline"
+**REQUIREMENTS:**
 
-Format your response as a direct question to the party.
+1. **Narrative Setup (2-3 sentences)**
+   - Establish the current situation
+   - Introduce the person/entity making the offer or presenting the dilemma
+   - Build tension or stakes
 
-Example:
+2. **The Question (1 sentence)**
+   - Must be answerable with ONLY "Accept" or "Decline"
+   - Should feel weighty and consequential
+   - Must relate directly to the current story situation
+   - Avoid open-ended or complex questions
+
+3. **Format Requirements**
+   - Place the actual question between ***QUEST*** markers
+   - The question must be on its own line
+   - Use quotation marks around the question text
+   - Keep the question under 25 words
+
+**WHAT MAKES A GOOD CHOICE:**
+✓ Both options (Accept/Decline) lead to interesting story paths
+✓ The stakes are clear and immediate
+✓ The choice reflects character values or goals
+✓ Declining is a valid, reasonable option (not obviously "wrong")
+✓ The consequences feel significant but not campaign-ending
+
+**WHAT TO AVOID:**
+✗ Questions that need explanation ("it depends...")
+✗ Choices where one option is clearly superior
+✗ Multiple conditions or complex scenarios
+✗ Questions that can't be answered with Accept/Decline
+✗ Vague or philosophical questions
+
+---
+
+**EXAMPLE FORMAT:**
+
+The weathered merchant leans forward, his eyes gleaming with desperation. "The artifact was stolen three nights ago by bandits heading into the Blackwood Forest. They're dangerous, but you look capable. I'll pay 100 gold pieces for its safe return."
 
 ***QUEST***
- "Will you accept the merchant's dangerous quest to retrieve the stolen artifact?
+"Will you accept the merchant's quest to retrieve the stolen artifact from the Blackwood Forest?"
 ***QUEST***
 
+---
+
+**MORE EXAMPLES:**
+
+**Example 1 - NPC Request:**
+A hooded figure approaches from the shadows, their voice urgent. "The city guard are corrupt—they'll arrest you on sight if we take the main road. I know a secret tunnel through the sewers, but it's infested with giant rats. It's risky, but it's our only way in."
+
+***QUEST***
+"Do you accept the stranger's offer to guide you through the dangerous sewer tunnels?"
+***QUEST***
+
+---
+
+**Example 2 - Moral Dilemma:**
+The village elder's voice cracks with emotion. "The creature has lived in these woods for generations, yes, but it killed two of our children last month. We need it dead. I know you adventurers have codes, but we're desperate. Will you help us?"
+
+***QUEST***
+"Will you accept the contract to hunt and kill the creature threatening the village?"
+***QUEST***
+
+---
+
+**Example 3 - Strategic Choice:**
+Your party stands before a massive iron door with two keyholes. The inscription reads: "One key opens the treasure vault. The other releases the guardian beast. Choose wisely, for you may only take one." Two ancient keys rest on pedestals before you.
+
+***QUEST***
+"Do you accept the risk and choose a key to unlock the door?"
+***QUEST***
+
+---
+
+**Example 4 - Alliance Offer:**
+The rival adventuring party's leader extends a scarred hand. "We both want what's in that dungeon. We can fight each other for scraps, or we can work together and split the loot evenly. I give you my word we'll honor the deal. What do you say?"
+
+***QUEST***
+"Will you accept the rival party's offer to form a temporary alliance?"
+***QUEST***
+
+---
+
+**NOW, GENERATE YOUR RESPONSE:**
+
+Based on the current narrative context provided above, create a compelling binary choice moment using the exact format shown. Remember to:
+- Set up the situation in 2-3 sentences
+- Place the question between ***QUEST*** markers
+- Ensure the question can only be answered with Accept or Decline
+- Make both options feel viable and interesting
