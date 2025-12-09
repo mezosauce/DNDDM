@@ -440,7 +440,8 @@ class StoryPackageFlow:
         
         elif prompt_template == 'pre_question':
             prompt_parts.append(pre_question_prompt)
-           
+            prompt_parts.append("\nPresent a meaningful binary choice (Accept/Decline) "
+                              "that will affect the story direction.")
         
         elif prompt_template == 'post_question':
             prompt_parts.append(post_question_prompt)

@@ -522,43 +522,18 @@ def extract_dice_situation_from_response(ai_response: str) -> Optional[Dict]:
 
 def extract_question_from_response(ai_response: str) -> Optional[Dict]:
     """
-    Parse AI response for binary question with improved extraction.
+    Parse AI response for binary question.
     
     Returns question data dict if found, None otherwise.
     """
-    import re
-    
-    # Look for ***QUEST*** markers first (as shown in prompt template)
-    quest_pattern = r'\*\*\*QUEST\*\*\*\s*(.*?)\s*\*\*\*QUEST\*\*\*'
-    quest_match = re.search(quest_pattern, ai_response, re.DOTALL | re.IGNORECASE)
-    
-    if quest_match:
-        question_text = quest_match.group(1).strip()
-        return {
-            'question_text': question_text,
-            'full_context': ai_response
-        }
-    
-    # Fallback: Look for sentences with question marks
-    sentences = re.split(r'[.!]\s+', ai_response)
+    # Look for question marks
+    sentences = ai_response.split('.')
     for sentence in sentences:
         if '?' in sentence:
-            # Clean up the sentence
-            question_text = sentence.strip()
-            if not question_text.endswith('?'):
-                question_text = question_text.split('?')[0] + '?'
-            
             return {
-                'question_text': question_text,
+                'question_text': sentence.strip(),
                 'full_context': ai_response
             }
-    
-    # Last resort: use entire response
-    if ai_response.strip():
-        return {
-            'question_text': ai_response.strip(),
-            'full_context': ai_response
-        }
     
     return None
 
@@ -819,38 +794,6 @@ def register_story_package_routes(app):
             # Get question data from story_state
             question_data = story_state.pending_question or {}
             
-            # If no question exists, generate one
-            if not question_data or not question_data.get('question_text'):
-                print("[Question State] No pending question found, generating...")
-                
-                # Build context for AI
-                context_data_build = build_story_context(campaign_name)
-                context_data_build['current_step'] = tracker.current_step
-                context_data_build['story_state'] = story_state.to_dict()
-                context_data_build['tracker'] = tracker.to_dict()
-                
-                # Generate prompt using flow
-                prompt = flow.generate_ai_prompt_for_step(tracker.current_step, context_data_build)
-                
-                # Call AI
-                ai_response = call_claude_api(prompt, max_tokens=600)
-                
-                # Extract question from response
-                question_data = extract_question_from_response(ai_response)
-                
-                if not question_data:
-                    # Fallback parsing if extract function fails
-                    question_data = {
-                        'question_text': ai_response,
-                        'full_context': ai_response
-                    }
-                
-                # Store in story_state
-                story_state.pending_question = question_data
-                save_story_package_data(campaign_name, tracker, story_state)
-                
-                print(f"[Question State] Generated question: {question_data.get('question_text', '')[:100]}...")
-            
             context_data = {
                 'campaign_name': campaign_name,
                 'tracker': tracker.to_dict(),
@@ -862,6 +805,7 @@ def register_story_package_routes(app):
             }
             
             return render_template('HTML/question_state.html', **context_data)
+            
         except Exception as e:
             print(f"Error in question_state_page: {e}")
             return f"Error: {str(e)}", 500

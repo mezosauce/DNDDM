@@ -18,7 +18,6 @@ from phase_3 import load_story_package_data, save_story_package_data
 import pickle
 import base64
 
-
 def initialize_character_resources(character):
     """Initialize resource tracking attributes for a character"""
     # Get character level
