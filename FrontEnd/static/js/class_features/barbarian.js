@@ -1,310 +1,242 @@
 /**
- * Barbarian Class Features UI
- * Handles Barbarian-specific displays: Rage, Unarmored Defense, Feature Tree
+ * Barbarian Feature Manager
+ * Client-side tracking of Barbarian class features and resources
  */
-// API base used by frontend to reach the backend service.
-// Defaults to "/" (same origin) so it works when served from the same Flask app.
-// Override with window.API_BASE if needed for cross-origin use.
-const API_BASE = (typeof window !== 'undefined' && window.API_BASE) ? window.API_BASE : '';
 
-class BarbarianFeatureManager extends ClassFeatureManager {
+class BarbarianFeatureManager extends BaseFeatureManager {
     constructor() {
-        super('Barbarian');
-        this.ragesUsed = 0;
+        super();
+        this.className = 'Barbarian';
+        
+        // Rage tracking
         this.ragesPerDay = 2;
+        this.ragesUsed = 0;
         this.rageDamage = 2;
         this.currentlyRaging = false;
-        this.stats = { strength: 10, dexterity: 10, constitution: 10 };
+        
+        // Level-based features
+        this.recklessAttackAvailable = false;
+        this.dangerSenseActive = false;
+        this.fastMovement = 0;
+        this.brutalCriticalDice = 0;
+        this.feralInstinct = false;
+        this.relentlessRage = false;
+        this.persistentRage = false;
+        this.indomitableMight = false;
     }
-
+    
+    /**
+     * Initialize from character data
+     */
     initialize(level, stats) {
         this.level = level;
-        this.stats = stats || this.stats;
-        this.updateRageProgression();
-        this.render();
+        this.stats = stats;
+        
+        // Calculate level-based resources
+        this.calculateLevelFeatures();
+        
+        console.log(`[BarbarianFeatures] Initialized level ${level} barbarian`);
     }
-
-    updateRageProgression() {
-        // Rage uses per day based on level
-        if (this.level >= 20) this.ragesPerDay = 999; // Unlimited
-        else if (this.level >= 17) this.ragesPerDay = 6;
-        else if (this.level >= 12) this.ragesPerDay = 5;
-        else if (this.level >= 6) this.ragesPerDay = 4;
-        else if (this.level >= 3) this.ragesPerDay = 3;
-        else this.ragesPerDay = 2;
-
-        // Rage damage based on level
+    
+    /**
+     * Calculate features based on level
+     */
+    calculateLevelFeatures() {
+        // Rage progression
+        if (this.level >= 1) {
+            this.ragesPerDay = 2;
+            this.rageDamage = 2;
+        }
+        if (this.level >= 3) this.ragesPerDay = 3;
+        if (this.level >= 6) this.ragesPerDay = 4;
+        if (this.level >= 9) {
+            this.rageDamage = 3;
+            this.brutalCriticalDice = 1;
+        }
+        if (this.level >= 12) this.ragesPerDay = 5;
+        if (this.level >= 13) this.brutalCriticalDice = 2;
         if (this.level >= 16) this.rageDamage = 4;
-        else if (this.level >= 9) this.rageDamage = 3;
-        else this.rageDamage = 2;
-    }
-
-    calculateUnarmoredDefense() {
-        const dexMod = calculateModifier(this.stats.dexterity);
-        const conMod = calculateModifier(this.stats.constitution);
-        return 10 + dexMod + conMod;
-    }
-
-    render() {
-        const container = document.getElementById('barbarian-features');
-        if (!container) return;
-
-        container.innerHTML = `
-            <div class="class-specific-section active">
-                <div class="class-section-header">
-                    ⚔️ Barbarian Features
-                </div>
-                
-                ${this.renderRageTracker()}
-                ${this.renderUnarmoredDefenseDisplay()}
-                ${this.renderFeatureTree()}
-            </div>
-        `;
-
-        this.attachEventListeners();
-    }
-
-    renderRageTracker() {
-        const rageText = this.level >= 20 ? 'Unlimited' : `${this.ragesUsed}/${this.ragesPerDay}`;
-        const percentage = this.level >= 20 ? 100 : ((this.ragesPerDay - this.ragesUsed) / this.ragesPerDay) * 100;
-        
-        return `
-            <div class="resource-tracker">
-                <div class="resource-name">
-                    🔥 Rage ${this.currentlyRaging ? '(ACTIVE)' : ''}
-                </div>
-                <div class="resource-bar">
-                    <div class="resource-fill" style="width: ${percentage}%; background: linear-gradient(90deg, #ff6b6b 0%, #ee5a52 100%);">
-                        ${rageText}
-                    </div>
-                </div>
-                <div class="resource-buttons">
-                    <button id="rage-enter-btn" ${this.currentlyRaging || this.ragesUsed >= this.ragesPerDay ? 'disabled' : ''}>
-                        Enter Rage
-                    </button>
-                    <button id="rage-end-btn" ${!this.currentlyRaging ? 'disabled' : ''}>
-                        End Rage
-                    </button>
-                    <button id="rage-reset-btn">
-                        Long Rest
-                    </button>
-                </div>
-                ${this.currentlyRaging ? this.renderRageBenefits() : ''}
-            </div>
-        `;
-    }
-
-    renderRageBenefits() {
-        return `
-            <div class="calculation-display" style="margin-top: 10px;">
-                <strong style="color: #ff6b6b;">Rage Benefits:</strong>
-                <div class="calculation-formula">
-                    • Advantage on Strength checks and saves<br>
-                    • +${this.rageDamage} damage on melee attacks (STR-based)<br>
-                    • Resistance to physical damage (B/P/S)<br>
-                    • Cannot cast spells or concentrate
-                </div>
-            </div>
-        `;
-    }
-
-    renderUnarmoredDefenseDisplay() {
-        const ac = this.calculateUnarmoredDefense();
-        const dexMod = calculateModifier(this.stats.dexterity);
-        const conMod = calculateModifier(this.stats.constitution);
-        
-        return `
-            <div class="calculation-display">
-                <div class="ability-card-name">🛡️ Unarmored Defense</div>
-                <div class="calculation-formula">
-                    AC = 10 + DEX (${formatModifier(dexMod)}) + CON (${formatModifier(conMod)})
-                </div>
-                <div class="calculation-result">
-                    AC ${ac}
-                </div>
-            </div>
-        `;
-    }
-
-    renderFeatureTree() {
-        const features = [
-            { level: 1, name: 'Rage', desc: `${this.ragesPerDay} uses per day, +${this.rageDamage} damage` },
-            { level: 1, name: 'Unarmored Defense', desc: '10 + DEX + CON when not wearing armor' },
-            { level: 2, name: 'Reckless Attack', desc: 'Advantage on melee attacks, enemies have advantage on you' },
-            { level: 2, name: 'Danger Sense', desc: 'Advantage on DEX saves vs. effects you can see' },
-            { level: 3, name: 'Primal Path', desc: 'Choose' || 'Choose your path' },
-            { level: 5, name: 'Extra Attack', desc: 'Attack twice when you take the Attack action' },
-            { level: 5, name: 'Fast Movement', desc: '+10 ft speed when not wearing heavy armor' },
-            { level: 7, name: 'Feral Instinct', desc: 'Advantage on initiative, can act in surprise round' },
-            { level: 9, name: 'Brutal Critical (1 die)', desc: 'Roll 1 extra weapon damage die on crits' },
-            { level: 11, name: 'Relentless Rage', desc: 'Con save to stay at 1 HP when you drop to 0 while raging' },
-            { level: 13, name: 'Brutal Critical (2 dice)', desc: 'Roll 2 extra weapon damage dice on crits' },
-            { level: 15, name: 'Persistent Rage', desc: 'Rage only ends if you fall unconscious or choose to end it' },
-            { level: 17, name: 'Brutal Critical (3 dice)', desc: 'Roll 3 extra weapon damage dice on crits' },
-            { level: 18, name: 'Indomitable Might', desc: 'STR checks less than STR score use STR score instead' },
-            { level: 20, name: 'Primal Champion', desc: '+4 STR and CON (max 24), unlimited rages' }
-        ];
-
-        let html = '<div class="feature-tree">';
-        
-        features.forEach(feature => {
-            const unlocked = this.isFeatureUnlocked(feature.level);
-            html += `
-                <div class="feature-node ${unlocked ? 'unlocked' : 'locked'}">
-                    <div class="feature-level">Lv ${feature.level}</div>
-                    <div style="flex: 1;">
-                        <div class="feature-name">${feature.name}</div>
-                        <div class="feature-desc">${feature.desc}</div>
-                    </div>
-                </div>
-            `;
-        });
-
-        html += '</div>';
-        return html;
-    }
-
-    attachEventListeners() {
-        const enterBtn = document.getElementById('rage-enter-btn');
-        const endBtn = document.getElementById('rage-end-btn');
-        const resetBtn = document.getElementById('rage-reset-btn');
-
-        if (enterBtn) {
-            enterBtn.addEventListener('click', () => this.enterRage());
+        if (this.level >= 17) {
+            this.ragesPerDay = 6;
+            this.brutalCriticalDice = 3;
         }
-        if (endBtn) {
-            endBtn.addEventListener('click', () => this.endRage());
+        if (this.level >= 20) this.ragesPerDay = 999; // Unlimited
+        
+        // Class features by level
+        if (this.level >= 2) {
+            this.recklessAttackAvailable = true;
+            this.dangerSenseActive = true;
         }
-        if (resetBtn) {
-            resetBtn.addEventListener('click', () => this.longRest());
+        if (this.level >= 5) this.fastMovement = 10;
+        if (this.level >= 7) this.feralInstinct = true;
+        if (this.level >= 11) this.relentlessRage = true;
+        if (this.level >= 15) this.persistentRage = true;
+        if (this.level >= 18) this.indomitableMight = true;
+    }
+    
+    /**
+     * Update state from combat data
+     */
+    updateFromCombatState(participantData) {
+        if (participantData.rage) {
+            this.currentlyRaging = participantData.rage.active || false;
+            const remaining = participantData.rage.uses_remaining || 0;
+            this.ragesUsed = this.ragesPerDay - remaining;
         }
     }
-
+    
+    /**
+     * Get available actions for the action menu
+     */
+    getAvailableActions() {
+        const actions = [];
+        
+        // Rage
+        if (!this.currentlyRaging && this.ragesUsed < this.ragesPerDay) {
+            actions.push({
+                name: 'Rage',
+                description: `Enter a rage: +${this.rageDamage} damage, advantage on STR checks, resistance to physical damage`,
+                cost: `${this.ragesUsed}/${this.ragesPerDay} uses`,
+                available: true,
+                type: 'skill',
+                target_type: 'self',
+                data: { skill_name: 'Rage' },
+                auto_target_single: true
+            });
+        }
+        
+        // Reckless Attack (Level 2+)
+        if (this.level >= 2) {
+            actions.push({
+                name: 'Reckless Attack',
+                description: 'Gain advantage on attack rolls this turn, enemies have advantage against you',
+                cost: 'Free (once per turn)',
+                available: true,
+                type: 'skill',
+                target_type: 'enemy',
+                data: { skill_name: 'Reckless Attack' }
+            });
+        }
+        
+        return actions;
+    }
+    
+    /**
+     * Attempt to enter rage
+     */
     enterRage() {
-        if (this.ragesUsed >= this.ragesPerDay || this.currentlyRaging) return;
+        if (this.ragesUsed >= this.ragesPerDay) {
+            console.log('[BarbarianFeatures] No rage uses remaining');
+            return false;
+        }
+        if (this.currentlyRaging) {
+            console.log('[BarbarianFeatures] Already raging');
+            return false;
+        }
         
         this.currentlyRaging = true;
         this.ragesUsed++;
-        this.render();
-        // Optimistically update UI then notify backend
-        this.showNotification('🔥 RAGE ACTIVATED! +' + this.rageDamage + ' damage, advantage on STR checks!');
-
-        // Send to backend if available
-        if (this.characterName) {
-            fetch(`${API_BASE}/api/barbarian/${encodeURIComponent(this.characterName)}/enter_rage`, {
-                method: 'POST', headers: {'Content-Type': 'application/json'}
-            }).catch(() => {});
-        }
+        console.log(`[BarbarianFeatures] Entered rage (${this.ragesUsed}/${this.ragesPerDay} used)`);
+        return true;
     }
-
+    
+    /**
+     * End rage
+     */
     endRage() {
-        if (!this.currentlyRaging) return;
-        
         this.currentlyRaging = false;
-        this.render();
-        this.showNotification('Rage ended.');
-
-        if (this.characterName) {
-            fetch(`${API_BASE}/api/barbarian/${encodeURIComponent(this.characterName)}/end_rage`, {
-                method: 'POST', headers: {'Content-Type': 'application/json'}
-            }).catch(() => {});
-        }
+        console.log('[BarbarianFeatures] Rage ended');
     }
-
-    longRest() {
-        this.ragesUsed = 0;
-        this.currentlyRaging = false;
-        this.render();
-        this.showNotification('✨ Long rest completed. Rages restored!');
-
-        if (this.characterName) {
-            fetch(`${API_BASE}/api/barbarian/${encodeURIComponent(this.characterName)}/long_rest`, {
-                method: 'POST', headers: {'Content-Type': 'application/json'}
-            }).catch(() => {});
-        }
+    
+    /**
+     * Get ability modifier
+     */
+    getModifier(ability) {
+        const score = this.stats[ability] || 10;
+        return Math.floor((score - 10) / 2);
     }
-
-    showNotification(message) {
-        // Simple notification - could be enhanced with a toast system
-        const notification = document.createElement('div');
-        notification.className = 'feature-unlock-notice';
-        notification.textContent = message;
-        notification.style.position = 'fixed';
-        notification.style.top = '20px';
-        notification.style.right = '20px';
-        notification.style.zIndex = '1000';
-        notification.style.animation = 'slideIn 0.3s ease-out';
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.style.animation = 'slideOut 0.3s ease-out';
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
+    
+    /**
+     * Get proficiency bonus based on level
+     */
+    getProficiencyBonus() {
+        if (this.level < 5) return 2;
+        if (this.level < 9) return 3;
+        if (this.level < 13) return 4;
+        if (this.level < 17) return 5;
+        return 6;
     }
-
-    updateStats(stats) {
-        this.stats = stats;
-        this.render();
-        if (this.characterName) {
-            fetch(`${API_BASE}/api/barbarian/${encodeURIComponent(this.characterName)}/update_stats`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({stats: stats})
-            }).catch(() => {});
-        }
-    }
-
-    setLevel(level) {
-        this.level = parseInt(level) || 1;
-        this.updateRageProgression();
-        this.render();
-        if (this.characterName) {
-            fetch(`${API_BASE}/api/barbarian/${encodeURIComponent(this.characterName)}/set_level`, {
-                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({level: this.level})
-            }).catch(() => {});
-        }
-    }
-
-    setCharacterName(name) {
-        this.characterName = name;
-    }
-
-    setCharacterName(name) {
-        this.characterName = name;
-
-        // Ensure backend has this character - create minimal record if missing
-        (async () => {
-            try {
-                const res = await fetch(`${API_BASE}/api/barbarian/${encodeURIComponent(this.characterName)}`);
-                if (res.status === 404) {
-                    // Create minimal character on backend so subsequent calls succeed
-                    await fetch(`${API_BASE}/api/barbarian/${encodeURIComponent(this.characterName)}/create`, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            level: this.level || 1,
-                            stats: this.stats || {strength:15,dexterity:13,constitution:14,intelligence:10,wisdom:12,charisma:8},
-                            race: 'Human',
-                            background: ''
-                        })
-                    });
-                }
-            } catch (e) {
-                // Ignore network errors; keep UI functional offline
-                console.warn('Could not verify/create backend character:', e);
+    
+    /**
+     * Get display info for UI
+     */
+    getDisplayInfo() {
+        return {
+            className: this.className,
+            level: this.level,
+            features: {
+                rage: {
+                    active: this.currentlyRaging,
+                    uses: `${this.ragesUsed}/${this.ragesPerDay}`,
+                    damage: `+${this.rageDamage}`,
+                    remaining: this.ragesPerDay - this.ragesUsed
+                },
+                recklessAttack: this.recklessAttackAvailable,
+                dangerSense: this.dangerSenseActive,
+                fastMovement: this.fastMovement > 0 ? `+${this.fastMovement}ft` : null,
+                brutalCritical: this.brutalCriticalDice > 0 ? `+${this.brutalCriticalDice} dice` : null,
+                feralInstinct: this.feralInstinct,
+                relentlessRage: this.relentlessRage,
+                persistentRage: this.persistentRage,
+                indomitableMight: this.indomitableMight
             }
-        })();
+        };
+    }
+    
+    /**
+     * Get feature descriptions for tooltip/info
+     */
+    getFeatureDescriptions() {
+        const descriptions = [];
+        
+        if (this.currentlyRaging) {
+            descriptions.push({
+                name: 'Rage (Active)',
+                description: `+${this.rageDamage} melee damage, advantage on STR checks/saves, resistance to physical damage`
+            });
+        }
+        
+        if (this.recklessAttackAvailable) {
+            descriptions.push({
+                name: 'Reckless Attack',
+                description: 'Gain advantage on melee attacks, but attacks against you have advantage'
+            });
+        }
+        
+        if (this.dangerSenseActive) {
+            descriptions.push({
+                name: 'Danger Sense',
+                description: 'Advantage on DEX saves against effects you can see'
+            });
+        }
+        
+        if (this.fastMovement > 0) {
+            descriptions.push({
+                name: 'Fast Movement',
+                description: `+${this.fastMovement}ft movement speed when not wearing heavy armor`
+            });
+        }
+        
+        if (this.brutalCriticalDice > 0) {
+            descriptions.push({
+                name: 'Brutal Critical',
+                description: `Roll ${this.brutalCriticalDice} additional weapon damage ${this.brutalCriticalDice === 1 ? 'die' : 'dice'} on critical hits`
+            });
+        }
+        
+        return descriptions;
     }
 }
 
-// Export for global use
+// Export to global scope - THIS IS CRITICAL!
 window.BarbarianFeatureManager = BarbarianFeatureManager;
-
-// Auto-initialize if on character creation page
-document.addEventListener('DOMContentLoaded', () => {
-    const classSelect = document.getElementById('char-class');
-    if (classSelect && classSelect.value === 'Barbarian') {
-        window.barbarianManager = new BarbarianFeatureManager();
-    }
-});

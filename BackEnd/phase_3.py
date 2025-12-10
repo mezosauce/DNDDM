@@ -680,7 +680,25 @@ def register_story_package_routes(app):
                 
             else:
                 # Normal advancement
-                tracker.advance_step()
+                package_complete = tracker.advance_step()  # Returns True when package done
+                
+                # Handle package completion
+                if package_complete:
+                    if tracker.current_package < 5:
+                        # Start next package automatically
+                        tracker.start_next_package()
+                        
+                        # Add story event
+                        story_state.add_story_event(
+                            event_type="package_complete",
+                            narrative_text=f"Package {tracker.current_package - 1} complete! Starting Package {tracker.current_package}",
+                            metadata={"completed_package": tracker.current_package - 1}
+                        )
+                        
+                        flash(f"🎉 Package {tracker.get_package_display_name(tracker.current_package - 1)} complete! Starting {tracker.get_package_display_name()}", "success")
+                    else:
+                        # Campaign fully complete!
+                        flash("🎊 Campaign Complete! All 5 packages finished!", "success")
                 
                 # Clear cached content
                 session.pop(f"step_{current_step}_content", None)
@@ -741,7 +759,7 @@ def register_story_package_routes(app):
             ai_response = call_claude_api(prompt, max_tokens=800)
             
             # Parse response for state transition hints
-            if current_step == 6:
+            if current_step in [6, 12]:
                 # Extract monster info for upcoming combat
                 monster_info = extract_monster_info_from_response(ai_response, context_data.get('monster_index'))
 

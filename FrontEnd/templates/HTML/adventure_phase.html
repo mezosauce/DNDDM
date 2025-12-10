@@ -3,31 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quest Builder - {{ context.campaign.name }}</title>
+    <title>Phase 2: {{ context.campaign.name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/adventure_phase.css') }}">
 </head>
 <body>
     <div class="container">
         <div class="phase-header">
-            <h1>📜 {{ context.campaign.name }}</h1>
-            <p>📍 Phase 2: Guided Quest Builder</p>
+            <h1>{{ context.campaign.name }}</h1>
+            <p>Guided Quest Builder</p>
             <span class="phase-badge">Step-by-Step Setup</span>
         </div>
         
         <div class="content">
-            <!-- Main Quest Builder -->
-            <div>
-                <div class="panel">
-                    <div id="step-display"></div>
-                    <div id="options-container"></div>
-                    <div id="button-container"></div>
-                </div>
-            </div>
-            
-            <!-- Sidebar -->
-            <div>
-                <div class="panel">
+
+            <div class="panel">
                     <h2>👥 Party</h2>
                     <div class="party-summary">
                         {% for char in context.characters %}
@@ -53,6 +43,18 @@
                         <li data-step="roles">Party Roles</li>
                     </ul>
                 </div>
+
+            <!-- Main Quest Builder -->
+            <div>
+                <div class="panel">
+                    <div id="step-display"></div>
+                    <div id="options-container"></div>
+                    <div id="button-container"></div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div>
                 
                 <div class="panel">
                     <h2>📋 Your Selections</h2>

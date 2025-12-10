@@ -112,16 +112,9 @@
             <div id="combat-result-details">
                 <!-- Populated on combat end -->
             </div>
-            <button id="btn-continue" type = "button" class="btn-primary">Continue</button>
+            <button id="btn-continue" type= "button" class="btn-primary">Continue</button>
         </div>
     </div>
-
-    <!-- Scripts -->
-    <script src="{{ url_for('static', filename='js/combat/CombatAnimations.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/combat/CombatLog.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/combat/BattlefieldView.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/combat/ActionMenu.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/combat/CombatViewController.js') }}"></script>
     
     <!-- Class Feature Managers -->
     <script src="{{ url_for('static', filename='js/class_features/base.js') }}"></script>
@@ -129,6 +122,16 @@
     <script src="{{ url_for('static', filename='js/class_features/bard.js') }}"></script>
     <script src="{{ url_for('static', filename='js/class_features/cleric.js') }}"></script>
     <script src="{{ url_for('static', filename='js/class_features/druid.js') }}"></script>
+    
+    
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/combat/CombatAnimations.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/combat/CombatLog.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/combat/BattlefieldView.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/combat/ActionMenu.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/combat/CombatViewController.js') }}"></script>
+    
+    
 
     <script>
         // Initialize combat when page loads
