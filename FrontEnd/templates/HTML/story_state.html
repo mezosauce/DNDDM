@@ -12,7 +12,7 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>📖 {{ campaign_name }}</h1>
+            <h1>{{ campaign_name }}</h1>
             <p>Story Package {{ package_number }} - Step {{ current_step }} of 15</p>
             <div class="progress-bar">
                 <div class="progress-fill" style="width: {{ (current_step / 15 * 100)|int }}%">  
@@ -33,7 +33,7 @@
                     </div>
 
                     <!-- Narrative Content -->
-                    <h2>🎭 The Story Unfolds...</h2>
+                    <h2>The Story Unfolds...</h2>
                     <div class="narrative-box" id="narrative-content">
                         {% if narrative_content %}
                             {{ narrative_content }}
@@ -48,12 +48,12 @@
                     <div id="action-buttons">
                         {% if not narrative_content %}
                             <button class="generate-btn" onclick="generateNarrative()">
-                                ✨ Generate Story Content
+                                Generate Story Content
                             </button>
                         {% else %}
                             {% if is_conditional_evaluation %}
                                 <button class="continue-btn" onclick="advanceStory()">
-                                    🎲 Evaluate Dice Result & Continue
+                                     Evaluate Dice Result & Continue
                                 </button>
                             {% else %}
                                 <button class="continue-btn" onclick="advanceStory()">
@@ -68,7 +68,7 @@
             <!-- Sidebar -->
             <div>
                 <div class="panel">
-                    <h2>📊 Package Progress</h2>
+                    <h2>Package Progress</h2>
                     <div style="margin-top: 20px;">
                         <div style="display: flex; justify-content: space-between; margin: 10px 0;">
                             <span>Current Package:</span>
@@ -86,7 +86,7 @@
                 </div>
 
                 <div class="panel" style="margin-top: 20px;">
-                    <h2>ℹ️ Step Type</h2>
+                    <h2>Step Type</h2>
                     <p style="margin-top: 15px; color: #b0b0b0;">
                         {{ step_definition.state_type|upper }}
                     </p>
@@ -95,7 +95,7 @@
                             ✓ AI-generated content
                         {% endif %}
                         {% if step_definition.is_transition %}
-                            ⚡ Transition to {{ step_definition.next_state_type }}
+                             Transition to {{ step_definition.next_state_type }}
                         {% endif %}
                     </p>
                 </div>

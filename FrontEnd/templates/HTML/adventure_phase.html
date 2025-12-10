@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phase 2: {{ context.campaign.name }}</title>
+    <title>{{ context.campaign.name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/adventure_phase.css') }}">
 </head>
@@ -12,13 +12,12 @@
         <div class="phase-header">
             <h1>{{ context.campaign.name }}</h1>
             <p>Guided Quest Builder</p>
-            <span class="phase-badge">Step-by-Step Setup</span>
         </div>
         
         <div class="content">
-
-            <div class="panel">
-                    <h2>👥 Party</h2>
+            <div>
+                <div class="panel">
+                    <h2>Party</h2>
                     <div class="party-summary">
                         {% for char in context.characters %}
                         <div class="character-mini">
@@ -30,7 +29,7 @@
                 </div>
                 
                 <div class="panel">
-                    <h2>✅ Progress</h2>
+                    <h2>Progress</h2>
                     <ul class="checklist" id="progress-checklist">
                         <li data-step="quest_hook">Quest Hook</li>
                         <li data-step="objective">Main Objective</li>
@@ -43,6 +42,8 @@
                         <li data-step="roles">Party Roles</li>
                     </ul>
                 </div>
+            </div>
+            
 
             <!-- Main Quest Builder -->
             <div>
@@ -56,6 +57,7 @@
             <!-- Sidebar -->
             <div>
                 
+
                 <div class="panel">
                     <h2>📋 Your Selections</h2>
                     <div class="selections-summary" id="selections-display">

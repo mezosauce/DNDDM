@@ -9,14 +9,15 @@
 <body>
     <div class="container">
         <div class="panel">
-            <span class="badge">📍 Story Package {{ tracker.current_package }} - Decision Point</span>
+            <span class="badge">Story Package {{ tracker.current_package }} - Decision Point</span>
             
-            <h1>⚖️ A Choice Must Be Made</h1>
+            <h1> A Choice Must Be Made</h1>
 
             <!-- Context/Setup -->
-            {% if question_context %}
-            <div class="context-box">
-                {{ question_context }}
+            {% if ai_narrative %}
+            <div class="narrative-box">
+                <div class="dm-label">🎲 Dungeon Master</div>
+                <p>{{ ai_narrative }}</p>
             </div>
             {% endif %}
 

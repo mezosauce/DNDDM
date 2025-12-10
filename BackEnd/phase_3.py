@@ -809,6 +809,36 @@ def register_story_package_routes(app):
         try:
             campaign, tracker, story_state, flow = load_story_package_data(campaign_name)
             
+            current_step = tracker.current_step
+            
+            # Check if we have AI-generated narrative for this step
+            cache_key = f"step_{current_step}_content"
+            ai_narrative = session.get(cache_key, None)
+            
+            # If no cached narrative, generate it now
+            if not ai_narrative:
+                print(f"[Question State] No cached narrative found, generating for step {current_step}")
+                
+                # Build context for AI
+                context_data = build_story_context(campaign_name)
+                context_data['current_step'] = current_step
+                context_data['step_definition'] = flow.get_step_definition(current_step)
+                context_data['story_state'] = story_state.to_dict()
+                context_data['tracker'] = tracker.to_dict()
+                
+                # Generate prompt and get AI response
+                prompt = flow.generate_ai_prompt_for_step(current_step, context_data)
+                ai_narrative = call_claude_api(prompt, max_tokens=800)
+                
+                # Extract question from response
+                question = extract_question_from_response(ai_narrative)
+                if question:
+                    story_state.pending_question = question
+                    save_story_package_data(campaign_name, tracker, story_state)
+                
+                # Cache the narrative
+                session[cache_key] = ai_narrative
+            
             # Get question data from story_state
             question_data = story_state.pending_question or {}
             
@@ -816,10 +846,12 @@ def register_story_package_routes(app):
                 'campaign_name': campaign_name,
                 'tracker': tracker.to_dict(),
                 'story_state': story_state.to_dict(),
+                'ai_narrative': ai_narrative,  # Full AI narrative
                 'question_text': question_data.get('question_text', 'Do you accept this quest?'),
                 'question_context': question_data.get('full_context', ''),
                 'consequences_accept': 'You will embark on this quest.',
-                'consequences_decline': 'You will seek another path.'
+                'consequences_decline': 'You will seek another path.',
+                'current_step': current_step
             }
             
             return render_template('HTML/question_state.html', **context_data)
