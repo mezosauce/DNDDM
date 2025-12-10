@@ -12,7 +12,7 @@
             margin: 0 auto;
         }
         h1 {
-            color: #ff6b6b;
+            color: #C19A6B;
             margin-bottom: 10px;
         }
         .phase-header {
@@ -25,7 +25,7 @@
         .phase-badge {
             display: inline-block;
             padding: 8px 15px;
-            background: #51cf66;
+            background: #00B4D8;
             border-radius: 6px;
             font-weight: bold;
             margin-top: 10px;
@@ -42,7 +42,7 @@
             padding: 20px;
         }
         h2 {
-            color: #ff6b6b;
+            color: #C19A6B;
             margin-bottom: 15px;
         }
         
@@ -52,14 +52,14 @@
         }
         .step-title {
             font-size: 1.3em;
-            color: #51cf66;
+            color: #00B4D8;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
         .step-number {
-            background: #51cf66;
+            background: #00B4D8;
             color: #1e1e2e;
             width: 30px;
             height: 30px;
@@ -85,17 +85,17 @@
             transition: all 0.3s;
         }
         .option-card:hover {
-            border-color: #51cf66;
+            border-color: #00B4D8;
             transform: translateX(5px);
             background: rgba(81, 207, 102, 0.1);
         }
         .option-card.selected {
-            border-color: #51cf66;
+            border-color: #00B4D8;
             background: rgba(81, 207, 102, 0.2);
         }
         .option-title {
             font-weight: bold;
-            color: #51cf66;
+            color: #00B4D8;
             margin-bottom: 8px;
             font-size: 1.1em;
         }
@@ -109,7 +109,7 @@
             width: 100%;
             padding: 12px;
             margin-top: 10px;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            background: linear-gradient(135deg, #C19A6B 0%, #7B1FA2 100%);
             border: none;
             border-radius: 6px;
             color: white;
@@ -130,7 +130,7 @@
             background: linear-gradient(135deg, #4dabf7 0%, #3b9ae1 100%);
         }
         .next-btn {
-            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            background: linear-gradient(135deg, #00B4D8 0%, #40c057 100%);
         }
         .advance-btn {
             background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
@@ -170,7 +170,7 @@
             transition: all 0.3s;
         }
         .checklist li.completed {
-            border-left-color: #51cf66;
+            border-left-color: #00B4D8;
             background: rgba(81, 207, 102, 0.1);
         }
         .checklist li.active {
@@ -185,7 +185,7 @@
         }
         .checklist li.completed::before {
             content: "✓ ";
-            color: #51cf66;
+            color: #00B4D8;
         }
         .checklist li.active::before {
             content: "→ ";
@@ -219,12 +219,12 @@
             margin: 10px 0;
             padding: 10px;
             background: rgba(81, 207, 102, 0.1);
-            border-left: 3px solid #51cf66;
+            border-left: 3px solid #00B4D8;
             border-radius: 4px;
         }
         .selection-label {
             font-weight: bold;
-            color: #51cf66;
+            color: #00B4D8;
             font-size: 0.9em;
             margin-bottom: 5px;
         }

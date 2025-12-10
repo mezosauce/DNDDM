@@ -82,7 +82,7 @@
         
         .result-title {
             font-weight: bold;
-            color: #51cf66;
+            color: #00B4D8;
             margin-bottom: 5px;
             font-size: 1.1em;
         }
@@ -186,7 +186,7 @@
             padding: 8px 12px;
             font-size: 0.85em;
             background: rgba(81, 207, 102, 0.2);
-            border: 1px solid #51cf66;
+            border: 1px solid #00B4D8;
             width: 100%;
             margin: 0;
         }

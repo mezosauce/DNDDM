@@ -1,17 +1,4 @@
-/* Phase 3 Dice State - Improved Styling */
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    color: #e0e0e0;
-    min-height: 100vh;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
 
 .container {
     max-width: 1600px;
@@ -49,7 +36,7 @@ body {
 .phase-indicator {
     display: inline-block;
     padding: 8px 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #D4AF37 0%, #7B1FA2 100%);
     border-radius: 25px;
     margin-top: 10px;
 }
@@ -270,7 +257,7 @@ body {
     font-size: 1.4em;
     font-weight: bold;
     color: #fff;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #D4AF37 0%, #7B1FA2 100%);
     border: none;
     border-radius: 50px;
     cursor: pointer;
@@ -448,13 +435,13 @@ body {
 }
 
 .narrative-result.success {
-    border-left-color: #51cf66;
+    border-left-color: #00B4D8;
     background: linear-gradient(135deg, rgba(81, 207, 102, 0.15) 0%, rgba(81, 207, 102, 0.05) 100%);
     animation: successGlow 1s ease-in-out;
 }
 
 .narrative-result.failure {
-    border-left-color: #ff6b6b;
+    border-left-color: #C19A6B;
     background: linear-gradient(135deg, rgba(255, 107, 107, 0.15) 0%, rgba(255, 107, 107, 0.05) 100%);
 }
 

@@ -28,7 +28,7 @@
 }
 
 .class-info-value {
-    color: #51cf66;
+    color: #00B4D8;
     font-weight: bold;
 }
 
@@ -58,7 +58,7 @@
 }
 
 .class-section-header::before {
-    content: '⚔️';
+    content: '';
     font-size: 1.5em;
 }
 
@@ -92,7 +92,7 @@
 
 .feature-unlock-notice {
     background: rgba(81, 207, 102, 0.1);
-    border-left: 4px solid #51cf66;
+    border-left: 4px solid #00B4D8;
     padding: 10px;
     margin: 10px 0;
     border-radius: 4px;

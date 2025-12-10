@@ -246,7 +246,7 @@ class PaladinFeatureManager extends ClassFeatureManager {
         
         return `
             <div class="calculation-display">
-                <div class="ability-card-name">📜 Spellcasting</div>
+                <div class="ability-card-name"> Spellcasting</div>
                 <div class="spell-slots-grid">
                     ${Object.entries(this.spellSlots).map(([level, slots]) => `
                         ${this.maxSpellSlots[level] > 0 ? `
@@ -309,7 +309,7 @@ class PaladinFeatureManager extends ClassFeatureManager {
 
         return `
             <div class="calculation-display">
-                <div class="ability-card-name">⚔️ ${this.fightingStyle}</div>
+                <div class="ability-card-name"> ${this.fightingStyle}</div>
                 <div class="calculation-formula">
                     ${styleDescriptions[this.fightingStyle] || 'Combat style specialty'}
                 </div>
@@ -516,7 +516,7 @@ class PaladinFeatureManager extends ClassFeatureManager {
         
         this.spellSlots[level]--;
         this.render();
-        this.showNotification(`📜 Used level ${level} spell slot.`);
+        this.showNotification(` Used level ${level} spell slot.`);
     }
 
     regainSpellSlot(level) {
@@ -524,7 +524,7 @@ class PaladinFeatureManager extends ClassFeatureManager {
         
         this.spellSlots[level]++;
         this.render();
-        this.showNotification(`📜 Regained level ${level} spell slot.`);
+        this.showNotification(` Regained level ${level} spell slot.`);
     }
 
     longRest() {

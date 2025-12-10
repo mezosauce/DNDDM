@@ -215,7 +215,7 @@
             idealRolled = true;
             const btn = document.getElementById('roll-ideal-btn');
             btn.disabled = true;
-            btn.textContent = '🎲 Already Rolled (click options to change)';
+            btn.textContent = ' Already Rolled (click options to change)';
             btn.classList.add('rolled');
             
     }
@@ -237,7 +237,7 @@
             bondRolled = true;
             const btn = document.getElementById('roll-bond-btn');
             btn.disabled = true;
-            btn.textContent = '🎲 Already Rolled (click options to change)';
+            btn.textContent = ' Already Rolled (click options to change)';
             btn.classList.add('rolled');
             
     }
@@ -260,7 +260,7 @@
             const btn = document.getElementById('roll-flaw-btn');
             
             btn.disabled = true;
-            btn.textContent = '🎲 Already Rolled (click options to change)';
+            btn.textContent = ' Already Rolled (click options to change)';
             btn.classList.add('rolled');
         
     }

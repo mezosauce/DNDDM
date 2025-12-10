@@ -160,7 +160,7 @@ class BattlefieldView {
         
         if (participant.type === 'character') {
             const classIcons = {
-                'Barbarian': '⚔️',
+                'Barbarian': '',
                 'Bard': '🎵',
                 'Cleric': '✨',
                 'Druid': '🌿',

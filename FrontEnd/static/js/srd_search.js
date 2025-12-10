@@ -172,7 +172,7 @@
                     <div class="error-message">
                         <h3>⚠️ Content Not Available</h3>
                         <p>${error.message}</p>
-                        <hr style="margin: 20px 0; border: 1px solid #ff6b6b;">
+                        <hr style="margin: 20px 0; border: 1px solid #C19A6B;">
                         <h4>Preview from Search:</h4>
                         <div style="margin-top: 15px; text-align: left; white-space: pre-wrap;">
                             ${escapeHtml(result.content)}

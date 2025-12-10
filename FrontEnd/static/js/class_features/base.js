@@ -39,7 +39,7 @@ class ClassFeatureManager {
         return node;
     }
 
-    createResourceTracker(resourceName, current, max, color = '#ff6b6b') {
+    createResourceTracker(resourceName, current, max, color = '#C19A6B') {
         const tracker = document.createElement('div');
         tracker.className = 'resource-tracker';
         tracker.innerHTML = `

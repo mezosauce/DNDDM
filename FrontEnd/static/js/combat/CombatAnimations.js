@@ -236,7 +236,7 @@ class CombatAnimations {
         // Create projectile or slash effect
         const projectile = document.createElement('div');
         projectile.className = 'attack-projectile';
-        projectile.textContent = '⚔️';
+        projectile.textContent = '';
         
         // Start position (attacker)
         const attackerRect = attacker.getBoundingClientRect();

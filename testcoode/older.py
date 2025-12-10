@@ -1008,7 +1008,7 @@ if __name__ == '__main__':
     create_templates()
     
     print("\n" + "="*60)
-    print("🎲 AI Dungeon Master - Campaign System")
+    print(" AI Dungeon Master - Campaign System")
     print("="*60)
     
     if dm and hasattr(dm, 'ollama_available') and dm.ollama_available:

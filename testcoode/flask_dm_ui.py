@@ -334,7 +334,7 @@ def create_templates():
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
         h1, h2 {
-            color: #ff6b6b;
+            color: #C19A6B;
             margin-bottom: 15px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
@@ -345,8 +345,8 @@ def create_templates():
             border-radius: 50%;
             margin-right: 8px;
         }
-        .status-online { background: #51cf66; }
-        .status-offline { background: #ff6b6b; }
+        .status-online { background: #00B4D8; }
+        .status-offline { background: #C19A6B; }
         .game-state {
             background: rgba(74, 74, 106, 0.3);
             padding: 15px;
@@ -381,11 +381,11 @@ def create_templates():
         }
         .message-player {
             background: rgba(81, 207, 102, 0.2);
-            border-left: 3px solid #51cf66;
+            border-left: 3px solid #00B4D8;
         }
         .message-dm {
             background: rgba(255, 107, 107, 0.2);
-            border-left: 3px solid #ff6b6b;
+            border-left: 3px solid #C19A6B;
         }
         .message-label {
             font-weight: bold;
@@ -403,7 +403,7 @@ def create_templates():
             font-size: 16px;
         }
         button {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            background: linear-gradient(135deg, #C19A6B 0%, #7B1FA2 100%);
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s;
@@ -436,11 +436,11 @@ def create_templates():
             font-weight: bold;
         }
         .natural-20 { background: rgba(255, 215, 0, 0.3); color: #ffd700; }
-        .natural-1 { background: rgba(255, 0, 0, 0.3); color: #ff6b6b; }
+        .natural-1 { background: rgba(255, 0, 0, 0.3); color: #C19A6B; }
         .loading {
             text-align: center;
             padding: 20px;
-            color: #ff6b6b;
+            color: #C19A6B;
         }
         .spinner {
             display: inline-block;
@@ -448,7 +448,7 @@ def create_templates():
             height: 20px;
             border: 3px solid rgba(255, 107, 107, 0.3);
             border-radius: 50%;
-            border-top-color: #ff6b6b;
+            border-top-color: #C19A6B;
             animation: spin 1s ease-in-out infinite;
         }
         @keyframes spin {
@@ -461,7 +461,7 @@ def create_templates():
         <!-- Left Panel: Controls -->
         <div>
             <div class="panel">
-                <h1>🎲 AI Dungeon Master</h1>
+                <h1> AI Dungeon Master</h1>
                 <div>
                     <span class="status-indicator" id="status-indicator"></span>
                     <span id="status-text">Checking...</span>
@@ -606,7 +606,7 @@ def create_templates():
             const div = document.createElement('div');
             div.className = `message message-${type}`;
             div.innerHTML = `
-                <div class="message-label">${type === 'player' ? '🎲 Player' : '🎭 DM'}</div>
+                <div class="message-label">${type === 'player' ? ' Player' : '🎭 DM'}</div>
                 <div>${text}</div>
             `;
             container.appendChild(div);
@@ -693,7 +693,7 @@ def create_templates():
             color: #e0e0e0;
             padding: 15px;
         }
-        h1 { color: #ff6b6b; margin-bottom: 20px; text-align: center; }
+        h1 { color: #C19A6B; margin-bottom: 20px; text-align: center; }
         .dice-roller {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -722,7 +722,7 @@ def create_templates():
     </style>
 </head>
 <body>
-    <h1>🎲 Dice Roller</h1>
+    <h1> Dice Roller</h1>
     <div class="dice-roller">
         <button onclick="roll('d4')">d4</button>
         <button onclick="roll('d6')">d6</button>
@@ -764,7 +764,7 @@ if __name__ == '__main__':
         create_templates()
     
     print("\n" + "="*60)
-    print("🎲 AI Dungeon Master Web Interface")
+    print(" AI Dungeon Master Web Interface")
     print("="*60)
     
     if dm and dm.ollama_available:

@@ -27,7 +27,7 @@
     /* UI Colors */
     --text-primary: #ecf0f1;
     --text-secondary: #bdc3c7;
-    --hp-color: #e74c3c;
+    --hp-color: #90BE6D;
     --mp-color: #3498db;
     
     /* Animations */
@@ -36,13 +36,6 @@
     --transition-slow: 0.5s ease;
 }
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-medium) 100%);
-    color: var(--text-primary);
-    overflow: hidden;
-    height: 100vh;
-}
 
 /* ============================================
    MAIN CONTAINER
@@ -56,6 +49,16 @@ body {
     margin: 0 auto;
     padding: 10px;
     gap: 10px;
+}
+
+.Combat-Left {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+.View-Container {
+    display: grid;
+    gap: 15px;
+    height: calc(100vh - 90px); 
 }
 
 /* ============================================
@@ -120,7 +123,7 @@ body {
 
 #combat-main {
     display: grid;
-    grid-template-columns: 1fr 400px 1fr;
+    grid-template-columns: 1fr 400px 1fr 300px;
     gap: 15px;
 }
 
@@ -574,19 +577,21 @@ body {
    ============================================ */
 
 #combat-log-container {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
     background: rgba(22, 33, 62, 0.95);
-    border-top: 2px solid var(--accent-blue);
-    transition: var(--transition-normal);
-    max-height: 300px;
-    z-index: 100;
+    border-left: 2px solid var(--accent-blue);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
-#combat-log-container.collapsed {
-    max-height: 40px;
+.log-header {
+    padding: 10px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg-light);
+    border-bottom: 2px solid var(--accent-blue);
 }
 
 .log-header {
@@ -604,7 +609,7 @@ body {
 
 #combat-log {
     padding: 15px 20px;
-    max-height: 250px;
+    flex: 1;
     overflow-y: auto;
     font-family: 'Courier New', monospace;
     font-size: 0.9em;
@@ -717,10 +722,11 @@ body {
    RESPONSIVE
    ============================================ */
 
+   
 @media (max-width: 1200px) {
     #combat-main {
         grid-template-columns: 1fr;
-        grid-template-rows: 300px auto 300px;
+        grid-template-rows: 300px auto 300px 200px;
     }
     
     #battle-animation-area {
@@ -734,7 +740,14 @@ body {
     #enemy-area {
         order: 3;
     }
+    
+    #combat-log-container {
+        order: 4;
+        border-left: none;
+        border-top: 2px solid var(--accent-blue);
+    }
 }
+
 
 @media (max-width: 768px) {
     #combat-container {
@@ -978,11 +991,11 @@ body {
 }
 
 .log-entry.damage {
-    border-left-color: #ff6b6b;
+    border-left-color: #C19A6B;
 }
 
 .log-entry.healing {
-    border-left-color: #51cf66;
+    border-left-color: #00B4D8;
 }
 
 .log-entry.buff {
@@ -1155,7 +1168,7 @@ body {
 
 /* Status effect animations */
 .effect-animation.rage {
-    color: #ff6b6b;
+    color: #C19A6B;
 }
 
 .effect-animation.inspiration {
@@ -1163,7 +1176,7 @@ body {
 }
 
 .effect-animation.heal {
-    color: #51cf66;
+    color: #00B4D8;
 }
 
 .effect-animation.buff {

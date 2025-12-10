@@ -450,7 +450,7 @@ def create_phase3_prompt(
         prompt += f"Current Location: {campaign_context['current_location']}\n"
     
     if campaign_context.get('active_combat'):
-        prompt += "⚔️ COMBAT IS ACTIVE\n"
+        prompt += " COMBAT IS ACTIVE\n"
     
     # Party info
     if campaign_context.get('characters'):

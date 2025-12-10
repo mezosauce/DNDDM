@@ -44,7 +44,7 @@
 }
 
 .ability-row.unlocked .ability-level-cell {
-    color: #51cf66;
+    color: #00B4D8;
     font-weight: bold;
 }
 
@@ -83,7 +83,7 @@
 }
 
 .ability-row.unlocked .ability-tag {
-    background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+    background: linear-gradient(135deg, #00B4D8 0%, #40c057 100%);
 }
 
 .ability-row.locked .ability-tag {

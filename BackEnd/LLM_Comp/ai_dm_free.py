@@ -336,7 +336,7 @@ STEP 4: Run Your AI DM!
 -----------------------
     python ai_dm_free.py
 
-That's it! 100% FREE, no API keys, no subscriptions! 🎲
+That's it! 100% FREE, no API keys, no subscriptions! 
 """)
 
 
@@ -394,7 +394,7 @@ def interactive_session(srd_path: str, model: str = "llama3.2:3b"):
     # Game loop
     while True:
         try:
-            player_input = input("\n🎲 You: ").strip()
+            player_input = input("\n You: ").strip()
             
             if not player_input:
                 continue

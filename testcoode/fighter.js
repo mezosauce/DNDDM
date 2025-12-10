@@ -95,7 +95,7 @@ class FighterFeatureManager extends ClassFeatureManager {
         container.innerHTML = `
             <div class="class-specific-section active">
                 <div class="class-section-header">
-                    ⚔️ Fighter Features
+                     Fighter Features
                 </div>
                 
                 ${this.renderResourceTrackers()}

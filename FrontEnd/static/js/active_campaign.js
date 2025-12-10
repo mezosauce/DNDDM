@@ -54,7 +54,7 @@ async function searchSRD() {
         const data = await response.json();
         
         if (data.error) {
-            resultsDiv.innerHTML = `<div style="color: #ff6b6b; padding: 10px;">${data.error}</div>`;
+            resultsDiv.innerHTML = `<div style="color: #C19A6B; padding: 10px;">${data.error}</div>`;
             return;
         }
         
@@ -62,7 +62,7 @@ async function searchSRD() {
         displaySRDResults(data.results);
         
     } catch (error) {
-        resultsDiv.innerHTML = `<div style="color: #ff6b6b; padding: 10px;">Error: ${error.message}</div>`;
+        resultsDiv.innerHTML = `<div style="color: #C19A6B; padding: 10px;">Error: ${error.message}</div>`;
     }
 }
 
@@ -173,7 +173,7 @@ function showSRDDetail(index) {
                 // Show banner and auto-start
                 const banner = document.createElement('div');
                 banner.className = 'session-start-banner';
-                banner.innerHTML = '⚔️ Session 1 Beginning! The adventure starts now... ⚔️';
+                banner.innerHTML = ' Session 1 Beginning! The adventure starts now... ';
                 document.querySelector('.phase-header').after(banner);
                 
                 // Auto-start after short delay
@@ -352,7 +352,7 @@ function showSRDDetail(index) {
             div.className = `message message-${type}`;
             
             let label = '';
-            if (type === 'player') label = '🎲 Player';
+            if (type === 'player') label = ' Player';
             else if (type === 'dm') label = '🎭 DM';
             else if (type === 'system') label = '📢 System';
             
@@ -516,7 +516,7 @@ async function searchSRD() {
         const data = await response.json();
         
         if (data.error) {
-            resultsDiv.innerHTML = `<div style="color: #ff6b6b; padding: 10px;">${data.error}</div>`;
+            resultsDiv.innerHTML = `<div style="color: #C19A6B; padding: 10px;">${data.error}</div>`;
             return;
         }
         
@@ -524,7 +524,7 @@ async function searchSRD() {
         displaySRDResults(data.results);
         
     } catch (error) {
-        resultsDiv.innerHTML = `<div style="color: #ff6b6b; padding: 10px;">Error: ${error.message}</div>`;
+        resultsDiv.innerHTML = `<div style="color: #C19A6B; padding: 10px;">Error: ${error.message}</div>`;
     }
 }
 
@@ -629,7 +629,7 @@ async function showSRDDetailModal(result) {
             <div class="error-message">
                 <h3>⚠️ Could not load full content</h3>
                 <p>${error.message}</p>
-                <hr style="margin: 20px 0; border: 1px solid #ff6b6b;">
+                <hr style="margin: 20px 0; border: 1px solid #C19A6B;">
                 <h4>Preview from Search:</h4>
                 <div style="margin-top: 15px; white-space: pre-wrap; line-height: 1.6;">
                     ${escapeHtml(result.content)}

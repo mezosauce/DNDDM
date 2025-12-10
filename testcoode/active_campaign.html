@@ -13,12 +13,12 @@
 <body>
     <div class="container container-full">
         <div class="phase-header">
-            <h1>⚔️ {{ context.campaign.name }}</h1>
+            <h1> {{ context.campaign.name }}</h1>
             <div class="session-info">
                 <div>
                     <span class="phase-badge phase-active">Session {{ context.campaign.session_number }}</span>
                 </div>
-                <button onclick="endSession()" style="width: auto; padding: 8px 20px; background: linear-gradient(135deg, #e600ff 0%, #ee5a52 100%);">
+                <button onclick="endSession()" style="width: auto; padding: 8px 20px; background: linear-gradient(135deg, #e600ff 0%, #7B1FA2 100%);">
                     End Session
                 </button>
             </div>
@@ -79,7 +79,7 @@
                  <div class="panel">
                     <h2>⚡ Quick Actions</h2>
                     <div class="quick-actions">
-                        <button class="quick-btn" onclick="quickAction('I attack')">⚔️ Attack</button>
+                        <button class="quick-btn" onclick="quickAction('I attack')"> Attack</button>
                         <button class="quick-btn" onclick="quickAction('I cast a spell')">✨ Cast Spell</button>
                         <button class="quick-btn" onclick="quickAction('I search the room')">🔍 Search</button>
                         <button class="quick-btn" onclick="quickAction('I investigate')">📖 Investigate</button>
@@ -134,7 +134,7 @@
                 </div>
                 
                 <div class="panel">
-                    <h2>🎲 Dice Roller</h2>
+                    <h2> Dice Roller</h2>
                     <div class="dice-grid">
                         <button class="dice-btn" onclick="roll('d4')">d4</button>
                         <button class="dice-btn" onclick="roll('d6')">d6</button>
@@ -187,7 +187,7 @@
             <div class="quick-searches-horizontal">
                 <button class="quick-search-btn-small" onclick="quickSearchSRD('fireball')">🔥 Fireball</button>
                 <button class="quick-search-btn-small" onclick="quickSearchSRD('grapple')">🤼 Grapple</button>
-                <button class="quick-search-btn-small" onclick="quickSearchSRD('opportunity attack')">⚔️ Opportunity</button>
+                <button class="quick-search-btn-small" onclick="quickSearchSRD('opportunity attack')"> Opportunity</button>
                 <button class="quick-search-btn-small" onclick="quickSearchSRD('conditions')">🎭 Conditions</button>
                 <button class="quick-search-btn-small" onclick="quickSearchSRD('cover')">🛡️ Cover</button>
                 <button class="quick-search-btn-small" onclick="quickSearchSRD('death saving throw')">💀 Death Saves</button>

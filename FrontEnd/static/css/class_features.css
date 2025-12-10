@@ -24,7 +24,7 @@
 
 .feature-node.unlocked {
     background: rgba(81, 207, 102, 0.2);
-    border: 2px solid #51cf66;
+    border: 2px solid #00B4D8;
 }
 
 .feature-node.locked {
@@ -40,7 +40,7 @@
     align-items: center;
     justify-content: center;
     background: rgba(255, 107, 107, 0.3);
-    border: 2px solid #ff6b6b;
+    border: 2px solid #C19A6B;
     border-radius: 50%;
     font-weight: bold;
     font-size: 0.9em;
@@ -48,8 +48,8 @@
 
 .feature-node.unlocked .feature-level {
     background: rgba(81, 207, 102, 0.3);
-    border-color: #51cf66;
-    color: #51cf66;
+    border-color: #00B4D8;
+    color: #00B4D8;
 }
 
 .feature-node.locked .feature-level {
@@ -65,7 +65,7 @@
 }
 
 .feature-node.unlocked .feature-name {
-    color: #51cf66;
+    color: #00B4D8;
 }
 
 .feature-node.locked .feature-name {
@@ -94,7 +94,7 @@
 
 .resource-name {
     font-weight: bold;
-    color: #ff6b6b;
+    color: #C19A6B;
     margin-bottom: 8px;
     font-size: 1.1em;
 }
@@ -110,7 +110,7 @@
 
 .resource-fill {
     height: 100%;
-    background: linear-gradient(90deg, #ff6b6b 0%, #ee5a52 100%);
+    background: linear-gradient(90deg, #C19A6B 0%, #7B1FA2 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -161,7 +161,7 @@
 }
 
 .ability-card.active {
-    border-color: #51cf66;
+    border-color: #00B4D8;
     background: rgba(81, 207, 102, 0.1);
 }
 
@@ -177,7 +177,7 @@
 
 .ability-card-value {
     font-size: 1.5em;
-    color: #51cf66;
+    color: #00B4D8;
     font-weight: bold;
 }
 
@@ -206,7 +206,7 @@
 .calculation-result {
     font-size: 1.5em;
     font-weight: bold;
-    color: #51cf66;
+    color: #00B4D8;
     margin-top: 10px;
 }
 
@@ -238,7 +238,7 @@
 }
 
 .toggle-switch.active {
-    background: #51cf66;
+    background: #00B4D8;
 }
 
 .toggle-switch::after {

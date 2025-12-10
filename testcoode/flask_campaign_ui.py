@@ -616,7 +616,7 @@ def create_templates():
             margin: 0 auto;
         }
         h1 {
-            color: #ff6b6b;
+            color: #C19A6B;
             margin-bottom: 30px;
             text-align: center;
             font-size: 2.5em;
@@ -637,12 +637,12 @@ def create_templates():
         }
         .campaign-card:hover {
             transform: translateY(-5px);
-            border-color: #ff6b6b;
+            border-color: #C19A6B;
             box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
         }
         .campaign-name {
             font-size: 1.5em;
-            color: #ff6b6b;
+            color: #C19A6B;
             margin-bottom: 10px;
         }
         .campaign-info {
@@ -657,15 +657,15 @@ def create_templates():
             font-size: 0.8em;
             margin-top: 10px;
         }
-        .phase-setup { background: #ff6b6b; }
-        .phase-adventure { background: #51cf66; }
+        .phase-setup { background: #C19A6B; }
+        .phase-adventure { background: #00B4D8; }
         .phase-active { background: #4dabf7; }
         .new-campaign-btn {
             display: block;
             width: 200px;
             margin: 0 auto 30px;
             padding: 15px;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            background: linear-gradient(135deg, #C19A6B 0%, #7B1FA2 100%);
             border: none;
             border-radius: 8px;
             color: white;
@@ -687,10 +687,10 @@ def create_templates():
 </head>
 <body>
     <div class="container">
-        <h1>🎲 Campaign Manager</h1>
+        <h1> Campaign Manager</h1>
         
         <button class="new-campaign-btn" onclick="location.href='/campaign/new'">
-            ⚔️ New Campaign
+             New Campaign
         </button>
         <button class="new-campaign-btn" onclick="location.href='/settings/prompts'" 
         style="background: linear-gradient(135deg, #4dabf7 0%, #3b9ae1 100%); margin-bottom: 10px;">
@@ -748,7 +748,7 @@ def create_templates():
             padding: 40px;
         }
         h1 {
-            color: #ff6b6b;
+            color: #C19A6B;
             margin-bottom: 30px;
             text-align: center;
         }
@@ -787,17 +787,17 @@ def create_templates():
             transition: all 0.3s;
         }
         .party-btn:hover {
-            border-color: #ff6b6b;
+            border-color: #C19A6B;
         }
         .party-btn.selected {
-            background: #ff6b6b;
-            border-color: #ff6b6b;
+            background: #C19A6B;
+            border-color: #C19A6B;
         }
         button {
             width: 100%;
             padding: 15px;
             margin-top: 30px;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            background: linear-gradient(135deg, #C19A6B 0%, #7B1FA2 100%);
             border: none;
             border-radius: 8px;
             color: white;
@@ -818,7 +818,7 @@ def create_templates():
 </head>
 <body>
     <div class="container">
-        <h1>⚔️ Create New Campaign</h1>
+        <h1> Create New Campaign</h1>
         
         <form id="campaign-form">
             <label>Campaign Name *</label>
@@ -915,7 +915,7 @@ def create_templates():
             margin: 0 auto;
         }
         h1 {
-            color: #ff6b6b;
+            color: #C19A6B;
             margin-bottom: 10px;
         }
         .phase-header {
@@ -937,7 +937,7 @@ def create_templates():
         }
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #ff6b6b 0%, #51cf66 100%);
+            background: linear-gradient(90deg, #C19A6B 0%, #00B4D8 100%);
             transition: width 0.3s;
             display: flex;
             align-items: center;
@@ -956,7 +956,7 @@ def create_templates():
             padding: 20px;
         }
         h2 {
-            color: #ff6b6b;
+            color: #C19A6B;
             margin-bottom: 15px;
         }
         .character-list {
@@ -967,12 +967,12 @@ def create_templates():
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 10px;
-            border-left: 3px solid #51cf66;
+            border-left: 3px solid #00B4D8;
         }
         .character-name {
             font-size: 1.2em;
             font-weight: bold;
-            color: #51cf66;
+            color: #00B4D8;
         }
         .character-info {
             color: #b0b0b0;
@@ -1004,7 +1004,7 @@ def create_templates():
         }
         .stat-label {
             font-weight: bold;
-            color: #ff6b6b;
+            color: #C19A6B;
             min-width: 45px;
             font-size: 14px;
         }
@@ -1021,13 +1021,13 @@ def create_templates():
         }
         #points-remaining.over-budget {
             background: rgba(255, 107, 107, 0.3);
-            color: #ff6b6b;
+            color: #C19A6B;
         }
         button {
             width: 100%;
             padding: 12px;
             margin-top: 10px;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            background: linear-gradient(135deg, #C19A6B 0%, #7B1FA2 100%);
             border: none;
             border-radius: 6px;
             color: white;
@@ -1045,14 +1045,14 @@ def create_templates():
             transform: none;
         }
         .advance-btn {
-            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            background: linear-gradient(135deg, #00B4D8 0%, #40c057 100%);
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="phase-header">
-            <h1>⚔️ {{ campaign.name }}</h1>
+            <h1> {{ campaign.name }}</h1>
             <p>📍 Phase 1: Setup & Character Creation</p>
             
             <div class="progress">
@@ -1111,7 +1111,7 @@ def create_templates():
                     </select>
                     
                     <h3 style="margin-top: 15px;">Ability Scores (60 points total)</h3>
-                    <div id="points-remaining" style="text-align: center; font-size: 1.2em; color: #51cf66; margin-bottom: 10px;">
+                    <div id="points-remaining" style="text-align: center; font-size: 1.2em; color: #00B4D8; margin-bottom: 10px;">
                         Points Remaining: <span id="points-left">0</span>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 10px 0;">
@@ -1213,10 +1213,10 @@ def create_templates():
             
             if (remaining < 0) {
                 pointsDiv.classList.add('over-budget');
-                pointsLeftSpan.style.color = '#ff6b6b';
+                pointsLeftSpan.style.color = '#C19A6B';
             } else {
                 pointsDiv.classList.remove('over-budget');
-                pointsLeftSpan.style.color = '#51cf66';
+                pointsLeftSpan.style.color = '#00B4D8';
             }
         }
         
@@ -1317,7 +1317,7 @@ def create_templates():
             margin: 0 auto;
         }
         h1 {
-            color: #ff6b6b;
+            color: #C19A6B;
             margin-bottom: 10px;
         }
         .phase-header {
@@ -1330,7 +1330,7 @@ def create_templates():
         .phase-badge {
             display: inline-block;
             padding: 8px 15px;
-            background: #51cf66;
+            background: #00B4D8;
             border-radius: 6px;
             font-weight: bold;
             margin-top: 10px;
@@ -1347,7 +1347,7 @@ def create_templates():
             padding: 20px;
         }
         h2 {
-            color: #ff6b6b;
+            color: #C19A6B;
             margin-bottom: 15px;
         }
         
@@ -1357,14 +1357,14 @@ def create_templates():
         }
         .step-title {
             font-size: 1.3em;
-            color: #51cf66;
+            color: #00B4D8;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
         .step-number {
-            background: #51cf66;
+            background: #00B4D8;
             color: #1e1e2e;
             width: 30px;
             height: 30px;
@@ -1390,17 +1390,17 @@ def create_templates():
             transition: all 0.3s;
         }
         .option-card:hover {
-            border-color: #51cf66;
+            border-color: #00B4D8;
             transform: translateX(5px);
             background: rgba(81, 207, 102, 0.1);
         }
         .option-card.selected {
-            border-color: #51cf66;
+            border-color: #00B4D8;
             background: rgba(81, 207, 102, 0.2);
         }
         .option-title {
             font-weight: bold;
-            color: #51cf66;
+            color: #00B4D8;
             margin-bottom: 8px;
             font-size: 1.1em;
         }
@@ -1414,7 +1414,7 @@ def create_templates():
             width: 100%;
             padding: 12px;
             margin-top: 10px;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            background: linear-gradient(135deg, #C19A6B 0%, #7B1FA2 100%);
             border: none;
             border-radius: 6px;
             color: white;
@@ -1435,7 +1435,7 @@ def create_templates():
             background: linear-gradient(135deg, #4dabf7 0%, #3b9ae1 100%);
         }
         .next-btn {
-            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            background: linear-gradient(135deg, #00B4D8 0%, #40c057 100%);
         }
         .advance-btn {
             background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
@@ -1475,7 +1475,7 @@ def create_templates():
             transition: all 0.3s;
         }
         .checklist li.completed {
-            border-left-color: #51cf66;
+            border-left-color: #00B4D8;
             background: rgba(81, 207, 102, 0.1);
         }
         .checklist li.active {
@@ -1490,7 +1490,7 @@ def create_templates():
         }
         .checklist li.completed::before {
             content: "✓ ";
-            color: #51cf66;
+            color: #00B4D8;
         }
         .checklist li.active::before {
             content: "→ ";
@@ -1524,12 +1524,12 @@ def create_templates():
             margin: 10px 0;
             padding: 10px;
             background: rgba(81, 207, 102, 0.1);
-            border-left: 3px solid #51cf66;
+            border-left: 3px solid #00B4D8;
             border-radius: 4px;
         }
         .selection-label {
             font-weight: bold;
-            color: #51cf66;
+            color: #00B4D8;
             font-size: 0.9em;
             margin-bottom: 5px;
         }
@@ -1542,7 +1542,7 @@ def create_templates():
 <body>
     <div class="container">
         <div class="phase-header">
-            <h1>📜 {{ context.campaign.name }}</h1>
+            <h1> {{ context.campaign.name }}</h1>
             <p>📍 Phase 2: Guided Quest Builder</p>
             <span class="phase-badge">Step-by-Step Setup</span>
         </div>
@@ -1672,7 +1672,7 @@ def create_templates():
                 const data = await response.json();
                 
                 if (data.error) {
-                    optionsContainer.innerHTML = `<p style="color: #ff6b6b;">Error: ${data.error}</p>`;
+                    optionsContainer.innerHTML = `<p style="color: #C19A6B;">Error: ${data.error}</p>`;
                     return;
                 }
                 
@@ -1680,7 +1680,7 @@ def create_templates():
                 displayOptions();
                 
             } catch (error) {
-                optionsContainer.innerHTML = `<p style="color: #ff6b6b;">Error: ${error.message}</p>`;
+                optionsContainer.innerHTML = `<p style="color: #C19A6B;">Error: ${error.message}</p>`;
             }
         }
         
@@ -1774,15 +1774,15 @@ def create_templates():
                         <div class="step-number">✓</div>
                         <span>Quest Setup Complete!</span>
                     </div>
-                    <p style="color: #51cf66; margin-bottom: 20px;">
+                    <p style="color: #00B4D8; margin-bottom: 20px;">
                         All preparation steps are complete. You're ready to begin your adventure!
                     </p>
                 </div>
             `;
             
             optionsContainer.innerHTML = `
-                <div style="background: rgba(81, 207, 102, 0.1); padding: 20px; border-radius: 8px; border: 2px solid #51cf66;">
-                    <h3 style="color: #51cf66; margin-bottom: 15px;">📋 Quest Summary</h3>
+                <div style="background: rgba(81, 207, 102, 0.1); padding: 20px; border-radius: 8px; border: 2px solid #00B4D8;">
+                    <h3 style="color: #00B4D8; margin-bottom: 15px;">📋 Quest Summary</h3>
                     ${Object.entries(selections).map(([key, value]) => {
                         const step = steps.find(s => s.key === key);
                         return `<p style="margin: 10px 0;"><strong>${step ? step.name : key}:</strong> ${value}</p>`;
@@ -1792,7 +1792,7 @@ def create_templates():
             
             buttonContainer.innerHTML = `
                 <button class="advance-btn" onclick="beginAdventure()">
-                    ⚔️ Begin Adventure (Start Session 1)
+                     Begin Adventure (Start Session 1)
                 </button>
             `;
             
@@ -1866,7 +1866,7 @@ def create_templates():
             margin: 0 auto;
         }
         h1 {
-            color: #ff6b6b;
+            color: #C19A6B;
             margin-bottom: 10px;
         }
         .phase-header {
@@ -1901,12 +1901,12 @@ def create_templates():
             padding: 20px;
         }
         h2 {
-            color: #ff6b6b;
+            color: #C19A6B;
             margin-bottom: 15px;
             font-size: 1.3em;
         }
         h3 {
-            color: #51cf66;
+            color: #00B4D8;
             margin: 15px 0 10px;
             font-size: 1.1em;
         }
@@ -1932,11 +1932,11 @@ def create_templates():
         }
         .message-dm {
             background: rgba(255, 107, 107, 0.2);
-            border-left: 3px solid #ff6b6b;
+            border-left: 3px solid #C19A6B;
         }
         .message-player {
             background: rgba(81, 207, 102, 0.2);
-            border-left: 3px solid #51cf66;
+            border-left: 3px solid #00B4D8;
         }
         .message-system {
             background: rgba(77, 171, 247, 0.2);
@@ -1955,12 +1955,12 @@ def create_templates():
             padding: 12px;
             border-radius: 8px;
             margin-bottom: 10px;
-            border-left: 3px solid #51cf66;
+            border-left: 3px solid #00B4D8;
         }
         .char-name {
             font-size: 1.1em;
             font-weight: bold;
-            color: #51cf66;
+            color: #00B4D8;
             margin-bottom: 5px;
         }
         .char-stats {
@@ -1975,7 +1975,7 @@ def create_templates():
         }
         .hp-fill {
             height: 8px;
-            background: #51cf66;
+            background: #00B4D8;
             border-radius: 4px;
             transition: width 0.3s;
         }
@@ -1998,7 +1998,7 @@ def create_templates():
             transition: all 0.3s;
         }
         .dice-btn:hover {
-            border-color: #ff6b6b;
+            border-color: #C19A6B;
             background: rgba(255, 107, 107, 0.2);
         }
         .dice-result {
@@ -2016,7 +2016,7 @@ def create_templates():
         }
         .natural-1 {
             background: rgba(255, 0, 0, 0.3);
-            color: #ff6b6b;
+            color: #C19A6B;
         }
         
         /* Initiative Tracker */
@@ -2033,7 +2033,7 @@ def create_templates():
             border-left: 3px solid #4a4a6a;
         }
         .initiative-item.active {
-            border-left-color: #ff6b6b;
+            border-left-color: #C19A6B;
             background: rgba(255, 107, 107, 0.2);
         }
         
@@ -2058,7 +2058,7 @@ def create_templates():
             width: 100%;
             padding: 10px;
             margin-top: 8px;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            background: linear-gradient(135deg, #C19A6B 0%, #7B1FA2 100%);
             border: none;
             border-radius: 6px;
             color: white;
@@ -2078,7 +2078,7 @@ def create_templates():
         .loading {
             text-align: center;
             padding: 15px;
-            color: #ff6b6b;
+            color: #C19A6B;
         }
         .spinner {
             display: inline-block;
@@ -2086,7 +2086,7 @@ def create_templates():
             height: 18px;
             border: 3px solid rgba(255, 107, 107, 0.3);
             border-radius: 50%;
-            border-top-color: #ff6b6b;
+            border-top-color: #C19A6B;
             animation: spin 1s ease-in-out infinite;
         }
         @keyframes spin {
@@ -2110,14 +2110,14 @@ def create_templates():
             transition: all 0.3s;
         }
         .quick-btn:hover {
-            border-color: #51cf66;
+            border-color: #00B4D8;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="phase-header">
-            <h1>⚔️ {{ context.campaign.name }}</h1>
+            <h1> {{ context.campaign.name }}</h1>
             <div class="session-info">
                 <div>
                     <span class="phase-badge">Session {{ context.campaign.session_number }}</span>
@@ -2150,7 +2150,7 @@ def create_templates():
                 </div>
                 
                 <div class="panel">
-                    <h2>🎲 Dice Roller</h2>
+                    <h2> Dice Roller</h2>
                     <div class="dice-grid">
                         <button class="dice-btn" onclick="roll('d4')">d4</button>
                         <button class="dice-btn" onclick="roll('d6')">d6</button>
@@ -2167,7 +2167,7 @@ def create_templates():
                 <div class="panel">
                     <h2>⚡ Quick Actions</h2>
                     <div class="quick-actions">
-                        <button class="quick-btn" onclick="quickAction('I attack')">⚔️ Attack</button>
+                        <button class="quick-btn" onclick="quickAction('I attack')"> Attack</button>
                         <button class="quick-btn" onclick="quickAction('I cast a spell')">✨ Cast Spell</button>
                         <button class="quick-btn" onclick="quickAction('I search the room')">🔍 Search</button>
                         <button class="quick-btn" onclick="quickAction('I investigate')">📖 Investigate</button>
@@ -2190,7 +2190,7 @@ def create_templates():
             <!-- Right Sidebar: Combat & Tools -->
             <div>
                 <div class="panel">
-                    <h2>⚔️ Initiative Tracker</h2>
+                    <h2> Initiative Tracker</h2>
                     <ul class="initiative-list" id="initiative-list">
                         <li style="text-align: center; color: #888; padding: 20px;">
                             No combat active
@@ -2275,7 +2275,7 @@ def create_templates():
             div.className = `message message-${type}`;
             
             let label = '';
-            if (type === 'player') label = '🎲 Player';
+            if (type === 'player') label = ' Player';
             else if (type === 'dm') label = '🎭 DM';
             else if (type === 'system') label = '📢 System';
             
@@ -2442,7 +2442,7 @@ def prompt_settings():
             margin: 0 auto;
         }
         h1 {
-            color: #ff6b6b;
+            color: #C19A6B;
             margin-bottom: 10px;
             text-align: center;
         }
@@ -2466,7 +2466,7 @@ def prompt_settings():
             margin-bottom: 30px;
         }
         h2 {
-            color: #ff6b6b;
+            color: #C19A6B;
             margin-bottom: 10px;
         }
         .phase-desc {
@@ -2502,7 +2502,7 @@ def prompt_settings():
             font-size: 14px;
         }
         .save-btn {
-            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            background: linear-gradient(135deg, #00B4D8 0%, #40c057 100%);
             color: white;
             flex: 1;
         }
@@ -2538,8 +2538,8 @@ def prompt_settings():
         }
         .success-msg {
             background: rgba(81, 207, 102, 0.2);
-            border: 2px solid #51cf66;
-            color: #51cf66;
+            border: 2px solid #00B4D8;
+            color: #00B4D8;
             padding: 12px;
             border-radius: 6px;
             margin-top: 10px;
@@ -2554,7 +2554,7 @@ def prompt_settings():
 </head>
 <body>
     <div class="container">
-        <h1>🎲 AI Prompt Templates</h1>
+        <h1> AI Prompt Templates</h1>
         <p class="subtitle">Customize how your AI Dungeon Master behaves</p>
         
         <div class="info-box">
@@ -2564,7 +2564,7 @@ def prompt_settings():
         </div>
         
         <div class="prompt-section">
-            <h2>📜 Preparation Phase Prompt</h2>
+            <h2> Preparation Phase Prompt</h2>
             <p class="phase-desc">
                 Used during quest planning and adventure setup (Phase 2: Call to Adventure)
             </p>
@@ -2577,7 +2577,7 @@ def prompt_settings():
         </div>
         
         <div class="prompt-section">
-            <h2>⚔️ Active Campaign Prompt</h2>
+            <h2> Active Campaign Prompt</h2>
             <p class="phase-desc">
                 Used during actual gameplay sessions (Phase 3: Active Campaign)
             </p>
@@ -2711,7 +2711,7 @@ if __name__ == '__main__':
         create_templates()
     
     print("\n" + "="*60)
-    print("🎲 AI Dungeon Master - Campaign System")
+    print(" AI Dungeon Master - Campaign System")
     print("="*60)
     
     if dm and dm.ollama_available:

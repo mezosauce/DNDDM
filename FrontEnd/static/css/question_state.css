@@ -22,7 +22,7 @@
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     }
     h1 {
-        color: #ff6b6b;
+        color: #C19A6B;
         text-align: center;
         margin-bottom: 30px;
         font-size: 2em;
@@ -64,18 +64,18 @@
         box-shadow: 0 8px 20px rgba(81, 207, 102, 0.3);
     }
     .choice-accept {
-        border-color: #51cf66;
+        border-color: #00B4D8;
     }
     .choice-accept:hover {
         background: rgba(81, 207, 102, 0.15);
-        border-color: #51cf66;
+        border-color: #00B4D8;
     }
     .choice-decline {
-        border-color: #ff6b6b;
+        border-color: #C19A6B;
     }
     .choice-decline:hover {
         background: rgba(255, 107, 107, 0.15);
-        border-color: #ff6b6b;
+        border-color: #C19A6B;
     }
     .choice-icon {
         font-size: 3em;

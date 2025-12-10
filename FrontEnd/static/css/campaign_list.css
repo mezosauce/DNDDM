@@ -1,18 +1,11 @@
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e1e2e 0%, #2d1b3d 100%);
-            color: #e0e0e0;
-            min-height: 100vh;
-            padding: 40px 20px;
-        }
+  
         .container {
             max-width: 1000px;
             margin: 0 auto;
         }
         h1 {
-            color: #ff6b6b;
+            color: #C19A6B;
             margin-bottom: 30px;
             text-align: center;
             font-size: 2.5em;
@@ -24,7 +17,7 @@
             margin-top: 30px;
         }
         .campaign-card {
-            background: rgba(30, 30, 46, 0.8);
+            background: #1B263B;
             border: 2px solid #4a4a6a;
             border-radius: 10px;
             padding: 20px;
@@ -33,12 +26,12 @@
         }
         .campaign-card:hover {
             transform: translateY(-5px);
-            border-color: #ff6b6b;
+            border-color: #C19A6B;
             box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
         }
         .campaign-name {
             font-size: 1.5em;
-            color: #ff6b6b;
+            color: #C19A6B;
             margin-bottom: 10px;
         }
         .campaign-info {
@@ -53,15 +46,15 @@
             font-size: 0.8em;
             margin-top: 10px;
         }
-        .phase-setup { background: #ff6b6b; }
-        .phase-adventure { background: #51cf66; }
+        .phase-setup { background: #C19A6B; }
+        .phase-adventure { background: #00B4D8; }
         .phase-active { background: #4dabf7; }
         .new-campaign-btn {
             display: block;
             width: 200px;
             margin: 0 auto 30px;
             padding: 15px;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            background: linear-gradient(135deg, #C19A6B 0%, #7B1FA2 100%);
             border: none;
             border-radius: 8px;
             color: white;

@@ -198,7 +198,7 @@ async function rollDice() {
         button.classList.remove('rolling');
         
         // Show error in narrative result
-        narrativeResult.innerHTML = `<p style="color: #ff6b6b; font-weight: 600;">⚠️ Error: ${error.message}</p>
+        narrativeResult.innerHTML = `<p style="color: #C19A6B; font-weight: 600;">⚠️ Error: ${error.message}</p>
             <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.8;">Please try refreshing the page or contact support if the issue persists.</p>`;
         narrativeResult.classList.remove('hidden');
         narrativeResult.classList.add('failure');
@@ -263,8 +263,8 @@ async function displayResult(data) {
             ${outcomeData.emoji} ${outcomeData.text}
         </p>
         ${result.success ? 
-            `<p style="font-size: 1.1em; color: #51cf66;">You rolled ${result.total} against DC ${result.target} — Success by ${result.margin}!</p>` :
-            `<p style="font-size: 1.1em; color: #ff6b6b;">You rolled ${result.total} against DC ${result.target} — Failed by ${Math.abs(result.margin)}!</p>`
+            `<p style="font-size: 1.1em; color: #00B4D8;">You rolled ${result.total} against DC ${result.target} — Success by ${result.margin}!</p>` :
+            `<p style="font-size: 1.1em; color: #C19A6B;">You rolled ${result.total} against DC ${result.target} — Failed by ${Math.abs(result.margin)}!</p>`
         }
     </div>`;
     
@@ -315,13 +315,13 @@ function getOutcomeData(outcome) {
         'success': {
             emoji: '✅',
             text: 'Success!',
-            color: '#51cf66',
+            color: '#00B4D8',
             className: 'success'
         },
         'failure': {
             emoji: '❌',
             text: 'Failure',
-            color: '#ff6b6b',
+            color: '#C19A6B',
             className: 'failure'
         },
         'critical_failure': {

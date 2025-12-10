@@ -227,7 +227,7 @@ class WarlockFeatureManager extends ClassFeatureManager {
         
         return `
             <div class="calculation-display">
-                <div class="ability-card-name">📜 Eldritch Invocations</div>
+                <div class="ability-card-name"> Eldritch Invocations</div>
                 <div class="calculation-formula">
                     Known: ${this.currentInvocations.size}/${this.invocationsKnown}
                     ${availableSlots > 0 ? ` (${availableSlots} available)` : ''}
@@ -451,7 +451,7 @@ class WarlockFeatureManager extends ClassFeatureManager {
         if (invocation) {
             this.currentInvocations.add(invocation);
             this.render();
-            this.showNotification(`📜 Learned: ${invocation}`);
+            this.showNotification(` Learned: ${invocation}`);
         }
     }
 
@@ -461,7 +461,7 @@ class WarlockFeatureManager extends ClassFeatureManager {
         const invocation = Array.from(this.currentInvocations)[0]; // Remove first one for simplicity
         this.currentInvocations.delete(invocation);
         this.render();
-        this.showNotification(`📜 Removed: ${invocation}`);
+        this.showNotification(` Removed: ${invocation}`);
     }
 
     changeFamiliar() {
@@ -479,14 +479,14 @@ class WarlockFeatureManager extends ClassFeatureManager {
         if (weapon) {
             this.pactWeapon = weapon;
             this.render();
-            this.showNotification(`⚔️ Summoned: ${weapon}`);
+            this.showNotification(` Summoned: ${weapon}`);
         }
     }
 
     dismissWeapon() {
         this.pactWeapon = '';
         this.render();
-        this.showNotification('⚔️ Pact weapon dismissed');
+        this.showNotification(' Pact weapon dismissed');
     }
 
     addTomeCantrip() {
@@ -512,7 +512,7 @@ class WarlockFeatureManager extends ClassFeatureManager {
         if (this.darkOnesLuckUsed) return false;
         this.darkOnesLuckUsed = true;
         this.render();
-        this.showNotification('🎲 Dark One\'s Own Luck: Added d10 to roll');
+        this.showNotification(' Dark One\'s Own Luck: Added d10 to roll');
         return true;
     }
 

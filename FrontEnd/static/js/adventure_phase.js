@@ -80,7 +80,7 @@
                 const data = await response.json();
                 
                 if (data.error) {
-                    optionsContainer.innerHTML = `<p style="color: #ff6b6b;">Error: ${data.error}</p>`;
+                    optionsContainer.innerHTML = `<p style="color: #C19A6B;">Error: ${data.error}</p>`;
                     return;
                 }
                 
@@ -88,7 +88,7 @@
                 displayOptions();
                 
             } catch (error) {
-                optionsContainer.innerHTML = `<p style="color: #ff6b6b;">Error: ${error.message}</p>`;
+                optionsContainer.innerHTML = `<p style="color: #C19A6B;">Error: ${error.message}</p>`;
             }
         }
         
@@ -182,15 +182,15 @@
                         <div class="step-number">✓</div>
                         <span>Quest Setup Complete!</span>
                     </div>
-                    <p style="color: #51cf66; margin-bottom: 20px;">
+                    <p style="color: #00B4D8; margin-bottom: 20px;">
                         All preparation steps are complete. You're ready to begin your adventure!
                     </p>
                 </div>
             `;
             
             optionsContainer.innerHTML = `
-                <div style="background: rgba(81, 207, 102, 0.1); padding: 20px; border-radius: 8px; border: 2px solid #51cf66;">
-                    <h3 style="color: #51cf66; margin-bottom: 15px;">📋 Quest Summary</h3>
+                <div style="background: rgba(81, 207, 102, 0.1); padding: 20px; border-radius: 8px; border: 2px solid #00B4D8;">
+                    <h3 style="color: #00B4D8; margin-bottom: 15px;">📋 Quest Summary</h3>
                     ${Object.entries(selections).map(([key, value]) => {
                         const step = steps.find(s => s.key === key);
                         return `<p style="margin: 10px 0;"><strong>${step ? step.name : key}:</strong> ${value}</p>`;
@@ -200,7 +200,7 @@
             
             buttonContainer.innerHTML = `
                 <button class="advance-btn" onclick="beginAdventure()">
-                    ⚔️ Begin Adventure (Start Session 1)
+                     Begin Adventure (Start Session 1)
                 </button>
             `;
             

@@ -26,8 +26,8 @@ class CombatLog {
         
         // Message type colors
         this.messageColors = {
-            'damage': '#ff6b6b',      // Red - damage dealt
-            'healing': '#51cf66',     // Green - healing
+            'damage': '#C19A6B',      // Red - damage dealt
+            'healing': '#00B4D8',     // Green - healing
             'buff': '#4dabf7',        // Blue - buffs/positive effects
             'debuff': '#ffa94d',      // Orange - debuffs/negative effects
             'miss': '#adb5bd',        // Gray - misses

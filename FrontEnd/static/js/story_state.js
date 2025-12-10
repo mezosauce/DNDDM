@@ -28,18 +28,18 @@ function generateNarrative() {
             
             actionButtons.innerHTML = `
                 <button class="continue-btn" onclick="advanceStory()">
-                    ${isConditional ? '🎲 Evaluate & Continue' : '→ Continue to Next Step'}
+                    ${isConditional ? ' Evaluate & Continue' : '→ Continue to Next Step'}
                 </button>
             `;
         } else {
-            narrativeBox.innerHTML = `<p style="color: #ff6b6b;">Error: ${data.error}</p>`;
+            narrativeBox.innerHTML = `<p style="color: #C19A6B;">Error: ${data.error}</p>`;
             button.disabled = false;
             button.textContent = '✨ Generate Story Content';
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        narrativeBox.innerHTML = `<p style="color: #ff6b6b;">Error generating content. Please try again.</p>`;
+        narrativeBox.innerHTML = `<p style="color: #C19A6B;">Error generating content. Please try again.</p>`;
         button.disabled = false;
         button.textContent = '✨ Generate Story Content';
     });

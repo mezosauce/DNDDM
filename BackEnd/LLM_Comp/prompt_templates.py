@@ -118,7 +118,7 @@ def create_full_prompt(phase, campaign_context, query, srd_content=""):
             prompt += f"Current Location: {campaign_context['current_location']}\n"
         
         if campaign_context.get('active_combat'):
-            prompt += "⚔️ COMBAT IS ACTIVE\n"
+            prompt += " COMBAT IS ACTIVE\n"
         
         if campaign_context.get('recent_events'):
             prompt += "\nRecent Events:\n"
@@ -149,7 +149,7 @@ if __name__ == "__main__":
     templates = PromptTemplates()
     
     print("=" * 70)
-    print("📜 AI PROMPT TEMPLATE SYSTEM")
+    print(" AI PROMPT TEMPLATE SYSTEM")
     print("=" * 70)
     print("\n✓ Created prompt templates in 'prompts/' directory:")
     print("  - prep_phase_prompt.txt")

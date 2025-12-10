@@ -28,7 +28,7 @@
             const data = await response.json();
             
             if (data.error) {
-                resultsDiv.innerHTML = `<div style="color: #ff6b6b; padding: 10px;">${data.error}</div>`;
+                resultsDiv.innerHTML = `<div style="color: #C19A6B; padding: 10px;">${data.error}</div>`;
                 return;
             }
             
@@ -36,7 +36,7 @@
             displaySRDResults(data.results);
             
         } catch (error) {
-            resultsDiv.innerHTML = `<div style="color: #ff6b6b; padding: 10px;">Error: ${error.message}</div>`;
+            resultsDiv.innerHTML = `<div style="color: #C19A6B; padding: 10px;">Error: ${error.message}</div>`;
         }
     }
     

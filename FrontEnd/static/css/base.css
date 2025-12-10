@@ -15,7 +15,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #1e1e2e 0%, #2d1b3d 100%);
+    background: #0d1B2A;
     color: #e0e0e0;
     min-height: 100vh;
     padding: 20px;
@@ -50,17 +50,17 @@ body {
    ============================================================================ */
 
 h1 {
-    color: #ff6b6b;
+    color: #C19A6B;
     margin-bottom: 10px;
 }
 
 h2 {
-    color: #ff6b6b;
+    color: #C19A6B;
     margin-bottom: 15px;
 }
 
 h3 {
-    color: #51cf66;
+    color: #00B4D8;
     margin: 15px 0 10px;
     font-size: 1.1em;
 }
@@ -88,7 +88,7 @@ h3 {
 }
 
 .card-highlight {
-    border-left: 3px solid #51cf66;
+    border-left: 3px solid #00B4D8;
 }
 
 /* ============================================================================
@@ -114,12 +114,12 @@ h3 {
 }
 
 .phase-badge.phase-setup {
-    background: #ff6b6b;
+    background: #C19A6B;
 }
 
 .phase-badge.phase-call_to_adventure,
 .phase-badge.phase-adventure {
-    background: #51cf66;
+    background: #00B4D8;
 }
 
 .phase-badge.phase-active {
@@ -148,7 +148,7 @@ input:focus,
 textarea:focus,
 select:focus {
     outline: none;
-    border-color: #ff6b6b;
+    border-color: #C19A6B;
 }
 
 textarea {
@@ -171,7 +171,7 @@ button {
     width: 100%;
     padding: 12px;
     margin-top: 10px;
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+    background: linear-gradient(135deg, #C19A6B 0%, #7B1FA2 100%);
     border: none;
     border-radius: 6px;
     color: white;
@@ -199,11 +199,11 @@ button:active {
 
 /* Button Variants */
 .btn-primary {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+    background: linear-gradient(135deg, #C19A6B 0%, #7B1FA2 100%);
 }
 
 .btn-success {
-    background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+    background: linear-gradient(135deg, #00B4D8 0%, #40c057 100%);
 }
 
 .btn-info {
@@ -279,7 +279,7 @@ button:active {
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #ff6b6b 0%, #51cf66 100%);
+    background: linear-gradient(90deg, #C19A6B 0%, #00B4D8 100%);
     transition: width 0.3s;
     display: flex;
     align-items: center;
@@ -326,12 +326,12 @@ button:active {
 
 .message-dm {
     background: rgba(255, 107, 107, 0.2);
-    border-left: 3px solid #ff6b6b;
+    border-left: 3px solid #C19A6B;
 }
 
 .message-player {
     background: rgba(81, 207, 102, 0.2);
-    border-left: 3px solid #51cf66;
+    border-left: 3px solid #00B4D8;
 }
 
 .message-system {
@@ -356,8 +356,8 @@ button:active {
 
 .success-msg {
     background: rgba(81, 207, 102, 0.2);
-    border: 2px solid #51cf66;
-    color: #51cf66;
+    border: 2px solid #00B4D8;
+    color: #00B4D8;
     padding: 12px;
     border-radius: 6px;
     margin-top: 10px;
@@ -367,8 +367,8 @@ button:active {
 
 .error-msg {
     background: rgba(255, 107, 107, 0.2);
-    border: 2px solid #ff6b6b;
-    color: #ff6b6b;
+    border: 2px solid #C19A6B;
+    color: #C19A6B;
     padding: 12px;
     border-radius: 6px;
     margin-top: 10px;
@@ -399,11 +399,11 @@ button:active {
 }
 
 .text-success {
-    color: #51cf66;
+    color: #00B4D8;
 }
 
 .text-danger {
-    color: #ff6b6b;
+    color: #C19A6B;
 }
 
 .text-warning {
@@ -518,5 +518,5 @@ button:active {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #ff6b6b;
+    background: #C19A6B;
 }

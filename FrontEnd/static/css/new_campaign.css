@@ -16,7 +16,7 @@
             padding: 40px;
         }
         h1 {
-            color: #ff6b6b;
+            color: #C19A6B;
             margin-bottom: 30px;
             text-align: center;
         }
@@ -55,17 +55,17 @@
             transition: all 0.3s;
         }
         .party-btn:hover {
-            border-color: #ff6b6b;
+            border-color: #C19A6B;
         }
         .party-btn.selected {
-            background: #ff6b6b;
-            border-color: #ff6b6b;
+            background: #C19A6B;
+            border-color: #C19A6B;
         }
         button {
             width: 100%;
             padding: 15px;
             margin-top: 30px;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            background: linear-gradient(135deg, #C19A6B 0%, #7B1FA2 100%);
             border: none;
             border-radius: 8px;
             color: white;

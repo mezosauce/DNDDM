@@ -124,7 +124,7 @@
         
         .error-details {
             background: rgba(255, 107, 107, 0.1);
-            border: 1px solid #ff6b6b;
+            border: 1px solid #C19A6B;
             border-radius: 6px;
             padding: 10px;
             margin-top: 10px;
@@ -133,7 +133,7 @@
         }
         
         .session-start-banner {
-            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            background: linear-gradient(135deg, #00B4D8 0%, #40c057 100%);
             color: white;
             padding: 20px;
             border-radius: 10px;
@@ -226,7 +226,7 @@
 
     .srd-result-title {
         font-weight: bold;
-        color: #51cf66;
+        color: #00B4D8;
         font-size: 0.95em;
         margin-bottom: 4px;
     }
@@ -279,7 +279,7 @@
 }
 
 .search-toggle:hover {
-    color: #51cf66;
+    color: #00B4D8;
 }
 
 .search-content {
@@ -317,9 +317,9 @@
     padding: 6px 12px;
     font-size: 0.85em;
     background: rgba(81, 207, 102, 0.2);
-    border: 1px solid #51cf66;
+    border: 1px solid #00B4D8;
     border-radius: 4px;
-    color: #51cf66;
+    color: #00B4D8;
     cursor: pointer;
     transition: all 0.2s;
     width: auto;
@@ -345,13 +345,13 @@
     padding: 15px;
     border-radius: 8px;
     margin-bottom: 12px;
-    border-left: 3px solid #51cf66;
+    border-left: 3px solid #00B4D8;
 }
 
 .char-name {
     font-size: 1.2em;
     font-weight: bold;
-    color: #51cf66;
+    color: #00B4D8;
     margin-bottom: 8px;
 }
 
@@ -375,7 +375,7 @@
 
 .hp-fill {
     height: 100%;
-    background: linear-gradient(90deg, #ff6b6b 0%, #51cf66 100%);
+    background: linear-gradient(90deg, #C19A6B 0%, #00B4D8 100%);
     transition: width 0.3s;
 }
 
@@ -408,7 +408,7 @@
 }
 
 .initiative-item.active {
-    border-left-color: #51cf66;
+    border-left-color: #00B4D8;
     background: rgba(81, 207, 102, 0.2);
 }
 
@@ -450,14 +450,14 @@
 
 #dice-result.natural-20 {
     background: rgba(81, 207, 102, 0.3);
-    border: 2px solid #51cf66;
-    color: #51cf66;
+    border: 2px solid #00B4D8;
+    color: #00B4D8;
 }
 
 #dice-result.natural-1 {
     background: rgba(255, 107, 107, 0.3);
-    border: 2px solid #ff6b6b;
-    color: #ff6b6b;
+    border: 2px solid #C19A6B;
+    color: #C19A6B;
 }
 
 /* Quick Actions */
@@ -495,7 +495,7 @@
 
 /* SRD Result Active State */
 .srd-result.active {
-    border-left-color: #51cf66;
+    border-left-color: #00B4D8;
     background: rgba(81, 207, 102, 0.1);
 }
 
@@ -554,7 +554,7 @@
 }
 
 #srd-modal-title {
-    color: #51cf66;
+    color: #00B4D8;
     margin: 0 0 10px 0;
     font-size: 1.8em;
 }
@@ -617,7 +617,7 @@
     background: rgba(0, 0, 0, 0.5);
     padding: 2px 6px;
     border-radius: 3px;
-    color: #51cf66;
+    color: #00B4D8;
     font-family: 'Courier New', monospace;
     font-size: 0.9em;
 }
@@ -668,7 +668,7 @@
 }
 
 .srd-content-viewer strong {
-    color: #51cf66;
+    color: #00B4D8;
 }
 
 .srd-content-viewer em {

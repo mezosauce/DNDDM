@@ -155,7 +155,7 @@ class RollResult:
     
     def get_roll_breakdown(self) -> str:
         """Get detailed breakdown of the roll"""
-        breakdown = f"🎲 **Roll Breakdown:**\n"
+        breakdown = f" **Roll Breakdown:**\n"
         breakdown += f"  • Dice: {self.dice_type.name}\n"
         
         if len(self.raw_rolls) > 1:
@@ -479,7 +479,7 @@ class DiceRollState:
         if roll.player_stats:
             preview_mod = roll.player_stats.get_total_modifier(roll.relevant_stat, roll.skill)
         
-        prompt = f"🎲 **Roll Required:** {roll.situation}\n"
+        prompt = f" **Roll Required:** {roll.situation}\n"
         prompt += f"  • Dice: {roll.dice_type.name}\n"
         prompt += f"  • Target: {roll.target_number}\n"
         prompt += f"  • Stat: {roll.relevant_stat.capitalize()}"
@@ -758,7 +758,7 @@ if __name__ == "__main__":
     dice_state = DiceRollState(player_stats=player_stats)
     
     # Test 1: Detect roll requests
-    print("\n🎲 TEST 1: Roll Detection")
+    print("\n TEST 1: Roll Detection")
     print("-" * 70)
     
     test_dm_responses = [
@@ -775,7 +775,7 @@ if __name__ == "__main__":
         print(f"Roll Detected: {detected}")
     
     # Test 2: Parse roll parameters
-    print("\n\n🎲 TEST 2: Parse Roll Parameters")
+    print("\n\n TEST 2: Parse Roll Parameters")
     print("-" * 70)
     
     dm_response = "You try to sneak past the guards. Roll Stealth, DC 18."
@@ -787,7 +787,7 @@ if __name__ == "__main__":
         print(f"  {key}: {value}")
     
     # Test 3: Activate roll
-    print("\n\n🎲 TEST 3: Activate Roll")
+    print("\n\n TEST 3: Activate Roll")
     print("-" * 70)
     
     roll_ctx = dice_state.activate_roll(
@@ -811,7 +811,7 @@ if __name__ == "__main__":
     print(f"\n{dice_state.get_roll_prompt()}")
     
     # Test 4: Execute roll
-    print("\n\n🎲 TEST 4: Execute Roll")
+    print("\n\n TEST 4: Execute Roll")
     print("-" * 70)
     
     print("\nExecuting roll...")
@@ -822,7 +822,7 @@ if __name__ == "__main__":
     print(f"\n{dice_state.format_result_for_dm(result)}")
     
     # Test 5: Multiple rolls with different outcomes
-    print("\n\n🎲 TEST 5: Multiple Rolls")
+    print("\n\n TEST 5: Multiple Rolls")
     print("-" * 70)
     
     test_scenarios = [
@@ -858,7 +858,7 @@ if __name__ == "__main__":
         print(result.get_narrative_result())
     
     # Test 6: Advantage/Disadvantage
-    print("\n\n🎲 TEST 6: Advantage & Disadvantage")
+    print("\n\n TEST 6: Advantage & Disadvantage")
     print("-" * 70)
     
     print("\nRolling with ADVANTAGE:")
@@ -882,7 +882,7 @@ if __name__ == "__main__":
     print(result_dis.get_roll_breakdown())
     
     # Test 7: Integration helper
-    print("\n\n🎲 TEST 7: Integration Helper")
+    print("\n\n TEST 7: Integration Helper")
     print("-" * 70)
     
     dice_state2 = DiceRollState(player_stats)
@@ -899,7 +899,7 @@ if __name__ == "__main__":
         print("\n" + message)
     
     # Test 8: Statistics
-    print("\n\n🎲 TEST 8: Statistics")
+    print("\n\n TEST 8: Statistics")
     print("-" * 70)
     
     stats = dice_state.get_statistics()
@@ -911,7 +911,7 @@ if __name__ == "__main__":
             print(f"  {key}: {value}")
     
     # Test 9: Serialization
-    print("\n\n🎲 TEST 9: Serialization")
+    print("\n\n TEST 9: Serialization")
     print("-" * 70)
     
     dice_dict = dice_state.to_dict()
