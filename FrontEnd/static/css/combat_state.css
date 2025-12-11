@@ -51,14 +51,9 @@
     gap: 10px;
 }
 
-.Combat-Left {
-    display: grid;
-    
-}
+
 .View-Container {
-    display: grid;
-    grid-template-columns: 3fr 1fr;
-    gap: 15px;
+    
     height: calc(100vh - 90px); 
 }
 
@@ -124,7 +119,7 @@
 
 #combat-main {
     display: grid;
-    grid-template-columns: 1fr 400px 1fr ;
+    grid-template-columns: 1fr 400px 1fr 300px;
     gap: 15px;
 }
 
